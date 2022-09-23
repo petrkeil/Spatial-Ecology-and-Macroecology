@@ -1,0 +1,686 @@
+---
+title: 'Spatial Ecology and Macroecology'
+subtitle: 'Practical - Week 1'
+date: 2022-09-26
+author: 'Florencia Grattarola'
+institute: '(Department of Spatial Sciences)'
+format: 
+  revealjs:
+    logo: '../img/Logo_czu_cz_hr.png'
+    auto-stretch: false
+    code-copy: true
+    code-tools: true
+    enter-title-slide: false
+    theme: [assets/monash.scss]
+    controls: true
+    width: 1280
+    height: 720
+    css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
+    highlight-style: github
+editor: visual
+---
+
+## What are we going to see today?
+
+::: incremental
+1.  Data types
+2.  Data sources
+3.  Open data
+    -   Data standards
+    -   Licensing
+    -   Data sharing
+4.  Data download through R
+5.  Data quality
+:::
+
+# Data types {background-color="#5F9747"}
+
+## 1. Data types
+
+Species distributions
+
+. . .
+
+::: incremental
+-   **Occurrence records**
+-   **Sampling events**
+-   **Checklists**
+-   **Range maps**
+-   **Atlases**
+:::
+
+## 1. Data types
+
+::: incremental
+-   **Disaggregated**: precision is high, but completeness and representativeness is low. *For example*: point occurrences and plot data.\
+-   **Aggregated**: precision is low, but completeness and representativeness is high. *For example*: expert range maps and regional checklists.\
+:::
+
+<br> 
+
+. . .
+
+While **disaggregated** data can produce reliable results for a limited set of well-covered regions, **aggregated** data types can provide critical information for the extrapolation of biodiversity patterns into less well-sampled regions.
+
+## 1. Data types
+
+::: incremental
+-   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.\
+-   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.\
+-   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.\
+:::
+
+<br>
+
+. . .
+
+It's crucial we know **how** the data were collected because this will define how we can use the data.
+
+# 2. Data sources {background-color="#5F9747"}
+
+------------------------------------------------------------------------
+
+![](/img/gbif-full-logo-green.png){.centre top="200" height="200"}
+
+### [gbif.org](https://www.gbif.org)
+
+**GBIF** is an international network and data infrastructure funded by the world's governments and aimed at providing anyone, anywhere, open access to data about all types of life on Earth.
+
+![](https://github.com/ropensci/rgbif/raw/master/man/figures/logo.png){height="100"} `rgbif`: <https://github.com/ropensci/rgbif>
+
+------------------------------------------------------------------------
+
+![](/img/obis-logo.png){.centre top="200" height="200"}
+
+### [obis.org](https://obis.org)
+
+**OBIS** is a global open-access data and information clearing-house on marine biodiversity for science, conservation and sustainable development.
+
+![](https://github.com/iobis/robis/raw/master/man/figures/logo.png){height="100"} `robis`: <https://github.com/iobis/robis>
+
+------------------------------------------------------------------------
+
+![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+
+### [ebird.org](https://ebird.org/home)
+
+**eBird**'s goal is to gather birdwatcher's knowledge and experience in the form of checklists of birds, archive it, and freely share it to power new data-driven approaches to science, conservation and education.
+
+![](https://cornelllabofornithology.github.io/auk/logo.png){height="100"} `auk`: <https://cornelllabofornithology.github.io/auk/>
+
+------------------------------------------------------------------------
+
+![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+
+### [ebird.org](https://ebird.org/home)
+
+**eBird**'s goal is to gather birdwatcher's knowledge and experience in the form of checklists of birds, archive it, and freely share it to power new data-driven approaches to science, conservation and education.
+
+![](https://docs.ropensci.org/rebird/logo.png){height="100"}\
+`rebird`: [https://github.com/ropensci/rebird](https://github.com/ropensci/rebird/)
+
+------------------------------------------------------------------------
+
+![](/img/iNaturalist-Wordmark.png){.centre top="200" height="100"}
+
+### [inaturalist.org](https://www.inaturalist.org)
+
+**iNaturalist** is one of the world's most popular nature apps. It allows participants to contribute observations of any organism, or traces thereof, along with associated spatio-temporal metadata.
+
+![](https://docs.ropensci.org/rebird/logo.png){height="100"} `rinat`: <https://github.com/ropensci/rinat>
+
+------------------------------------------------------------------------
+
+![](https://mol.org/static/img/logo.png){.centre top="200" height="100"}
+
+### [mol.org](https://mol.org)
+
+**Map of Life** endeavors to provide 'best-possible' species range information and species lists for any geographic area. The Map of Life assembles and integrates different sources of data describing species distributions worldwide.
+
+------------------------------------------------------------------------
+
+![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+
+### [iucnredlist.org](https://www.iucnredlist.org)
+
+**IUCN**'s (International Union for Conservation of Nature) Red List of Threatened Species has evolved to become the world's most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
+
+![](https://docs.ropensci.org/rebird/logo.png){height="100"} `rredlist`: <https://github.com/ropensci/rredlist>
+
+------------------------------------------------------------------------
+
+![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+
+### [iucnredlist.org](https://www.iucnredlist.org)
+
+**IUCN**'s (International Union for Conservation of Nature) Red List of Threatened Species has evolved to become the world's most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
+
+![](https://avatars.githubusercontent.com/u/29559340?s=200&v=4){height="100"} `redlistr`: <https://github.com/ropensci/rredlist>
+
+------------------------------------------------------------------------
+
+![](https://bien.nceas.ucsb.edu/bien/wp-content/uploads/2021/01/FinalBIENLogoNoText_highres-768x303.png){.centre top="200" width="352"}
+
+### [bien.nceas.ucsb.edu/bien/](https://bien.nceas.ucsb.edu/bien/)
+
+**BIEN** is a network of ecologists, botanists, and computer scientists working together to document global patterns of plant diversity, function and distribution.
+
+`rbien`: <https://github.com/bmaitner/RBIEN>
+
+------------------------------------------------------------------------
+
+![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
+
+### [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
+
+**BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites.
+
+------------------------------------------------------------------------
+
+![](https://sibbr.gov.br/img/logo.svg){.centre top="200" height="200"}
+
+### [sibbr.gov.br](https://sibbr.gov.br/?lang=en_GB)
+
+**SiBBr** (Brazilian Biodiversity Information System) is an online platform that integrates data and information about biodiversity and ecosystems from different sources, making them accessible for different uses.
+
+![](https://avatars.githubusercontent.com/u/4728758?s=200&v=4){height="100"} **sibbr**: <https://github.com/sibbr>
+
+------------------------------------------------------------------------
+
+![](https://www.ala.org.au/app/uploads/2020/06/ALA_Logo_Stacked_RGB.png){.centre top="200" height="200"}
+
+### [ala.org.au](https://www.ala.org.au)
+
+**ALA** (Atlas of Living Australia) is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
+
+![](https://galah.ala.org.au/reference/figures/logo.png){height="100"} `galah`: <https://galah.ala.org.au>
+
+------------------------------------------------------------------------
+
+![](https://living-atlases.gbif.org/assets/img/header/la-logo-header4.svg){.centre top="200" height="200"}
+
+### [living-atlases.gbif.org](https://living-atlases.gbif.org)
+
+The open community around the Atlas of Living Australia platform.
+
+------------------------------------------------------------------------
+
+![](http://biotime.st-andrews.ac.uk/images/logo.png){.centre top="200" height="200"}
+
+### [biotime.st-andrews.ac.uk](https://biotime.st-andrews.ac.uk)
+
+BioTime is an open access database global database of assemblage time series for quantifying and understanding biodiversity change.
+
+![](https://avatars.githubusercontent.com/u/29038235?s=200&v=4){height="100"} **BioTime Hub**: <https://github.com/bioTIMEHub>
+
+::: aside
+[Dornelas et al. (2018)](https://doi.org/10.1111/geb.12729)
+:::
+
+------------------------------------------------------------------------
+
+![](https://www.predicts.org.uk/images/predicts120.png){.centre top="200" height="200"}
+
+### [nhm.ac.uk/our-science/our-work/biodiversity/predicts](https://www.nhm.ac.uk/our-science/our-work/biodiversity/predicts.html)
+
+**PREDICTS** uses data on local biodiversity around the world to model how human activities affect biological communities. This biodiversity change is shown as the Biodiversity Intactness Index (BII).
+
+::: aside
+[Hudson et al. (2014)](https://doi.org/10.1002/ece3.1303)
+:::
+
+# [EXCERSICE]{.story} [Explore different data sources and find out..]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## Explore different data sources and find out:
+
+-   What **type of data** they collate?
+-   Which **taxa** do they cover?
+-   What types of data **formats** are available?
+-   Can everyone download the data? Are there any **restrictions**?
+-   Which type of *licences* do their data have?
+
+Pick only **one** data source.
+
+::: aside
+Should take around **10 minutes** :)
+:::
+
+# 3. Open Data {background-color="#5F9747"}
+
+## 3. Open Data
+
+**Open** means anyone can freely access, use, modify, and share for any purpose (subject, at most, to requirements that preserve provenance and openness).
+
+![](http://opendefinition.org/assets.okfn.org/images/ok_buttons/od_80x15_blue.png){.centre top="200" height="50"}
+
+------------------------------------------------------------------------
+
+## 3. Open Data: Data standards
+
+**Darwin Core** is the internationally agreed data standard to facilitate the sharing of information about biological diversity.
+
+### [dwc.tdwg.org](https://dwc.tdwg.org/terms/)
+
+<br> ![](https://www.tdwg.org/static/pages/about/logos/tdwg_logo.png){.centre top="200" height="200"}
+
+------------------------------------------------------------------------
+
+## 3. Open Data: Licensing
+
+Open data are licensed under open licenses.
+
+. . .
+
+Some examples:
+
+::: incremental
+-   CC0: Public domain
+-   CC-BY: Attribution
+-   CC-BY-NC: Attribution - Non Commercial
+-   CC-BY-SA: Attribution - Share Alike
+:::
+
+------------------------------------------------------------------------
+
+## 3. Open Data: Data sharing
+
+Data that are standardized and have an open licence can be shared :)
+
+![](https://upload.wikimedia.org/wikipedia/commons/6/65/To_deposit_or_not_to_deposit%2C_that_is_the_question_-_journal.pbio.1001779.g001.png){.absolute bottom="50" left="100" width="544" height="418"}
+
+# [PRACTICE]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+As an example we will use the mammals of Czech Republic We will access data through [**GBIF**](https://gbif.org)
+
+## Some preparation before starting to code
+
+. . .
+
+-   Create a new project for all your practical sessions.
+
+[File]{.font-big} \> [New project]{.font-big} \> [New directory]{.font-big} or [Existing directory]{.font-big}
+
+. . .
+
+-   Install the package `tidyverse`.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-block-border-left: true
+install.packages('tidyverse') # install
+```
+
+```{r}
+#| echo: true
+#| eval: true
+library(tidyverse) # load
+```
+
+. . .
+
+<br> We will be using many functions from this package, like `read_csv()`, `filter()`, `mutate()`.
+
+------------------------------------------------------------------------
+
+## Data download through R
+
+We will use **`rgbif`**.
+
+. . .
+
+First, we'll need to **install** the package.
+
+```{r}
+#| echo: true
+#| eval: false
+install.packages('rgbif')
+```
+
+. . .
+
+To use it, we **load** the library and check it's working.
+
+```{r}
+#| echo: true
+#| eval: true
+library(rgbif)
+packageVersion('rgbif')
+```
+
+. . .
+
+We will need the GBIF backbone taxon ID (`taxonKey`) for the *Mammalia* class. For that we will use another package called **`taxize`**.
+
+```{r}
+#| echo: true
+#| eval: false
+install.packages('taxize')
+```
+
+```{r}
+#| echo: true
+#| eval: true
+library(taxize)
+packageVersion('taxize')
+```
+
+## 4. Data download through R
+
+So, let's get the taxon ID for the *Mammalia* class
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+get_gbifid_('Mammalia') 
+```
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+So, let's get the taxon ID for the *Mammalia* class
+
+```{r}
+#| echo: true
+#| eval: true
+mammaliaTaxonKey <- get_gbifid_('Mammalia') %>% bind_rows() %>% 
+    filter(matchtype == 'EXACT' & status == 'ACCEPTED') %>%
+    pull(usagekey)
+
+```
+
+. . .
+
+![](https://github.com/allisonhorst/stats-illustrations/raw/main/rstats-artwork/dplyr_filter.jpg){.absolute bottom="50" left="100" width="682" height="377"}
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+And now we can use the function `occ_count()` to find out the number of occurrence records for the entire Czech Republic.
+
+. . .
+
+``` r
+occ_count(
+  taxonKey = NULL,
+  georeferenced = NULL,
+  basisOfRecord = NULL,
+  datasetKey = NULL,
+  date = NULL,
+  typeStatus = NULL,
+  country = NULL,
+  year = NULL,
+  from = 2000,
+  to = 2012,
+  type = "count",
+  publishingCountry = "US",
+  protocol = NULL,
+  curlopts = list()
+)
+```
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+How many occurrence records are in GBIF for the entire Czech Republic?
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+occ_count(country='CZ') # country code for Czech Republic (https://countrycode.org/)
+```
+
+. . .
+
+<br> And how many records for the mammals of Czech Republic?
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+occ_count(country='CZ', 
+          taxonKey=mammaliaTaxonKey) 
+```
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+We are ready to do a download. [Whoop!]{.font-big}\
+To do this, we will use `occ_search()`.
+
+. . .
+
+``` r
+occ_search(
+  taxonKey = NULL,
+  scientificName = NULL,
+  country = NULL,
+  publishingCountry = NULL,
+  hasCoordinate = NULL,
+  typeStatus = NULL,
+  recordNumber = NULL,
+  lastInterpreted = NULL,
+  continent = NULL,
+  geometry = NULL,
+  geom_big = "asis",
+  geom_size = 40,
+  geom_n = 10,
+  recordedBy = NULL,
+  recordedByID = NULL,
+  identifiedByID = NULL,
+  basisOfRecord = NULL,
+  datasetKey = NULL,
+  eventDate = NULL,
+  catalogNumber = NULL,
+  year = NULL,
+  month = NULL,
+  decimalLatitude = NULL,
+  decimalLongitude = NULL,
+  elevation = NULL,
+  depth = NULL,
+  institutionCode = NULL,
+  collectionCode = NULL,
+  hasGeospatialIssue = NULL,
+  issue = NULL,
+  search = NULL,
+  mediaType = NULL,
+  subgenusKey = NULL,
+  repatriated = NULL,
+  phylumKey = NULL,
+  kingdomKey = NULL,
+  classKey = NULL,
+  orderKey = NULL,
+  familyKey = NULL,
+  genusKey = NULL,
+  establishmentMeans = NULL,
+  protocol = NULL,
+  license = NULL,
+  organismId = NULL,
+  publishingOrg = NULL,
+  stateProvince = NULL,
+  waterBody = NULL,
+  locality = NULL,
+  limit = 500,
+  start = 0,
+  fields = "all",
+  return = NULL,
+  facet = NULL,
+  facetMincount = NULL,
+  facetMultiselect = NULL,
+  skip_validate = TRUE,
+  curlopts = list(),
+  ...
+)
+```
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+We are ready to do a download. [Whoop!]{.font-big}\
+To do this, we will use `occ_search()`.
+
+```{r}
+#| echo: true
+#| eval: true
+occ_search(taxonKey=mammaliaTaxonKey,
+           country='CZ') 
+```
+
+::: callout-tip
+## Tip
+
+Check the data output. What's the format? Can I filter those How many rows does it have?
+:::
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+We are ready to do a download. [Whoop!]{.font-big}\
+To do this, we will use `occ_search()`.
+
+```{r}
+#| echo: true
+#| eval: false
+occ_search(taxonKey=mammaliaTaxonKey,
+           country='CZ',
+            limit=6000) 
+```
+
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+Finally, we store the result in the object `mammalsCZ`.
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ <- occ_search(taxonKey=mammaliaTaxonKey,
+           country='CZ',
+           limit=6000) 
+
+mammalsCZ <- mammalsCZ$data
+```
+
+. . .
+
+How many records do we have?
+
+```{r}
+#| echo: true
+#| eval: true
+nrow(mammalsCZ)
+```
+
+# 5. Data quality {background-color="#5F9747"}
+
+## 5. Data quality
+
+Data are not 'good' or 'bad', the quality will depend on the purpose.
+
+::: incremental
+-   Data standards
+-   Taxonomic backbone and taxon names' harmonisation
+-   Spatial and temporal accuracy / precision
+:::
+
+. . .
+
+![](https://docs.ropensci.org/CoordinateCleaner/logo.png){height="100"} `CoordinateCleaner`: <https://github.com/ropensci/CoordinateCleaner>
+
+Automated flagging of common spatial and temporal errors in biological and palaeontological collection data.
+
+------------------------------------------------------------------------
+
+## 5. Data quality
+
+We will check the following fields as an example:
+
+-   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% 
+  filter(coordinateUncertaintyInMeters > 1000) %>% 
+  select(scientificName, coordinateUncertaintyInMeters, stateProvince)
+
+mammalsCZ <- mammalsCZ %>% 
+  filter(coordinateUncertaintyInMeters < 1000) # keeping this
+```
+
+------------------------------------------------------------------------
+
+## 5. Data quality
+
+We will check the following fields as an example:
+
+-   `taxonRank`: we want species
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% distinct(taxonRank)
+
+mammalsCZ <- mammalsCZ %>% 
+  filter(taxonRank == 'species')
+```
+
+------------------------------------------------------------------------
+
+## 5. Data quality
+
+We will check the following fields as an example:
+
+-   `basisOfRecord`: we want preserved specimens or observations
+
+```{r}
+#| echo: true
+#| eval: true
+
+mammalsCZ %>% distinct(basisOfRecord)
+mammalsCZ %>% group_by(basisOfRecord) %>% count()
+
+mammalsCZ %>% filter(basisOfRecord=='PRESERVED_SPECIMEN' & 
+                       basisOfRecord=='HUMAN_OBSERVATION')
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| echo: false
+#| eval: true
+library(sf)
+
+mammalsCZ_sf <- mammalsCZ  %>% 
+  filter(!is.na(decimalLongitude) & !is.na(decimalLatitude)) %>% 
+    st_as_sf(coords=c('decimalLongitude', 'decimalLatitude')) %>% 
+    st_set_crs(4326)
+
+Czechia <- rnaturalearth::ne_countries(scale = 110, 
+                                       type = "countries", 
+                                       country = 'czechia', 
+                                       returnclass ="sf")
+
+ggplot() +
+    geom_sf(data=Czechia, fill='white') + 
+    geom_sf(data=sf::st_intersection(mammalsCZ_sf, Czechia), aes(col=species), show.legend = F) +
+    theme_bw()
+```
+
+------------------------------------------------------------------------
+
+![](https://github.com/allisonhorst/stats-illustrations/raw/main/other-stats-artwork/debugging.jpg){.r-stretch}
