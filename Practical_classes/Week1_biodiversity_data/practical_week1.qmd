@@ -6,7 +6,7 @@ author: 'Florencia Grattarola'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
-    self-contained: false
+    self-contained: true
     logo: 'img/Logo_czu_cz_hr.png'
     auto-stretch: false
     code-copy: true
