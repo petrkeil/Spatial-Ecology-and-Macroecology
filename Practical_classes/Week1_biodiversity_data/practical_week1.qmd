@@ -95,7 +95,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 
 ## 1. Data types
 
-Data can also be defined as **how** it was collected.
+Data can also be defined as **how** they were collected.
 
 ---
 
@@ -131,7 +131,7 @@ Data can also be defined as **how** it was collected.
 
 ## 1. Data types
 
-Finally, data can also be defined as how it is **made available** for others.
+Finally, data can also be defined as how they are **made available** for others.
 
 ---
 
