@@ -6,7 +6,8 @@ author: 'Florencia Grattarola'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
-    logo: '../img/Logo_czu_cz_hr.png'
+    self-contained: false
+    logo: 'img/Logo_czu_cz_hr.png'
     auto-stretch: false
     code-copy: true
     code-tools: true
@@ -47,7 +48,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 ::: {layout-ncol=2}
 -   **Occurrence records**: primary data -- specimens from an herbarium or citizen-science observations.
 
-![](/img/occurrence-records.png)
+![](img/occurrence-records.png)
 :::
 
 --- 
@@ -57,7 +58,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 ::: {layout-ncol=2}
 -   **Sampling events**: effort is recorded -- tracks, quadrats, camera traps, DNA sampling.
 
-![](/img/sampling-events.png)
+![](img/sampling-events.png)
 :::
 
 --- 
@@ -67,7 +68,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 ::: {layout-ncol=2}
 -   **Checklists**: list of taxa -- species associated to a location.
 
-![](/img/checklists.png)
+![](img/checklists.png)
 :::
 
 --- 
@@ -77,7 +78,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 ::: {layout-ncol=2}
 -   **Range-maps**: expert-based -- maps from field guides.
 
-![](/img/range-map.png)
+![](img/range-map.png)
 :::
 
 --- 
@@ -87,7 +88,7 @@ Data that can place a particular **species** in a particular **place** and **tim
 ::: {layout-ncol=2}
 -   **Atlases**: info on distribution, abundance, long-term change -- birds from the Czech Republic.
 
-![](/img/atlas.png)
+![](img/atlas.png)
 :::
 
 ---
@@ -103,7 +104,7 @@ Data can also be defined as **how** it was collected.
 ::: {layout-ncol=2}
 -   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.
 
-![](/img/structured.png)
+![](img/structured.png)
 :::
 
 --- 
@@ -113,7 +114,7 @@ Data can also be defined as **how** it was collected.
 ::: {layout-ncol=2}
 -   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.  
 
-![](/img/semi-structured.png)
+![](img/semi-structured.png)
 :::
 
 --- 
@@ -123,7 +124,7 @@ Data can also be defined as **how** it was collected.
 ::: {layout-ncol=2}
 -   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.  
 
-![](/img/unstructured.png)
+![](img/unstructured.png)
 :::
 
 ---
@@ -139,9 +140,9 @@ Finally, data can also be defined as how it is **made available** for others.
 ::: {layout-ncol=3}
 -   **Disaggregated**: precision is high, but completeness and representativeness is low.  
 
-![](/img/occurrence-records.png)
+![](img/occurrence-records.png)
 
-![](/img/sampling-events.png)
+![](img/sampling-events.png)
 :::
 
 ---
@@ -151,9 +152,9 @@ Finally, data can also be defined as how it is **made available** for others.
 ::: {layout-ncol=3}
 -   **Aggregated**: precision is low, but completeness and representativeness is high. 
 
-![](/img/range-map.png)
+![](img/range-map.png)
 
-![](/img/checklists.png)
+![](img/checklists.png)
 :::
 
 . . .
@@ -165,7 +166,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/gbif-full-logo-green.png){.centre top="200" height="200"}
+![](img/gbif-full-logo-green.png){.centre top="200" height="200"}
 
 ### [gbif.org](https://www.gbif.org)
 
@@ -175,7 +176,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/obis-logo.png){.centre top="200" height="200"}
+![](img/obis-logo.png){.centre top="200" height="200"}
 
 ### [obis.org](https://obis.org)
 
@@ -185,7 +186,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+![](img/logo-ebird-1200.png){.centre top="200" height="200"}
 
 ### [ebird.org](https://ebird.org/home)
 
@@ -195,7 +196,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+![](img/logo-ebird-1200.png){.centre top="200" height="200"}
 
 ### [ebird.org](https://ebird.org/home)
 
@@ -206,7 +207,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/iNaturalist-Wordmark.png){.centre top="200" height="100"}
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/INaturalist_text_logo.svg/1280px-INaturalist_text_logo.svg.png){.centre top="200" height="100"}
 
 ### [inaturalist.org](https://www.inaturalist.org)
 
@@ -224,7 +225,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
 
@@ -234,7 +235,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
 
