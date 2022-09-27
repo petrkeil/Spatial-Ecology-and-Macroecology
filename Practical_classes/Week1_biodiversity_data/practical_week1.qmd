@@ -6,7 +6,8 @@ author: 'Florencia Grattarola'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
-    logo: '../img/Logo_czu_cz_hr.png'
+    self-contained: true
+    logo: 'img/Logo_czu_cz_hr.png'
     auto-stretch: false
     code-copy: true
     code-tools: true
@@ -17,6 +18,7 @@ format:
     height: 720
     css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
     highlight-style: github
+    #preview-links: true
 editor: visual
 ---
 
@@ -37,50 +39,134 @@ editor: visual
 
 ## 1. Data types
 
-Species distributions
+Data that can place a particular **species** in a particular **place** and **time** can take many forms.
 
-. . .
-
-::: incremental
--   **Occurrence records**
--   **Sampling events**
--   **Checklists**
--   **Range maps**
--   **Atlases**
-:::
+---
 
 ## 1. Data types
 
-::: incremental
--   **Disaggregated**: precision is high, but completeness and representativeness is low. *For example*: point occurrences and plot data.\
--   **Aggregated**: precision is low, but completeness and representativeness is high. *For example*: expert range maps and regional checklists.\
+::: {layout-ncol=2}
+-   **Occurrence records**: primary data -- specimens from an herbarium or citizen-science observations.
+
+![](img/occurrence-records.png)
 :::
 
-<br> 
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Sampling events**: effort is recorded -- tracks, quadrats, camera traps, DNA sampling.
+
+![](img/sampling-events.png)
+:::
+
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Checklists**: list of taxa -- species associated to a location.
+
+![](img/checklists.png)
+:::
+
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Range-maps**: expert-based -- maps from field guides.
+
+![](img/range-map.png)
+:::
+
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Atlases**: info on distribution, abundance, long-term change -- birds from the Czech Republic.
+
+![](img/atlas.png)
+:::
+
+---
+
+## 1. Data types
+
+Data can also be defined as **how** they were collected.
+
+---
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.
+
+![](img/structured.png)
+:::
+
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.  
+
+![](img/semi-structured.png)
+:::
+
+--- 
+
+## 1. Data types
+
+::: {layout-ncol=2}
+-   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.  
+
+![](img/unstructured.png)
+:::
+
+---
+
+## 1. Data types
+
+Finally, data can also be defined as how they are **made available** for others.
+
+---
+
+## 1. Data types
+
+::: {layout-ncol=3}
+-   **Disaggregated**: precision is high, but completeness and representativeness is low.  
+
+![](img/occurrence-records.png)
+
+![](img/sampling-events.png)
+:::
+
+---
+
+## 1. Data types
+
+::: {layout-ncol=3}
+-   **Aggregated**: precision is low, but completeness and representativeness is high. 
+
+![](img/range-map.png)
+
+![](img/checklists.png)
+:::
 
 . . .
 
 While **disaggregated** data can produce reliable results for a limited set of well-covered regions, **aggregated** data types can provide critical information for the extrapolation of biodiversity patterns into less well-sampled regions.
 
-## 1. Data types
-
-::: incremental
--   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.\
--   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.\
--   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.\
-:::
-
-<br>
-
-. . .
-
-It's crucial we know **how** the data were collected because this will define how we can use the data.
 
 # 2. Data sources {background-color="#5F9747"}
 
 ------------------------------------------------------------------------
 
-![](/img/gbif-full-logo-green.png){.centre top="200" height="200"}
+![](img/gbif-full-logo-green.png){.centre top="200" height="200"}
 
 ### [gbif.org](https://www.gbif.org)
 
@@ -90,7 +176,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/obis-logo.png){.centre top="200" height="200"}
+![](img/obis-logo.png){.centre top="200" height="200"}
 
 ### [obis.org](https://obis.org)
 
@@ -100,7 +186,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+![](img/logo-ebird-1200.png){.centre top="200" height="200"}
 
 ### [ebird.org](https://ebird.org/home)
 
@@ -110,7 +196,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/logo-ebird-1200.png){.centre top="200" height="200"}
+![](img/logo-ebird-1200.png){.centre top="200" height="200"}
 
 ### [ebird.org](https://ebird.org/home)
 
@@ -121,7 +207,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/iNaturalist-Wordmark.png){.centre top="200" height="100"}
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/INaturalist_text_logo.svg/1280px-INaturalist_text_logo.svg.png){.centre top="200" height="100"}
 
 ### [inaturalist.org](https://www.inaturalist.org)
 
@@ -139,7 +225,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
 
@@ -149,7 +235,7 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](/img/IUCN_Red_List.png){.centre top="200" height="200"}
+![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
 
@@ -169,14 +255,6 @@ It's crucial we know **how** the data were collected because this will define ho
 
 ------------------------------------------------------------------------
 
-![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
-
-### [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
-
-**BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites.
-
-------------------------------------------------------------------------
-
 ![](https://sibbr.gov.br/img/logo.svg){.centre top="200" height="200"}
 
 ### [sibbr.gov.br](https://sibbr.gov.br/?lang=en_GB)
@@ -184,6 +262,14 @@ It's crucial we know **how** the data were collected because this will define ho
 **SiBBr** (Brazilian Biodiversity Information System) is an online platform that integrates data and information about biodiversity and ecosystems from different sources, making them accessible for different uses.
 
 ![](https://avatars.githubusercontent.com/u/4728758?s=200&v=4){height="100"} **sibbr**: <https://github.com/sibbr>
+
+------------------------------------------------------------------------
+
+![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
+
+### [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
+
+**BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites. It's part of the NBN Atlas.
 
 ------------------------------------------------------------------------
 
@@ -249,7 +335,9 @@ Should take around **10 minutes** :)
 
 ## 3. Open Data
 
-**Open** means anyone can freely access, use, modify, and share for any purpose (subject, at most, to requirements that preserve provenance and openness).
+**Open** means anyone can freely access, use, modify, and share for any purpose.
+
+<br>
 
 ![](http://opendefinition.org/assets.okfn.org/images/ok_buttons/od_80x15_blue.png){.centre top="200" height="50"}
 
@@ -261,30 +349,53 @@ Should take around **10 minutes** :)
 
 ### [dwc.tdwg.org](https://dwc.tdwg.org/terms/)
 
-<br> ![](https://www.tdwg.org/static/pages/about/logos/tdwg_logo.png){.centre top="200" height="200"}
+. . . 
 
+:::: {.columns}
+
+::: {.column width="40%"}
+![](https://www.tdwg.org/static/pages/about/logos/tdwg_logo.png){.centre top="200" height="200"}
+:::
+
+::: {.column width="60%"}
+`countryCode`: The standard code for the country in which the Location occurs. Recommended best practice is to use an ISO 3166-1-alpha-2 country code.  
+`recordedBy `: 	A list (concatenated and separated) of names of people, groups, or organizations responsible for recording the original Occurrence.  
+:::
+
+:::: 
 ------------------------------------------------------------------------
 
 ## 3. Open Data: Licensing
 
-Open data are licensed under open licenses.
+Open data are licensed under open licenses. Some examples:
 
 . . .
 
-Some examples:
+:::: {.columns}
 
-::: incremental
--   CC0: Public domain
--   CC-BY: Attribution
--   CC-BY-NC: Attribution - Non Commercial
--   CC-BY-SA: Attribution - Share Alike
+::: {.column width="50%"}
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/cc-zero.png)  
+[**CC0**: Public domain]{.font-small}  
+  
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png)  
+[**CC-BY**: Attribution]{.font-small}  
 :::
+
+::: {.column width="50%"}
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc.png)  
+[**CC-BY-NC**: Attribution - Non Commercial]{.font-small}  
+  
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png)  
+[**CC-BY-SA**: Attribution - Share Alike]{.font-small}  
+:::
+
+::::
 
 ------------------------------------------------------------------------
 
 ## 3. Open Data: Data sharing
 
-Data that are standardized and have an open licence can be shared :)
+Data that are **standardized** and have an **open licence** can be shared :)
 
 ![](https://upload.wikimedia.org/wikipedia/commons/6/65/To_deposit_or_not_to_deposit%2C_that_is_the_question_-_journal.pbio.1001779.g001.png){.absolute bottom="50" left="100" width="544" height="418"}
 
@@ -321,7 +432,8 @@ library(tidyverse) # load
 
 . . .
 
-<br> We will be using many functions from this package, like `read_csv()`, `filter()`, `mutate()`.
+<br> 
+We will be using many functions from this package, like `filter()`, `mutate()`, and later `read_csv()`.
 
 ------------------------------------------------------------------------
 
@@ -402,7 +514,7 @@ mammaliaTaxonKey <- get_gbifid_('Mammalia') %>% bind_rows() %>%
 
 ## 4. Data download through R
 
-And now we can use the function `occ_count()` to find out the number of occurrence records for the entire Czech Republic.
+And now we can use the function `occ_count()` to find out the **number of occurrence records** for the entire Czech Republic.
 
 . . .
 
@@ -429,7 +541,7 @@ occ_count(
 
 ## 4. Data download through R
 
-How many occurrence records are in GBIF for the entire Czech Republic?
+How many occurrence records are in GBIF for the entire **Czech Republic**?
 
 . . .
 
@@ -441,7 +553,7 @@ occ_count(country='CZ') # country code for Czech Republic (https://countrycode.o
 
 . . .
 
-<br> And how many records for the mammals of Czech Republic?
+<br> And how many records for the **mammals** of Czech Republic?
 
 . . .
 
@@ -452,11 +564,15 @@ occ_count(country='CZ',
           taxonKey=mammaliaTaxonKey) 
 ```
 
+. . .
+
+<br>
+We are ready to do a download. [Whoop!]{.font-big}\
+
 ------------------------------------------------------------------------
 
 ## 4. Data download through R
 
-We are ready to do a download. [Whoop!]{.font-big}\
 To do this, we will use `occ_search()`.
 
 . . .
@@ -528,8 +644,7 @@ occ_search(
 
 ## 4. Data download through R
 
-We are ready to do a download. [Whoop!]{.font-big}\
-To do this, we will use `occ_search()`.
+Get occurrences records of mammals from Czech Republic.
 
 ```{r}
 #| echo: true
@@ -538,18 +653,13 @@ occ_search(taxonKey=mammaliaTaxonKey,
            country='CZ') 
 ```
 
-::: callout-tip
-## Tip
-
-Check the data output. What's the format? Can I filter those How many rows does it have?
-:::
+[Check the data output. What's the format? How many rows does it have?]{.font-aside}
 
 ------------------------------------------------------------------------
 
 ## 4. Data download through R
-
-We are ready to do a download. [Whoop!]{.font-big}\
-To do this, we will use `occ_search()`.
+ 
+Get **all** occurrences records of mammals from Czech Republic.
 
 ```{r}
 #| echo: true
@@ -559,9 +669,9 @@ occ_search(taxonKey=mammaliaTaxonKey,
             limit=6000) 
 ```
 
-------------------------------------------------------------------------
+. . .
 
-## 4. Data download through R
+<br>
 
 Finally, we store the result in the object `mammalsCZ`.
 
@@ -575,9 +685,27 @@ mammalsCZ <- occ_search(taxonKey=mammaliaTaxonKey,
 mammalsCZ <- mammalsCZ$data
 ```
 
-. . .
+------------------------------------------------------------------------
+
+## 4. Data download through R
+
+Mammals occurrence records from the Czech Republic
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ
+```
+
+---
+
+## 4. Data download through R
+
+Mammals occurrence records from the Czech Republic
 
 How many records do we have?
+
+. . .
 
 ```{r}
 #| echo: true
@@ -585,31 +713,169 @@ How many records do we have?
 nrow(mammalsCZ)
 ```
 
+. . .
+
+<br>
+
+How many species do we have?
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% 
+  filter(taxonRank=='SPECIES') %>% 
+  distinct(scientificName) %>% nrow()
+```
+
+. . .
+
+[`distinct()` is used to see unique values]{.font-aside} 
+
 # 5. Data quality {background-color="#5F9747"}
 
 ## 5. Data quality
 
-Data are not 'good' or 'bad', the quality will depend on the purpose.
+Data are not 'good' or 'bad', the quality will depend on our goal.  
+Some things we can check:  
 
 ::: incremental
--   Data standards
--   Taxonomic backbone and taxon names' harmonisation
--   Spatial and temporal accuracy / precision
+-   Base of the record (type of occurrence)
+-   Species names (taxonomic harmonisation)
+-   Spatial and temporal (accuracy / precision)
 :::
 
 . . .
 
 ![](https://docs.ropensci.org/CoordinateCleaner/logo.png){height="100"} `CoordinateCleaner`: <https://github.com/ropensci/CoordinateCleaner>
 
-Automated flagging of common spatial and temporal errors in biological and palaeontological collection data.
+Automated flagging of common spatial and temporal errors in data.
 
 ------------------------------------------------------------------------
 
 ## 5. Data quality
 
-We will check the following fields as an example:
+As an example, we will check the following fields:
+
+::: incremental
+-   `basisOfRecord`: we want preserved specimens or observations
+-   `taxonRank`: we want records at species level.
+-   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km.
+:::
+
+---
+
+## 5. Data quality
+
+-   `basisOfRecord`: we want preserved specimens or observations
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% distinct(basisOfRecord)
+```
+
+. . . 
+
+[`distinct()` is used to see unique values]{.font-aside}
+
+---
+
+## 5. Data quality
+
+-   `basisOfRecord`: we want preserved specimens or observations
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% group_by(basisOfRecord) %>% count()
+```
+
+. . . 
+
+[`group_by()` is used to group values within a variable]{.font-aside} 
+
+---
+
+## 5. Data quality
+
+-   `basisOfRecord`: we want preserved specimens or observations
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ <- mammalsCZ %>% 
+  filter(basisOfRecord=='PRESERVED_SPECIMEN' |
+           basisOfRecord=='HUMAN_OBSERVATION')
+```
+
+. . .
+
+[Note the use of `|` (OR) to filter the data.]{.font-aside}
+
+. . .
+
+<br>
+
+How many records do we have now?
+
+```{r}
+#| echo: true
+#| eval: true
+nrow(mammalsCZ)
+```
+
+---
+
+## 5. Data quality
+
+-   `taxonRank`: we want records at species level
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% distinct(taxonRank)
+```
+
+---
+
+## 5. Data quality
+
+-   `taxonRank`: we want records at species level
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ <- mammalsCZ %>% 
+  filter(taxonRank == 'SPECIES')
+```
+
+. . .
+
+<br>
+
+How many records do we have now?
+
+```{r}
+#| echo: true
+#| eval: true
+nrow(mammalsCZ)
+```
+
+---
+
+## 5. Data quality
 
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
+
+. . .
 
 ```{r}
 #| echo: true
@@ -617,48 +883,41 @@ We will check the following fields as an example:
 mammalsCZ %>% 
   filter(coordinateUncertaintyInMeters > 1000) %>% 
   select(scientificName, coordinateUncertaintyInMeters, stateProvince)
+```
 
+---
+
+## 5. Data quality
+
+-   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
+
+```{r}
+#| echo: true
+#| eval: true
 mammalsCZ <- mammalsCZ %>% 
   filter(coordinateUncertaintyInMeters < 1000) # keeping this
 ```
 
-------------------------------------------------------------------------
+. . . 
 
-## 5. Data quality
+<br>
 
-We will check the following fields as an example:
-
--   `taxonRank`: we want species
+How many records do we have now?
 
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ %>% distinct(taxonRank)
-
-mammalsCZ <- mammalsCZ %>% 
-  filter(taxonRank == 'species')
+nrow(mammalsCZ)
 ```
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
 
-We will check the following fields as an example:
+## How are the records distributed?
 
--   `basisOfRecord`: we want preserved specimens or observations
+. . .
 
-```{r}
-#| echo: true
-#| eval: true
-
-mammalsCZ %>% distinct(basisOfRecord)
-mammalsCZ %>% group_by(basisOfRecord) %>% count()
-
-mammalsCZ %>% filter(basisOfRecord=='PRESERVED_SPECIMEN' & 
-                       basisOfRecord=='HUMAN_OBSERVATION')
-```
-
-------------------------------------------------------------------------
+We'll get to this next week :)
 
 ```{r}
 #| echo: false
@@ -666,8 +925,10 @@ mammalsCZ %>% filter(basisOfRecord=='PRESERVED_SPECIMEN' &
 library(sf)
 
 mammalsCZ_sf <- mammalsCZ  %>% 
-  filter(!is.na(decimalLongitude) & !is.na(decimalLatitude)) %>% 
-    st_as_sf(coords=c('decimalLongitude', 'decimalLatitude')) %>% 
+  filter(!is.na(decimalLongitude) & 
+           !is.na(decimalLatitude)) %>% 
+    st_as_sf(coords=c('decimalLongitude', 
+                      'decimalLatitude')) %>% 
     st_set_crs(4326)
 
 Czechia <- rnaturalearth::ne_countries(scale = 110, 
@@ -677,10 +938,16 @@ Czechia <- rnaturalearth::ne_countries(scale = 110,
 
 ggplot() +
     geom_sf(data=Czechia, fill='white') + 
-    geom_sf(data=sf::st_intersection(mammalsCZ_sf, Czechia), aes(col=species), show.legend = F) +
+    geom_sf(data=sf::st_intersection(mammalsCZ_sf, Czechia), 
+            aes(col=order)) +
     theme_bw()
 ```
 
 ------------------------------------------------------------------------
 
 ![](https://github.com/allisonhorst/stats-illustrations/raw/main/other-stats-artwork/debugging.jpg){.r-stretch}
+
+---
+
+# Any doubts? {background-color="#5F9747"}
+
