@@ -895,7 +895,7 @@ mammalsCZ %>%
 #| echo: true
 #| eval: true
 mammalsCZ <- mammalsCZ %>% 
-  filter(coordinateUncertaintyInMeters < 1000) # keeping this
+  filter(coordinateUncertaintyInMeters < 10000) # keeping this
 ```
 
 . . . 
