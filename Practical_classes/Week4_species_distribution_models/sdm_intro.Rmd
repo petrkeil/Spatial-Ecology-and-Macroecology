@@ -1,0 +1,310 @@
+---
+title: "Intro to Species Distribution Modelling (SDM)"
+author: "Petr Keil"
+date: "November 27, 2018"
+output: 
+  html_document: 
+    highlight: tango
+    number_sections: yes
+    theme: cerulean
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+--------------------------------------------------------------------------------
+ 
+- I have taken a lot of ideas and material from [this intro](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf) to ```dismo``` package by **Robert Hijmans** and **Jane Elith**.
+- For the entire **raw code** used here see [this GitHub repository](https://github.com/petrkeil/SDM_Leipzig).
+
+
+# Introduction
+
+- Species Distribution Modelling (a.k.a. Niche Modelling) aims to predict **where   species live** from a limited set of observation.
+- Sometimes it aims to estimate species' **niches** from its distribution.  
+- It's a **huge** field, massively used in applied ecology and conservation.
+- It's a young field (last 20 years), and it is full of **problems and challenges**.
+
+## Goals
+
+- to show an **example use of SDM**, and to demonstrate the challenges it faces
+- to show R's great ability to work with **spatial data**
+- to demonstrate the concepts of **spatial predictors** and **crossvalidation**
+
+## **Brown-throated sloth** (*Bradypus variegatus*)
+
+This will be our example species -- data on its distribution will come from R
+package ```dismo```, where they are provided as an illustration.
+
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Bradypus.jpg/800px-Bradypus.jpg)
+
+--------------------------------------------------------------------------------
+
+# Loading the data and packages
+
+## Packages
+
+```{r, message=FALSE, warning=FALSE}
+library(dismo) # package for species distribution modelling
+library(sdm) # another package for species distribution modelling
+library(mgcv) # package for generalized additive models
+library(maptools); data(wrld_simpl) # world boundaries
+library(sp) # package for vector layers
+library(rgeos)
+library(raster) # package for raster layers
+```
+
+If you don't have any of these, just type ```install.packages("name of the package")```.
+
+## Data
+
+### *Bradypus variegatus* observations
+
+```{r}
+file <- paste(system.file(package="dismo"), "/ex/bradypus.csv", sep="")
+bradypus <- read.table(file,  header=TRUE,  sep=',')
+```
+
+Let's convert the lat-long point data to ```spatialPoints``` class
+
+```{r}
+brad.pts <- SpatialPoints(coords = bradypus[, c('lon', 'lat')], 
+                          proj4string = CRS("+proj=longlat +datum=WGS84"))
+
+```
+
+Plot the raw observational data
+
+```{r, fig.height = 7}
+plot(brad.pts)
+plot(wrld_simpl, add=TRUE, border="darkgrey")
+```
+
+
+### Environmental predictors
+
+They come from **WorldClim 1.4** and **WWF**. See the ```dismo``` documentation for details.
+
+```{r}
+files <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), 
+                    pattern='grd', 
+                    full.names=TRUE)
+
+predictors <- stack(files)
+names(predictors) <- c("MeanT","MeanP","WetP","DryP","MaxT",
+                       "MinT","TRange","WetT", "biome")
+```
+
+Let's plot the predictors
+
+```{r, fig.width = 8, fig.height = 7}
+plot(predictors)
+```
+
+
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/SlothDWA.jpg/800px-SlothDWA.jpg)
+
+Photo by Sergiodelgado, CC-BY-SA, Wikimedia Commons
+
+--------------------------------------------------------------------------------
+
+# Prepare the data for modelling
+
+This is a critical step! Some major decisions here, particularly, should we do:
+
+- Presence-only modelling (e.g. **MaxEnt**)
+- Presence-pseudo absence modelling
+- Presence-absence modelling (e.g. **GLM**)
+
+For a nice overview of the different modelling approaches see [this tutorial](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf).
+
+
+## Mask for the **pseudo-absence** data
+
+Note: We can later play with the diameter parameter.
+
+```{r}
+x <- circles(brad.pts, d=400000, lonlat=TRUE) # 400 km diameter (200 km radius)
+pol <- polygons(x)
+
+mask <- predictors[[1]]
+v <- extract(mask, x@polygons, cellnumbers=T)
+v <- do.call(rbind, v)
+v <- unique(v[,1])
+m <- mask
+m[] <- NA
+m[v] <- 1
+m <- m
+m[is.na(mask)] <- NA
+```
+
+```{r}
+plot(m)
+plot(wrld_simpl, add=TRUE, border="darkgrey")
+```
+
+## Put observations, pseudo-absences, and predictors together
+
+```{r}
+# presence data
+set.seed(0)
+pres.coords <- bradypus[, c('lon', 'lat')]
+pres.pred <- extract(predictors, brad.pts)
+pres <- rep(1, nrow(pres.pred))
+pres.data <- data.frame(pres, pres.pred, pres.coords)
+pres.data$biome <- as.factor(pres.data$biome)
+
+# background data
+abs.coords <- randomPoints(mask = m, n = 300, p = pres.coords)
+colnames(abs.coords) <- c("lon", "lat")
+abs.pred <- extract(predictors, abs.coords)
+pres <- rep(0, nrow(abs.coords))
+abs.data <- data.frame(pres, abs.pred, abs.coords)
+abs.data$biome <- as.factor(abs.data$biome)
+
+# all data
+sdmdata <- rbind(pres.data, abs.data)
+```
+
+Examine the resulting data points
+
+```{r, fig.height = 7}
+plot(lat ~ lon, data = sdmdata, col = as.factor(pres))
+plot(wrld_simpl, add=TRUE, border="darkgrey")
+```
+
+## Training and testing datasets for **crossvalidation**
+
+Crossvalidation is the best defense against overfitting!
+
+```{r}
+test.id <- sort(sample(x = 1:nrow(sdmdata), size = 100))
+train.id <- which(1:nrow(sdmdata) %in% test.id == FALSE)
+
+test.data <- sdmdata[test.id,]
+train.data <- sdmdata[train.id,]
+```
+
+
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/MC_Drei-Finger-Faultier.jpg/1920px-MC_Drei-Finger-Faultier.jpg)
+
+Photo by Christian Mehlführer, CC-BY license, Wikimedia Commons
+
+
+--------------------------------------------------------------------------------
+
+
+# Fitting a Generalized Linear Model
+
+
+## Logistic binomial regression
+
+In the code below, feel free to use anything of your current knowledge
+to modify it or imporve it!
+
+```{r}
+m.null <- glm(pres ~ 1, data=train.data, family = "binomial")
+
+m.full <- glm(pres ~ MeanT + MeanP + WetP + 
+              DryP + MaxT + MinT + TRange + WetT, 
+              data=train.data, family = "binomial")
+
+# step(m.full)
+
+m.env <-  glm(pres ~ MeanP + DryP + MaxT + MinT + WetT, 
+              data=train.data, family = "binomial")
+```
+
+## Logistic binomial regression with spatial component
+
+A **spatial component** accounts for the fact that species are often missing from some places even if they have suitable environmental conditions, and the other way round. 
+
+We will model the spatial component using a **smooth 2D spline surface**. For this we will use function `gam` from package `mgcv`:
+
+```{r}
+m.space <- gam(pres ~ s(lat, lon, bs="sos", k = 33), 
+                    data=train.data, family = "binomial")
+
+m.env.space <-  gam(pres ~ MeanP + DryP + MaxT + 
+                    MinT + WetT + s(lat, lon, bs="sos", k = 33), 
+                    data=train.data, family = "binomial")
+```
+
+
+
+# Model evaluation and maps of predictions
+
+## Comparison of AIC and BIC
+
+```{r}
+AIC(m.null, m.full, m.env, m.env.space, m.space)
+BIC(m.null, m.full, m.env, m.env.space, m.space)
+```
+
+Note: We get conflicting results from AIC and BIC!
+
+## Comparison with test data (crossvalidation)
+
+```{r}
+m.env.prd <- predict(m.env, newdata = test.data, type = "response")
+m.space.prd <- predict(m.space, newdata = test.data, type = "response")
+m.env.space.prd <- predict(m.env.space, newdata = test.data, type = "response")
+```
+
+```{r, fig.height= 3}
+par(mfrow=c(1,3))
+roc(x = test.data$pres, p = m.env.prd)
+roc(x = test.data$pres, p = m.space.prd)
+roc(x = test.data$pres, p = m.env.space.prd)
+```
+
+Ok, so crossvalidation tells us that the third model (with both space and 
+environment) is the best. Let's put it on the map then!
+
+## Mapping the predictions
+
+Prepare a dataset from the entire raster stack:
+
+```{r}
+all.data <- as.data.frame(predictors)
+all.data <- data.frame(all.data,
+                       lon = coordinates(predictors)[, 'x'],
+                       lat = coordinates(predictors)[, 'y'])
+all.data$biome <- as.factor(all.data$biome)
+```
+
+Make the predictions using our favourite model, and the entire raster data, and
+push this to a raster:
+
+```{r}
+m.env.prd <- predict(m.env, newdata = all.data, 
+                     type = "response", na.action = na.pass)
+
+pred.raster <- predictors[[1]]
+pred.raster[] <- as.vector(m.env.prd )
+```
+
+## This is where sloths live:
+
+```{r, fig.height = 10, fig.width = 10}
+  plot(brad.pts)
+  plot(pred.raster, add=TRUE)
+  plot(brad.pts, add=TRUE)
+  plot(wrld_simpl, add=TRUE, border="darkgrey")
+```
+
+--------------------------------------------------------------------------------
+
+# Concluding questions
+
+- How could one potentially solve the problem of unreliable pseudo-absences?
+- Could we easily re-run the analysis at a coarse easily?
+- Would extending the area for pseudo-absences impact the result?
+- How about making the spatial component more complex? Or simpler?
+
+
