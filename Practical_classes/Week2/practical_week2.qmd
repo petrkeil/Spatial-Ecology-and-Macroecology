@@ -26,7 +26,7 @@ editor: visual
 
 ## What are we going to see today?
 
-An example of large-scale biodiversity database, learning the basics and visualizing things. Gridding biodiversity data (geographic ranges, biodiversity), exploring patterns at different resolutions, making pretty maps.
+Gridding biodiversity data, exploring patterns at different resolutions, and making pretty maps.
 
 ::: incremental
 1.  Gridding biodiversity data\
@@ -670,8 +670,10 @@ Let's transform the data (both the world and the testudines' layers)
 ```{r}
 #| echo: true
 #| eval: true
-world_ea <- st_transform(world, crs = 'EPSG:8857')
-testudines_ea <- st_transform(testudines, crs = 'EPSG:8857')
+world_ea <- st_transform(world, crs = 'EPSG:8857') %>% 
+  st_make_valid %>% st_cast
+testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% 
+  st_make_valid %>% st_cast
 ```
 
 . . .
@@ -719,17 +721,70 @@ For the `cellsize` we will chose 1 degree, which is \~100km (=100,000m)
 
 ```{r}
 #| echo: true
-#| eval: true
+#| eval: false
 world_grid <- st_make_grid(world_ea, 
                            cellsize=100000,
                            square=FALSE) %>%  # this will make hexagons
   st_sf(gridID=1:length(.))                   # this will create a grid ID
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+world_grid <- readRDS('data/world_grid.rds')
+```
+
 . . . 
 
 <br>
 We have the grid, we are ready to calculate richness.
+
+---
+
+## Mapping species ranges 🐢
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.1) 
+```
+
+---
+
+## Mapping species ranges 🐢
+
+To make things faster, let's get a smaller dataset of *Testudines*  
+
+```{r}
+#| echo: true
+#| eval: true
+testu <- testudines_ea %>% 
+  filter(LEGEND=='Extant (resident)') %>% 
+  group_by(ID_NO) %>% 
+  summarise(BINOMIAL=unique(BINOMIAL),
+            PRESENCE=sum(PRESENCE)) %>% 
+  ungroup() %>% st_cast()
+```
+
+. . . 
+
+<br>
+
+This can take a while 
+
+
+---
+
+## Mapping species ranges 🐢
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.5)  +
+  geom_sf(data= testu %>% head(n=3), fill='red', alpha=0.5)
+```
 
 ---
 
@@ -742,15 +797,15 @@ To calculate number of records (N) and number of species per grid-cell (SR), we 
 ```{r}
 #| echo: true
 #| eval: false
-testudines_grid <- st_join(world_grid, testudines_ea) %>%
+testudines_grid <- st_join(world_grid, testu) %>%
   group_by(gridID) %>%
-  summarise(N=n(),
-            SR=n_distinct(BINOMIAL))
+  summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(BINOMIAL, na.rm = TRUE))
 ```
 
 <br>
 
-This will take a while 
+This **will** take a while 
 
 . . . 
 
@@ -761,14 +816,32 @@ And now, we plot!
 
 ## Mapping species ranges 🐢
 
+Here's the results :)
+
+---
+
+## Mapping species ranges 🐢
+
 ```{r}
-#| echo: true
-#| eval: false
+#| echo: false
+#| eval: true
+testudines_grid <- readRDS('data/testudines_grid.rds')
+testudines_grid
+```
+
+---
+
+## Mapping species ranges 🐢
+
+```{r}
+#| echo: false
+#| eval: true
+testudines_grid <- readRDS('data/testudines_grid.rds')
+
 ggplot() + 
-  geom_sf(data=testudines_grid, aes(fill=SR)) +
-  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) +
-  geom_sf(data=world_ea, fill=NA) +
-  coord_sf(crs=4326) +
+  geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
+  geom_sf(data=world_ea, fill=NA, col='grey70', size=0.2) +
   theme_bw()
 ```
 
@@ -778,3 +851,7 @@ ggplot() +
 
 -   R for Data Science <https://r4ds.hadley.nz>
 -   Geocomputation with R <https://geocompr.robinlovelace.net>
+
+---
+
+# Any doubts? {background-color="#5F9747"}
