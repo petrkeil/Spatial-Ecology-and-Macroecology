@@ -20,7 +20,6 @@ format:
     highlight-style: github
     scrollable: true
     enableEmoji: true
-    cache: true
 editor: visual
 ---
 
@@ -350,8 +349,8 @@ Let's store the output into a new object `CZ_mammals_grids`.
 #| eval: true
 mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
   group_by(OBJECTID) %>%
-  summarise(N=n(),
-            SR=n_distinct(species))
+  summarise(N=ifelse(n_distinct(species, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(species, na.rm = TRUE))
 ```
 
 ------------------------------------------------------------------------
@@ -725,7 +724,8 @@ For the `cellsize` we will chose 1 degree, which is \~100km (=100,000m)
 world_grid <- st_make_grid(world_ea, 
                            cellsize=100000,
                            square=FALSE) %>%  # this will make hexagons
-  st_sf(gridID=1:length(.))                   # this will create a grid ID
+  st_intersection(world_ea) %>% 
+  st_sf(gridID=1:length(.))     
 ```
 
 ```{r}
@@ -778,12 +778,14 @@ This can take a while
 
 ## Mapping species ranges 🐢
 
+Let's plot 10 species as an example
+
 ```{r}
 #| echo: false
 #| eval: true
 ggplot() + 
   geom_sf(data= world_grid, fill='white', size=0.5)  +
-  geom_sf(data= testu %>% head(n=3), fill='red', alpha=0.5)
+  geom_sf(data= testu %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
 ```
 
 ---
@@ -818,14 +820,17 @@ And now, we plot!
 
 Here's the results :)
 
----
-
-## Mapping species ranges 🐢
+. . .
 
 ```{r}
 #| echo: false
 #| eval: true
 testudines_grid <- readRDS('data/testudines_grid.rds')
+```
+
+```{r}
+#| echo: true
+#| eval: true
 testudines_grid
 ```
 

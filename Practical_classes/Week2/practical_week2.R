@@ -64,8 +64,8 @@ st_join(CZ_grids, mammalsCZ_sf) %>%
 # Store the output into a new object `CZ_mammals_grids`.
 mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
   group_by(OBJECTID) %>%
-  summarise(N=n(),
-            SR=n_distinct(species))
+  summarise(N=ifelse(n_distinct(species, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(species, na.rm = TRUE))
 
 # Plot
 ggplot() + 
@@ -153,7 +153,8 @@ world_grid <- st_make_grid(world_ea,
   st_intersection(world_ea) %>% 
   st_sf(gridID=1:length(.))                   # this will create a grid ID
 
-# saveRDS(world_grid, 'Practical_classes/Week2/data/world_grid.rds')
+# You can save the file so it's available for you to use next time
+# saveRDS(world_grid, 'data/world_grid.rds')
 
 ggplot() + 
   geom_sf(data= world_grid, fill='white', size=0.5) 
@@ -176,7 +177,8 @@ testudines_grid <- st_join(world_grid, testu) %>%
   summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
             SR=n_distinct(BINOMIAL, na.rm = TRUE))
 
-# saveRDS(testudines_grid, 'Practical_classes/Week2/data/testudines_grid.rds')
+# You can save the file so it's available for you to use next time
+# saveRDS(testudines_grid, 'data/testudines_grid.rds')
 
 # Plot 
 ggplot() + 
