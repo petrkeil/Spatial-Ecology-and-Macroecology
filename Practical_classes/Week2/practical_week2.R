@@ -1,7 +1,9 @@
-install.packages('sf')
+# install.packages('sf')
 # Libraries
 
+library(rnaturalearth)
 library(sf)
+sf_use_s2(FALSE)
 library(tidyverse)
 
 ##### LOCAL: Mapping occurrence records
@@ -62,8 +64,8 @@ st_join(CZ_grids, mammalsCZ_sf) %>%
 # Store the output into a new object `CZ_mammals_grids`.
 mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
   group_by(OBJECTID) %>%
-  summarise(N=n(),
-            SR=n_distinct(species))
+  summarise(N=ifelse(n_distinct(species, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(species, na.rm = TRUE))
 
 # Plot
 ggplot() + 
@@ -119,7 +121,68 @@ N
 # -   Visualise SR global hotspots  
 
 # Read testudines' IUCN range maps
-
 testudines <- st_read('Practical_classes/Week2/data/testudines/data_0.shp')
-
 testudines
+
+
+# Download a shapefile of the world at medium scale 
+world <- ne_countries(scale = 50, returnclass='sf')
+
+# Combine all countries into one unique polygon
+world <- st_union(world) %>% st_make_valid() %>% st_cast()
+
+# Let's see how it looks
+ggplot() + 
+  geom_sf(data=world, fill='white')
+
+# Project the layers (both the world and the testudines' layers): from lat/lon to equal area projection
+world_ea <- st_transform(world, crs = 'EPSG:8857') %>% st_make_valid %>% st_cast
+testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% st_make_valid %>% st_cast
+
+# Double check everything's alright
+st_crs(world_ea, parameters = TRUE)$epsg
+st_crs(world_ea, parameters = TRUE)$ud_unit
+st_crs(testudines_ea, parameters = TRUE)$epsg
+st_crs(testudines_ea, parameters = TRUE)$ud_unit
+
+# Create 1-degree grid-cells for the entire world
+# For the `cellsize` we will chose 1 degree, which is ~100km (=100,000m)
+world_grid <- st_make_grid(world_ea, 
+                           cellsize=100000,
+                           square=FALSE) %>%  # this will make hexagons
+  st_intersection(world_ea) %>% 
+  st_sf(gridID=1:length(.))                   # this will create a grid ID
+
+# You can save the file so it's available for you to use next time
+# saveRDS(world_grid, 'data/world_grid.rds')
+
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.5) 
+
+# Get a smaller dataset of testudines
+testu <- testudines_ea %>% 
+  filter(LEGEND=='Extant (resident)') %>% 
+  group_by(ID_NO) %>% 
+  summarise(BINOMIAL=unique(BINOMIAL),
+            PRESENCE=sum(PRESENCE)) %>% 
+  ungroup() %>% st_cast()
+
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.5)  +
+  geom_sf(data= testu %>% head(n=3), fill='red', alpha=0.5)
+
+# Calculate number of records (N) and number of species per grid-cell (SR)
+testudines_grid <- st_join(world_grid, testu) %>%
+  group_by(gridID) %>%
+  summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(BINOMIAL, na.rm = TRUE))
+
+# You can save the file so it's available for you to use next time
+# saveRDS(testudines_grid, 'data/testudines_grid.rds')
+
+# Plot 
+ggplot() + 
+  geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
+  geom_sf(data=world_ea, fill=NA, col='grey70', size=0.2) +
+  theme_bw()
