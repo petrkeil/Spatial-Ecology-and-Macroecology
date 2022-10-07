@@ -23,6 +23,7 @@ format:
 editor: visual
 ---
 
+
 ## What are we going to see today?
 
 Gridding biodiversity data, exploring patterns at different resolutions, and making pretty maps.
@@ -49,6 +50,7 @@ For all geocomputationgs today we will use the `sf` package.
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: false
@@ -56,7 +58,9 @@ For all geocomputationgs today we will use the `sf` package.
 install.packages('sf') # install
 ```
 
+
 . . .
+
 
 ```{r}
 #| echo: true
@@ -65,9 +69,11 @@ install.packages('sf') # install
 library(sf) # load
 ```
 
+
 . . .
 
 <br>
+
 
 ```{r}
 #| echo: true
@@ -75,6 +81,7 @@ library(sf) # load
 #| message: true
 sf_use_s2(FALSE)
 ```
+
 
 # Visualisation {background-color="#5F9747"}
 
@@ -84,11 +91,13 @@ For all the visualisations today we will use the `ggplot` package. It's part of 
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 library(tidyverse)
 ```
+
 
 . . .
 
@@ -123,6 +132,7 @@ Get the occurrence records
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -130,9 +140,11 @@ mammalsCZ <- readRDS('data/mammalsCZ.rds')
 mammalsCZ
 ```
 
+
 . . .
 
 Let's keep few fields
+
 
 ```{r}
 #| echo: true
@@ -141,6 +153,7 @@ mammalsCZ <- mammalsCZ %>% select(species, order, eventDate,
                                   decimalLongitude, decimalLatitude,
                                   stateProvince, countryCode, datasetName)
 ```
+
 
 ## Mapping occurrence records 🦌
 
@@ -168,6 +181,7 @@ Let's transform our data table into an sf object using `st_as_sf()`
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -176,6 +190,7 @@ mammalsCZ %>%
   st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
            crs=4326)
 ```
+
 
 . . .
 
@@ -187,6 +202,7 @@ Let's transform our data table into an sf object using `st_as_sf()`
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -196,6 +212,7 @@ mammalsCZ_sf <- mammalsCZ %>%
            crs=4326)
 ```
 
+
 ------------------------------------------------------------------------
 
 ## Mapping occurrence records 🦌
@@ -204,6 +221,7 @@ Get the administrative borders
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -211,11 +229,13 @@ CZ_borders <- st_read('data/CZE_adm0.shp')
 CZ_borders
 ```
 
+
 ## Mapping occurrence records 🦌
 
 Get the standard grids from the Czech Republic
 
 . . .
+
 
 ```{r}
 #| echo: true
@@ -223,6 +243,7 @@ Get the standard grids from the Czech Republic
 CZ_grids <- st_read('data/KvadratyCR_JTSK.shp')
 CZ_grids
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -232,12 +253,14 @@ Check the layer's Coordinate Reference System (CRS)
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 st_crs(CZ_borders)
 st_crs(CZ_grids)
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -247,12 +270,14 @@ We will transform `mammalsCZ` CRS to [S-JTSK / Krovak East North](https://epsg.i
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 mammalsCZ_sf <- st_transform(mammalsCZ_sf, crs = st_crs(CZ_grids))
 mammalsCZ_sf
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -262,6 +287,7 @@ Let's plot the sf objects
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -270,6 +296,7 @@ ggplot() +
   geom_sf(data=CZ_grids, fill=NA) + 
   geom_sf(data=mammalsCZ_sf)
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -297,12 +324,14 @@ To calculate number of records (N) and number of species per grid-cell (SR), we 
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 st_join(CZ_grids,       # GRID
         mammalsCZ_sf)   # POINTS
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -327,6 +356,7 @@ Let's calculate number of records (`N`) and number of species per grid-cell (`SR
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -336,6 +366,7 @@ st_join(CZ_grids, mammalsCZ_sf) %>%
             SR=n_distinct(species))
 ```
 
+
 ------------------------------------------------------------------------
 
 ## Mapping occurrence records 🦌
@@ -343,6 +374,7 @@ st_join(CZ_grids, mammalsCZ_sf) %>%
 Let's store the output into a new object `CZ_mammals_grids`.
 
 . . .
+
 
 ```{r}
 #| echo: true
@@ -352,6 +384,7 @@ mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
   summarise(N=ifelse(n_distinct(species, na.rm = TRUE)==0, 0, n()),
             SR=n_distinct(species, na.rm = TRUE))
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -364,6 +397,7 @@ We will do it using `geom_sf()` a `ggplot` function to visualise sf objects.
 
 ## Mapping occurrence records 🦌
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -371,6 +405,7 @@ ggplot() +
   geom_sf(data=mammalsCZ_grids) +
   coord_sf(crs=4326)
 ```
+
 
 . . .
 
@@ -386,6 +421,7 @@ We need to indicate which column from the object should the grids be filled with
 
 ## Mapping occurrence records 🦌
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -393,6 +429,7 @@ ggplot() +
   geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
   coord_sf(crs=4326)
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -412,6 +449,7 @@ Bare in mind that [[we see colors differently](https://davidmathlogic.com/colorb
 
 ## Mapping occurrence records 🦌
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -422,6 +460,7 @@ ggplot() +
   coord_sf(crs=4326) +
   theme_bw()
 ```
+
 
 Now, here's a better plot :)
 
@@ -439,6 +478,7 @@ Let's have a look at the sampling effort (`N`: number of records) and compare bo
 
 ## Mapping occurrence records 🦌
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -450,11 +490,13 @@ ggplot() +
   theme_bw()
 ```
 
+
 ------------------------------------------------------------------------
 
 ## Mapping occurrence records 🦌
 
 What can you say about the hotspots of species richness we found?
+
 
 ```{r}
 #| echo: false
@@ -483,6 +525,7 @@ N <- ggplot() +
 SR 
 N
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -527,11 +570,13 @@ Read testudines' IUCN range maps (`POLYGONS`)
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 testudines <- st_read('data/testudines/data_0.shp')
 ```
+
 
 . . .
 
@@ -545,11 +590,13 @@ What do the data look like?
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 testudines
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -558,6 +605,7 @@ testudines
 Now, let's get a world map. For this we will use the package `rnaturalearth`.
 
 . . .
+
 
 ```{r}
 #| echo: true
@@ -572,6 +620,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 ```
 
+
 ------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
@@ -580,12 +629,14 @@ We will download a shapefile of the world at medium scale and we will combine al
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
 world <- ne_countries(scale = 50, returnclass='sf')
 world <- st_union(world) %>% st_make_valid() %>% st_cast()
 ```
+
 
 . . .
 
@@ -595,12 +646,14 @@ world <- st_union(world) %>% st_make_valid() %>% st_cast()
 
 ## Mapping species ranges 🐢
 
+
 ```{r}
 #| echo: true
 #| eval: true
 ggplot() + 
   geom_sf(data=world, fill='white')
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -632,6 +685,7 @@ Equal-area maps preserve area measure, generally distorting shapes in order to d
 
 ## Mapping species ranges 🐢
 
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -654,6 +708,7 @@ ggplot() +
     coord_sf(crs = 'EPSG:8857')
 ```
 
+
 . . .
 
 We will choose **Equal Earth** (EPSG:8857).
@@ -666,6 +721,7 @@ Let's transform the data (both the world and the testudines' layers)
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -675,9 +731,11 @@ testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>%
   st_make_valid %>% st_cast
 ```
 
+
 . . .
 
 <br> And double check everything's alright
+
 
 ```{r}
 #| echo: true
@@ -687,6 +745,7 @@ st_crs(world_ea, parameters = TRUE)$ud_unit
 st_crs(testudines_ea, parameters = TRUE)$epsg
 st_crs(testudines_ea, parameters = TRUE)$ud_unit
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -718,6 +777,7 @@ For the `cellsize` we will chose 1 degree, which is \~100km (=100,000m)
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: false
@@ -734,6 +794,7 @@ world_grid <- st_make_grid(world_ea,
 world_grid <- readRDS('data/world_grid.rds')
 ```
 
+
 . . . 
 
 <br>
@@ -743,6 +804,7 @@ We have the grid, we are ready to calculate richness.
 
 ## Mapping species ranges 🐢
 
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -750,11 +812,13 @@ ggplot() +
   geom_sf(data= world_grid, fill='white', size=0.1) 
 ```
 
+
 ---
 
 ## Mapping species ranges 🐢
 
 To make things faster, let's get a smaller dataset of *Testudines*  
+
 
 ```{r}
 #| echo: true
@@ -766,6 +830,7 @@ testu <- testudines_ea %>%
             PRESENCE=sum(PRESENCE)) %>% 
   ungroup() %>% st_cast()
 ```
+
 
 . . . 
 
@@ -780,6 +845,7 @@ This can take a while
 
 Let's plot 10 species as an example
 
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -787,6 +853,7 @@ ggplot() +
   geom_sf(data= world_grid, fill='white', size=0.5)  +
   geom_sf(data= testu %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
 ```
+
 
 ---
 
@@ -796,6 +863,7 @@ To calculate number of records (N) and number of species per grid-cell (SR), we 
 
 . . .
 
+
 ```{r}
 #| echo: true
 #| eval: false
@@ -804,6 +872,7 @@ testudines_grid <- st_join(world_grid, testu) %>%
   summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
             SR=n_distinct(BINOMIAL, na.rm = TRUE))
 ```
+
 
 <br>
 
@@ -822,6 +891,7 @@ Here's the results :)
 
 . . .
 
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -834,9 +904,11 @@ testudines_grid <- readRDS('data/testudines_grid.rds')
 testudines_grid
 ```
 
+
 ---
 
 ## Mapping species ranges 🐢
+
 
 ```{r}
 #| echo: false
@@ -850,6 +922,7 @@ ggplot() +
   theme_bw()
 ```
 
+
 ---
 
 ## References
@@ -860,3 +933,4 @@ ggplot() +
 ---
 
 # Any doubts? {background-color="#5F9747"}
+
