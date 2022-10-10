@@ -216,7 +216,7 @@ Let's download the **WorldClim** data (version 2.1 climate data for 1970-2000):
 
 ::: incremental
 -   Annual mean temperature (`bio1`)\
--   Annual precipitation (`bio12`)\
+-   Annual precipitation (`bio15`)\
 :::
 
 . . .
@@ -710,9 +710,10 @@ Let's read the processed layer.
 #| echo: true
 #| eval: false
 land <- rast('data/MCD12Q1.006_LC_Prop1_doy2020001_aid0001.tif')
+land
 ```
 
-## 2. Get data: antthropogenic
+## 2. Get data: anthropogenic
 
 Read the layer.
 
@@ -722,6 +723,7 @@ Read the layer.
 #| echo: true
 #| eval: false
 footp <- rast('data/wildareas-v3-2009-human-footprint.tif')
+footp
 ```
 
 
@@ -746,8 +748,6 @@ r <- rast(res=100000, ext(vect(Asia_union)), crs=proj_Asia_ea)
 
 We will use the package `terra` to process the rasters.\
 First we need to create a new raster to use as a base.
-
-. . .
 
 ```{r}
 #| echo: true
@@ -1001,19 +1001,6 @@ Annual mean temperature (WorldClim BIO1)
 #| eval: false
 tm_shape(tavg) +
   tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10) 
-```
-
-------------------------------------------------------------------------
-
-## 2.2. Visualise data {auto-animate="true"}
-
-Annual mean temperature (WorldClim BIO1)
-
-```{r}
-#| echo: true
-#| eval: false
-tm_shape(tavg) +
-  tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10)
 ```
 
 ------------------------------------------------------------------------
