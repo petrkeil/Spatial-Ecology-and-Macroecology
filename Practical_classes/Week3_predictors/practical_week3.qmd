@@ -28,14 +28,14 @@ editor: visual
 We will explore the potential drivers of species distribution.
 
 ::: incremental
-1. Overview of data sources   
-2. Get data    
-    1. Process raster 
-    2. Visualise data 
-3. Correlations between predictors  
+1.  Overview of data sources\
+2.  Get data
+    1.  Process raster
+    2.  Visualise data
+3.  Correlations between predictors\
 :::
 
----
+------------------------------------------------------------------------
 
 ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5th4HWNhEfBMtu7blfu7FNLGvYbaljkWFRA&usqp=CAU){.centre top="200" height="200"}
 
@@ -43,15 +43,15 @@ We will explore the potential drivers of species distribution.
 
 **WorldClim** is a database of high spatial resolution global weather and climate data. You can download gridded weather and climate data for historical (near current) and future conditions.
 
----
+------------------------------------------------------------------------
 
 ![](https://chelsa-climate.org/wp-content/uploads/2016/02/logotest3.gif){.centre top="200" height="200"}
 
 ### [chelsa-climate.org](https://chelsa-climate.org)
 
-**CHELSA** (Climatologies at high resolution for the earth’s land surface areas) is a very high resolution (30 arc sec, ~1km) global downscaled climate data set. It includes climate layers for various time periods and variables, ranging from the Last Glacial Maximum, to the present, to several future scenarios.
+**CHELSA** (Climatologies at high resolution for the earth's land surface areas) is a very high resolution (30 arc sec, \~1km) global downscaled climate data set. It includes climate layers for various time periods and variables, ranging from the Last Glacial Maximum, to the present, to several future scenarios.
 
----
+------------------------------------------------------------------------
 
 ![](https://zenodo.org/record/4058819/files/screen_lvl2.png){.centre top="200" height="200"}
 
@@ -61,23 +61,23 @@ A global, spatially explicit characterization of 47 **terrestrial habitat types*
 
 ![](https://github.com/GuangchuangYu/hexSticker/raw/master/inst/figures/ggplot2.png){height="100"} `Habitatmapping`: <https://github.com/Martin-Jung/Habitatmapping>
 
----
+------------------------------------------------------------------------
 
 ![](https://developers.google.cn/earth-engine/datasets/images/RESOLVE/RESOLVE_ECOREGIONS_2017_sample.png){.centre top="200" height="200"}
 
 ### [ecoregions.appspot.com](https://ecoregions.appspot.com)
 
-The **RESOLVE Ecoregions** dataset, updated in 2017, offers a depiction of the 846 terrestrial ecoregions that represent our living planet. 
+The **RESOLVE Ecoregions** dataset, updated in 2017, offers a depiction of the 846 terrestrial ecoregions that represent our living planet.
 
----
+------------------------------------------------------------------------
 
 ![](https://ipbes.net/sites/default/files/copernicus.jpg){.centre top="200" height="200"}
 
 ### [land.copernicus.eu/pan-european/corine-land-cover](https://land.copernicus.eu/pan-european/corine-land-cover)
 
-The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 classes (from Europe). The inventory was initiated in 1985. Updates have been produced in 2000, 2006, 2012, and 2018. 
+The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 classes (from Europe). The inventory was initiated in 1985. Updates have been produced in 2000, 2006, 2012, and 2018.
 
----
+------------------------------------------------------------------------
 
 ![](https://chucktownfloods.cofc.edu/wp-content/uploads/2019/07/NASA-Logo-1024x512.png){.centre top="200" height="200"}
 
@@ -87,7 +87,7 @@ The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 cla
 
 ![](https://github.com/ropensci/MODIStsp/raw/master/man/figures/logo.png){height="100"} `MODIStsp`: <https://github.com/ropensci/MODIStsp/>
 
----
+------------------------------------------------------------------------
 
 ![](https://chucktownfloods.cofc.edu/wp-content/uploads/2019/07/NASA-Logo-1024x512.png){.centre top="200" height="200"}
 
@@ -111,11 +111,11 @@ In today's practical we will focus in the **Asian** continent and assess five di
 
 # 2. Get data: climatic {background-color="#5F9747"}
 
-## 2. Get data: climatic {auto-animate=true}
+## 2. Get data: climatic {auto-animate="true"}
 
 First, let's get a base map of Asia using the `rnaturalearth` package.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -126,12 +126,11 @@ sf_use_s2(FALSE)
 library(tidyverse)
 ```
 
-<br>
-[Remember to install the package first.]{.font-aside}
+<br> [Remember to install the package first.]{.font-aside}
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true} 
+## 2. Get data: climatic {auto-animate="true"}
 
 First, let's get a base map of Asia using the `rnaturalearth` package.
 
@@ -149,13 +148,13 @@ Asia <- ne_countries(scale=10,
                      returnclass = 'sf')
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true} 
+## 2. Get data: climatic {auto-animate="true"}
 
 Now, let's dissolve the administrative borders using `st_union()`
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -163,11 +162,11 @@ Now, let's dissolve the administrative borders using `st_union()`
 Asia_union <- st_union(Asia) %>% st_cast()
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true}
+## 2. Get data: climatic {auto-animate="true"}
 
-Now, let's dissolve the administrative borders using `st_union()`.  
+Now, let's dissolve the administrative borders using `st_union()`.\
 And transform the layer to an equal area projection. We will use: [WGS 1984 Lambert Asia](https://epsg.io/102012).
 
 ```{r}
@@ -177,12 +176,12 @@ Asia_union <- st_union(Asia) %>% st_cast()
 Asia_union <- st_transform(Asia_union, crs='ESRI:102012')
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true}
+## 2. Get data: climatic {auto-animate="true"}
 
-Now, let's dissolve the administrative borders using `st_union()`.  
-And transform the layer to an equal area projection. We will use: [WGS 1984 Lambert Asia](https://epsg.io/102012).  
+Now, let's dissolve the administrative borders using `st_union()`.\
+And transform the layer to an equal area projection. We will use: [WGS 1984 Lambert Asia](https://epsg.io/102012).\
 Let's store that `proj4string` in an object for later.
 
 ```{r}
@@ -194,9 +193,9 @@ Asia_union <- st_transform(Asia_union, crs='ESRI:102012')
 proj_Asia_ea <- '+proj=lcc +lat_0=0 +lon_0=105 +lat_1=30 +lat_2=62 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true}
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's see how it looks
 
@@ -209,26 +208,24 @@ ggplot() +
   theme_bw()
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic 
+## 2. Get data: climatic
 
 Let's download the **WorldClim** data (version 2.1 climate data for 1970-2000):
 
 ::: incremental
--   Annual mean temperature (`bio1`)    
--   Annual precipitation (`bio12`)  
+-   Annual mean temperature (`bio1`)\
+-   Annual precipitation (`bio12`)\
 :::
 
 . . .
 
-<br>
-You can download these data from <https://www.worldclim.org/data/worldclim21.html>
+<br> You can download these data from <https://www.worldclim.org/data/worldclim21.html>
 
+------------------------------------------------------------------------
 
----
-
-## 2. Get data: climatic {auto-animate=true}  
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's read the data. For this we will use the `terra` package.
 
@@ -240,12 +237,11 @@ Let's read the data. For this we will use the `terra` package.
 library(terra)
 ```
 
-<br>
-[Remember to install the package first.]{.font-aside}
+<br> [Remember to install the package first.]{.font-aside}
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true}  
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's read the data. For this we will use the `terra` package.
 
@@ -256,9 +252,9 @@ library(terra)
 tavg <- rast('data/wc2.1_30s_bio_1.tif')
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic {auto-animate=true}  
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's read the data. For this we will use the `terra` package.
 
@@ -270,9 +266,9 @@ tavg <- rast('data/wc2.1_30s_bio_1.tif')
 tavg
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: climatic  {auto-animate=true} 
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's read the data. For this we will use the `terra` package.
 
@@ -282,8 +278,7 @@ Let's read the data. For this we will use the `terra` package.
 prec <- rast('data/wc2.1_30s_bio_15.tif')
 ```
 
-
-## 2. Get data: climatic  {auto-animate=true} 
+## 2. Get data: climatic {auto-animate="true"}
 
 Let's read the data. For this we will use the `terra` package.
 
@@ -294,13 +289,13 @@ prec <- rast('data/wc2.1_30s_bio_15.tif')
 prec
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: elevation {auto-animate=true} 
+## 2. Get data: elevation {auto-animate="true"}
 
 We will also get this data from **WorldClim**.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -308,9 +303,9 @@ We will also get this data from **WorldClim**.
 elev <- rast('data/wc2.1_30s_elev.tif')
 ```
 
----
+------------------------------------------------------------------------
 
-## 2. Get data: elevation {auto-animate=true} 
+## 2. Get data: elevation {auto-animate="true"}
 
 We will also get this data from **WorldClim**.
 
@@ -321,15 +316,15 @@ elev <- rast('data/wc2.1_30s_elev.tif')
 elev
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
-Now, let's get the landcover data. For this we will use the package `MODIStsp`.  
+Now, let's get the landcover data. For this we will use the package `MODIStsp`.
 
 . . .
 
-To download **MODIS** data through the NASA *http* server, we need to create a profile at <https://urs.earthdata.nasa.gov/home> to get a user and password. 
+To download **MODIS** data through the NASA *http* server, we need to create a profile at <https://urs.earthdata.nasa.gov/home> to get a user and password.
 
 . . .
 
@@ -345,11 +340,11 @@ library(MODIStsp)
 
 [Remember to install the package first.]{.font-aside}
 
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
-Let's see what `MODIStsp` has to offer.  
+Let's see what `MODIStsp` has to offer.
 
 . . .
 
@@ -359,17 +354,17 @@ Let's see what `MODIStsp` has to offer.
 MODIStsp_get_prodnames()
 ```
 
-. . . 
+. . .
 
 We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v006/), and download data for **Asia** from the year **2020**.
 
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
 With `MODIStsp_get_prodlayers()` you can see all the layers of the product:
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -377,22 +372,21 @@ With `MODIStsp_get_prodlayers()` you can see all the layers of the product:
 MODIStsp_get_prodlayers("MCD12Q1")$bandnames
 ```
 
-. . . 
+. . .
 
 <br>
 
 There are five different land cover classification schemes, we will be using the primary land cover scheme (**LC1**) which identifies 17 classes defined by the [IGBP](http://www.igbp.net/) (International Geosphere-Biosphere Programme), including 11 natural vegetation classes, 3 human-altered classes, and 3 non-vegetated classes.
 
-
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
 We will use the function `MODIStsp()` to download data:
 
-. . . 
+. . .
 
-```r
+``` r
 MODIStsp(
   ...,
   gui = TRUE,
@@ -438,7 +432,7 @@ MODIStsp(
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
@@ -469,13 +463,13 @@ MODIStsp(gui             = FALSE,
 )
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2. Get data: land-cover
 
 We will use the function `MODIStsp()` to download data
 
-```r
+``` r
 GDAL version in use: 3.4.2
 [Fri Oct  7 10:48:35 2022] MODIStsp --> Starting processing
 [Fri Oct  7 10:48:35 2022] Accessing http server at:  https://e4ftl01.cr.usgs.gov/MOTA/MCD12Q1.006/
@@ -704,14 +698,41 @@ GDAL version in use: 3.4.2
 [Fri Oct  7 11:06:31 2022] Processing and Reprojecting Terra LC1 files for date: 2020_01_01
 ```
 
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Let's read the processed layer.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+land <- rast('data/MCD12Q1.006_LC_Prop1_doy2020001_aid0001.tif')
+```
+
+## 2. Get data: antthropogenic
+
+Read the layer.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+footp <- rast('data/wildareas-v3-2009-human-footprint.tif')
+```
+
+
 # 2.1. Process raster {background-color="#5F9747"}
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-We will use the package `terra` to process the rasters.  
+We will use the package `terra` to process the rasters.\
 First we need to create a new raster to use as a base.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -719,14 +740,14 @@ First we need to create a new raster to use as a base.
 r <- rast(res=100000, ext(vect(Asia_union)), crs=proj_Asia_ea)
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-We will use the package `terra` to process the rasters.  
+We will use the package `terra` to process the rasters.\
 First we need to create a new raster to use as a base.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -735,13 +756,13 @@ r <- rast(res=100000, ext(vect(Asia_union)), crs=proj_Asia_ea)
 r
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
 Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -749,12 +770,12 @@ Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).
 tavg <- crop(tavg, ext(vect(Asia))+1)
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).  
-We will project the layer to the equal area projection.  
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.
 
 ```{r}
 #| echo: true
@@ -763,14 +784,13 @@ tavg <- crop(tavg, ext(vect(Asia))+1)
 tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).  
-We will project the layer to the equal area projection.  
-We will `resample()` the layer to our target resolution.  
-
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.
 
 ```{r}
 #| echo: true
@@ -780,13 +800,13 @@ tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
 tavg <- resample(tavg, r, method='bilinear')
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).  
-We will project the layer to the equal area projection.  
-We will `resample()` the layer to our target resolution.  
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.\
 And finally we will use `mask()` to intersect the layer with the Asia polygon.
 
 ```{r}
@@ -798,13 +818,13 @@ tavg <- resample(tavg, r, method='bilinear')
 tavg <- mask(tavg, vect(Asia_union))
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).  
-We will project the layer to the equal area projection.  
-We will `resample()` the layer to our target resolution.  
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.\
 And finally we will use `mask()` to intersect the layer with the Asia polygon.
 
 ```{r}
@@ -824,11 +844,11 @@ tavg <- rast('data/tavg.tif')
 tavg
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster 
+## 2.1. Process raster
 
-We will do the same for the other continuous layers.  
+We will do the same for the other continuous layers.
 
 ```{r}
 #| echo: true
@@ -847,11 +867,11 @@ prec <- rast('data/prec.tif')
 prec
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.1. Process raster
 
-We will do the same for the other continuous layers.  
+We will do the same for the other continuous layers.
 
 ```{r}
 #| echo: true
@@ -870,13 +890,13 @@ elev <- rast('data/elev.tif')
 elev
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
 For land cover we will use a different projection method.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -884,9 +904,9 @@ For land cover we will use a different projection method.
 land <- crop(land, ext(vect(Asia))+1)
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
 For land cover we will use a different projection method.
 
@@ -897,12 +917,12 @@ land <- crop(land, ext(vect(Asia))+1)
 land <- project(land, proj_Asia_ea, method='near') # reproject to equal area
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.1. Process raster {auto-animate=true}
+## 2.1. Process raster {auto-animate="true"}
 
-For land cover we will use a different projection method.  
-Then we `resample()` and `mask()`.  
+For land cover we will use a different projection method.\
+Then we `resample()` and `mask()`.
 
 ```{r}
 #| echo: true
@@ -921,7 +941,7 @@ land <- rast('data/land.tif')
 land
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.1. Process raster
 
@@ -945,14 +965,13 @@ footp <- rast('data/footp.tif')
 footp
 ```
 
-
 # 2.2. Visualise data {background-color="#5F9747"}
 
-## 2.2. Visualise data 
+## 2.2. Visualise data
 
-We will use the package `tmap`.  
+We will use the package `tmap`.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -969,9 +988,9 @@ tmap_mode(mode ='view')
 -   Landcover (MODIS Terra MCD12Q1)
 -   Human footprint index (SEDAC)
 
----
+------------------------------------------------------------------------
 
-## 2.2. Visualise data {auto-animate=true}
+## 2.2. Visualise data {auto-animate="true"}
 
 Annual mean temperature (WorldClim BIO1)
 
@@ -984,12 +1003,11 @@ tm_shape(tavg) +
   tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10) 
 ```
 
----
+------------------------------------------------------------------------
 
-## 2.2. Visualise data {auto-animate=true}
+## 2.2. Visualise data {auto-animate="true"}
 
 Annual mean temperature (WorldClim BIO1)
-
 
 ```{r}
 #| echo: true
@@ -998,10 +1016,9 @@ tm_shape(tavg) +
   tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10)
 ```
 
+------------------------------------------------------------------------
 
----
-
-## 2.2. Visualise data {auto-animate=true}
+## 2.2. Visualise data {auto-animate="true"}
 
 Annual mean temperature (WorldClim BIO1)
 
@@ -1013,7 +1030,7 @@ tm_shape(tavg) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.2. Visualise data
 
@@ -1029,7 +1046,7 @@ tm_shape(prec) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.2. Visualise data
 
@@ -1045,7 +1062,7 @@ tm_shape(elev) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.2. Visualise data
 
@@ -1059,7 +1076,7 @@ Land-cover (MODIS Terra MCD12Q1). We need to make sure values are factors.
 land <- as.factor(land$land)
 ```
 
-. . . 
+. . .
 
 Then we can add values to the levels.
 
@@ -1087,7 +1104,7 @@ levels(land[[1]]) <- data.frame(ID=c(1,2,3,11,12,13,14,15,16,21,22,31,32,41,42,4
                    'Sparse Shrubland'))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.2. Visualise data
 
@@ -1103,7 +1120,7 @@ tm_shape(land) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2.2. Visualise data
 
@@ -1121,11 +1138,11 @@ tm_shape(footp) +
 
 # 3. Correlations between predictors {background-color="#5F9747"}
 
-## 3. Correlations between predictors  {auto-animate=true}
+## 3. Correlations between predictors {auto-animate="true"}
 
-Let's get values per grid-cell.   
+Let's get values per grid-cell.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -1133,11 +1150,11 @@ Let's get values per grid-cell.
 tavg[] 
 ```
 
----
+------------------------------------------------------------------------
 
-## 3. Correlations between predictors  {auto-animate=true}
+## 3. Correlations between predictors {auto-animate="true"}
 
-Let's get values per grid-cell.  
+Let's get values per grid-cell.\
 Rename the field.
 
 ```{r}
@@ -1148,13 +1165,13 @@ tavg[] %>%
   rename(tavg=wc2.1_30s_bio_1)
 ```
 
----
+------------------------------------------------------------------------
 
-## 3. Correlations between predictors  {auto-animate=true}
+## 3. Correlations between predictors {auto-animate="true"}
 
-Let's get values per grid-cell.    
-Rename the field.  
-Transform the `NaN` values into `NA`, and store the values in an object.  
+Let's get values per grid-cell.\
+Rename the field.\
+Transform the `NaN` values into `NA`, and store the values in an object.
 
 ```{r}
 #| echo: true
@@ -1165,13 +1182,13 @@ tavg_values <- tavg[] %>%
   mutate(tavg=ifelse(is.nan(tavg), NA, tavg))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
-We will do the same with the other layers  
+We will do the same with the other layers
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -1182,7 +1199,7 @@ prec_values <- prec[] %>%
   mutate(prec=ifelse(is.nan(prec), NA, prec))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
@@ -1197,11 +1214,11 @@ elev_values <- elev[] %>%
   mutate(elev=ifelse(is.nan(elev), NA, elev))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
-We will do the same with the other layers  
+We will do the same with the other layers
 
 ```{r}
 #| echo: true
@@ -1212,7 +1229,7 @@ land_values <- land[] %>%
   mutate(land=ifelse(is.nan(land), NA, land))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
@@ -1227,13 +1244,13 @@ footp_values <- footp[] %>%
   mutate(footp=ifelse(is.nan(footp), NA, footp))
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
 Let's see all the values together.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -1245,7 +1262,7 @@ predictors  <- tibble(tavg_values,
                       footp_values)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. Correlations between predictors
 
@@ -1261,7 +1278,7 @@ summary(predictors)
 
 Let's see how these values correlate.
 
-. . . 
+. . .
 
 ```{r}
 #| echo: true
@@ -1277,8 +1294,7 @@ What can this plot tell you?
 
 ## Turtles of Asia
 
-Let's read the data, plot it and see the patterns
-. . . 
+Let's read the data, plot it and see the patterns . . .
 
 ```{r}
 #| echo: true
@@ -1286,12 +1302,11 @@ Let's read the data, plot it and see the patterns
 grid_testudines_Asia <- readRDS('data/grid_testudines_Asia.rds')
 ```
 
----
+------------------------------------------------------------------------
 
 ## Turtles of Asia
 
-Let's read the data, plot it and see the patterns
-. . . 
+Let's read the data, plot it and see the patterns . . .
 
 ```{r}
 #| echo: false
@@ -1301,13 +1316,13 @@ tm_shape(grid_testudines_Asia) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
----
+------------------------------------------------------------------------
 
 ## Turtles of Asia
 
 Let's read the data, plot it and see the patterns
 
-. . . 
+. . .
 
 ```{r}
 #| echo: false
@@ -1331,14 +1346,13 @@ tm_shape(elev) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
-
----
+------------------------------------------------------------------------
 
 ## Turtles of Asia
 
 Let's read the data, plot it and see the patterns
 
-. . . 
+. . .
 
 ```{r}
 #| echo: false
@@ -1358,7 +1372,6 @@ tm_shape(footp) +
   tm_view(bbox = st_bbox(Asia))
 ```
 
-
----
+------------------------------------------------------------------------
 
 # Any doubts? {background-color="#5F9747"}
