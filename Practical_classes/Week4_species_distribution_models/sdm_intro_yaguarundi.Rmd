@@ -1,0 +1,29 @@
+---
+title: "Introduction to Species Distribution Modelling (SDM) - data preparation"
+author: "Petr Keil"
+date: "10/12/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(sf); sf_use_s2(FALSE)
+library(terra)
+library(tidyverse)
+```
+
+
+```{r}
+shape1 <- readRDS("data/PA_herpailurus_pos_blobs.RDs")
+shape2 <- readRDS("data/PA_herpailurus_pre_blobs.RDs")
+shape12<-rbind(shape1, shape2)
+hist(log10(shape12$blobArea))
+plot(shape12)
+```
+
+```{r}
+
+```
