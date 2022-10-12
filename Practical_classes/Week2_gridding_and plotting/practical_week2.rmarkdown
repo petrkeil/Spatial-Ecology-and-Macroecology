@@ -1,0 +1,936 @@
+---
+title: 'Spatial Ecology and Macroecology'
+subtitle: 'Practical - Week 2'
+date: 2022-10-03
+author: 'Florencia Grattarola'
+institute: '(Department of Spatial Sciences)'
+format: 
+  revealjs:
+    self-contained: true
+    logo: 'img/Logo_czu_cz_hr.png'
+    auto-stretch: false
+    code-copy: true
+    code-tools: true
+    enter-title-slide: false
+    theme: [assets/monash.scss]
+    controls: true
+    width: 1280
+    height: 720
+    css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
+    highlight-style: github
+    scrollable: true
+    enableEmoji: true
+editor: visual
+---
+
+
+## What are we going to see today?
+
+Gridding biodiversity data, exploring patterns at different resolutions, and making pretty maps.
+
+::: incremental
+1.  Gridding biodiversity data\
+2.  Visualisation
+:::
+
+. . .
+
+Examples
+
+::: incremental
+-   Local: occurrence records 🦌
+-   Global: species ranges 🐢
+:::
+
+# Gridding biodiversity data {background-color="#5F9747"}
+
+## Gridding biodiversity data
+
+For all geocomputationgs today we will use the `sf` package.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-block-border-left: true
+install.packages('sf') # install
+```
+
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+#| message: true
+library(sf) # load
+```
+
+
+. . .
+
+<br>
+
+
+```{r}
+#| echo: true
+#| eval: true
+#| message: true
+sf_use_s2(FALSE)
+```
+
+
+# Visualisation {background-color="#5F9747"}
+
+## Visualisation
+
+For all the visualisations today we will use the `ggplot` package. It's part of the `tidyverse`.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+library(tidyverse)
+```
+
+
+. . .
+
+``` r
+⁠ggplot(df, aes(x, ⁠
+```
+
+# [LOCAL]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+# {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/202963740/original.jpeg"}
+
+::: footer
+Photo of *Capreolus capreolus* observed in Czech Republic by romanvrbicek licensed CC-BY-NC, via [iNaturalist](https://www.gbif.org/occurrence/3859392197)
+:::
+
+## Mapping occurrence records 🦌
+
+Steps:
+
+::: incremental
+-   Get mammal's of the Czech Republic occurrence records (`POINTS`)\
+-   Read the Czech Republic's grid layer\
+-   Calculate mammal's species richness per grid-cell (SR)\
+-   Visualise SR hotspots in Czech Republic\
+:::
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Get the occurrence records
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ <- readRDS('data/mammalsCZ.rds')
+mammalsCZ
+```
+
+
+. . .
+
+Let's keep few fields
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ <- mammalsCZ %>% select(species, order, eventDate, 
+                                  decimalLongitude, decimalLatitude,
+                                  stateProvince, countryCode, datasetName)
+```
+
+
+## Mapping occurrence records 🦌
+
+Let's transform our data table into an sf object using `st_as_sf()`
+
+. . .
+
+``` r
+st_as_sf(
+  x,
+  ...,
+  agr = NA_agr_,
+  coords,
+  wkt,
+  dim = "XYZ",
+  remove = TRUE,
+  na.fail = TRUE,
+  sf_column_name = NULL
+)
+```
+
+## Mapping occurrence records 🦌
+
+Let's transform our data table into an sf object using `st_as_sf()`
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ %>% 
+  filter(!is.na(decimalLongitude) & !is.na(decimalLatitude)) %>% # filter records without coordinates
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326)
+```
+
+
+. . .
+
+[Note that `crs=4326` is related to the [EPSG:5514](https://epsg.io/4326) CRS: WGS 84]{.font-aside}
+
+## Mapping occurrence records 🦌
+
+Let's transform our data table into an sf object using `st_as_sf()`
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ_sf <- mammalsCZ %>% 
+  filter(!is.na(decimalLongitude) & !is.na(decimalLatitude)) %>% # filter records without coordinates
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326)
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Get the administrative borders
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+CZ_borders <- st_read('data/CZE_adm0.shp')
+CZ_borders
+```
+
+
+## Mapping occurrence records 🦌
+
+Get the standard grids from the Czech Republic
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+CZ_grids <- st_read('data/KvadratyCR_JTSK.shp')
+CZ_grids
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Check the layer's Coordinate Reference System (CRS)
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+st_crs(CZ_borders)
+st_crs(CZ_grids)
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+We will transform `mammalsCZ` CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ_sf <- st_transform(mammalsCZ_sf, crs = st_crs(CZ_grids))
+mammalsCZ_sf
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Let's plot the sf objects
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=CZ_borders, fill='white') +
+  geom_sf(data=CZ_grids, fill=NA) + 
+  geom_sf(data=mammalsCZ_sf)
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+To calculate number of records (N) and number of species per grid-cell (SR), we will use `st_join()`
+
+``` r
+st_join(
+  x,    #   object of class sf
+  y,    #   object of class sf
+  join = st_intersects,
+  ...,
+  suffix = c(".x", ".y"),
+  left = TRUE,
+  largest = FALSE
+)
+```
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+To calculate number of records (N) and number of species per grid-cell (SR), we will use `st_join()`.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+st_join(CZ_grids,       # GRID
+        mammalsCZ_sf)   # POINTS
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Now, we need to summarise the data per grid-cell.\
+Luckily, Tidyverse methods also work for sf objects :)
+
+. . .
+
+<br> We will do it with `group_by()` and `summarise()`.
+
+. . .
+
+First, we group by grid-cells and then we count values per grid.
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Let's calculate number of records (`N`) and number of species per grid-cell (`SR`)
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+st_join(CZ_grids, mammalsCZ_sf) %>% 
+  group_by(OBJECTID) %>% 
+  summarise(N=n(),
+            SR=n_distinct(species))
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Let's store the output into a new object `CZ_mammals_grids`.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
+  group_by(OBJECTID) %>%
+  summarise(N=ifelse(n_distinct(species, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(species, na.rm = TRUE))
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Finally, let's plot this.\
+We will do it using `geom_sf()` a `ggplot` function to visualise sf objects.
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids) +
+  coord_sf(crs=4326)
+```
+
+
+. . .
+
+Where are the nice colours?
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+We need to indicate which column from the object should the grids be filled with.
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  coord_sf(crs=4326)
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+Let's get a nicer color scale.
+
+. . .
+
+Bare in mind that [[we see colors differently](https://davidmathlogic.com/colorblind/). Thus, it's important to consider colorblind safe palettes]{.font-aside}
+
+. . .
+
+[Check out [The R Graph Gallery](https://r-graph-gallery.com/index.html) for many cool graphic options with `ggplot`]{.font-aside}
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1)+
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+```
+
+
+Now, here's a better plot :)
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+The hotspots are located in cities, how can they be the richest areas for mammals?
+
+. . .
+
+Let's have a look at the sampling effort (`N`: number of records) and compare both layers.
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1) +
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+What can you say about the hotspots of species richness we found?
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+#| fig-cap: 
+#|   - "Species richness"
+#|   - "Number of records"
+
+library(patchwork)
+
+SR <- ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) +
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+
+N <- ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1)+
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+
+SR 
+N
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping occurrence records 🦌
+
+-   Get mammal's of the Czech Republic occurrence records (`POINTS`)\
+-   Get the Czech Republic's grid\
+-   Calculate mammal's species richness per grid-cell (SR)\
+-   Visualise SR hotspots in Czech Republic
+
+. . .
+
+<br> We are done! No it's **your turn** :)
+
+---
+
+# [GLOBAL]{.story} [Testudines of the World]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+# {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/183234344/original.jpg"}
+
+::: footer
+Photo of *Emys orbicularis* observed in France by Martin Costechareire licensed CC-BY-NC, via [iNaturalist](https://www.gbif.org/occurrence/3743017591)
+:::
+
+## Mapping species ranges 🐢
+
+Steps:
+
+::: incremental
+-   Read testudines' IUCN range maps (`POLYGONS`)
+-   Get a world map
+-   Create a global 1-degree grid
+-   Calculate testudines's species richness per grid-cell (SR)\
+-   Visualise SR global hotspots\
+:::
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Read testudines' IUCN range maps (`POLYGONS`)
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+testudines <- st_read('data/testudines/data_0.shp')
+```
+
+
+. . .
+
+<br> Polygons were downloaded from IUCN [Spatial Data Download's](https://www.iucnredlist.org/resources/spatial-data-download) page.
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+What do the data look like?
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+testudines
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Now, let's get a world map. For this we will use the package `rnaturalearth`.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: false
+install.packages(c('rnaturalearth', 'rnaturalearthdata'))
+```
+
+```{r}
+#| echo: true
+#| eval: true
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+We will download a shapefile of the world at medium scale and we will combine all countries into one unique polygon.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+world <- ne_countries(scale = 50, returnclass='sf')
+world <- st_union(world) %>% st_make_valid() %>% st_cast()
+```
+
+
+. . .
+
+<br> Let's see how it looks
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=world, fill='white')
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Before working with this map, we need to **project** the layer: from lat/lon to equal area projection.
+
+. . .
+
+<br> Earth is not flat :) Projections help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this (**map projections**).
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Equal-area maps preserve area measure, generally distorting shapes in order to do that.
+
+::: columns
+::: {.column width="50%"}
+![](https://upload.wikimedia.org/wikipedia/commons/8/87/Tissot_mercator.png){height="400"}
+:::
+
+::: {.column width="50%"}
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Tissot_indicatrix_world_map_Behrmann_equal-area_proj.svg/2560px-Tissot_indicatrix_world_map_Behrmann_equal-area_proj.svg.png){height="400"}
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 3
+#| fig-cap: 
+#|   - "World Geodetic System (EPSG:4326)"
+#|   - "Mollweide (ESRI:54009)"
+#|   - "WGS 84 / Equal Earth Greenwich (EPSG:8857)"
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 4326)
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 'ESRI:54009')
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 'EPSG:8857')
+```
+
+
+. . .
+
+We will choose **Equal Earth** (EPSG:8857).
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Let's transform the data (both the world and the testudines' layers)
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: true
+world_ea <- st_transform(world, crs = 'EPSG:8857') %>% 
+  st_make_valid %>% st_cast
+testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% 
+  st_make_valid %>% st_cast
+```
+
+
+. . .
+
+<br> And double check everything's alright
+
+
+```{r}
+#| echo: true
+#| eval: true
+st_crs(world_ea, parameters = TRUE)$epsg
+st_crs(world_ea, parameters = TRUE)$ud_unit
+st_crs(testudines_ea, parameters = TRUE)$epsg
+st_crs(testudines_ea, parameters = TRUE)$ud_unit
+```
+
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+Now, let's create 1-degree grid-cells for the entire world.\
+We will do this using the function `st_make_grid()`
+
+. . .
+
+``` r
+st_make_grid(
+  x,
+  cellsize = c(diff(st_bbox(x)[c(1, 3)]), diff(st_bbox(x)[c(2, 4)]))/n,
+  offset = st_bbox(x)[c("xmin", "ymin")],
+  n = c(10, 10),
+  crs = if (missing(x)) NA_crs_ else st_crs(x),
+  what = "polygons",
+  square = TRUE,
+  flat_topped = FALSE
+)
+```
+
+------------------------------------------------------------------------
+
+## Mapping species ranges 🐢
+
+For the `cellsize` we will chose 1 degree, which is \~100km (=100,000m)
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: false
+world_grid <- st_make_grid(world_ea, 
+                           cellsize=100000,
+                           square=FALSE) %>%  # this will make hexagons
+  st_intersection(world_ea) %>% 
+  st_sf(gridID=1:length(.))     
+```
+
+```{r}
+#| echo: false
+#| eval: true
+world_grid <- readRDS('data/world_grid.rds')
+```
+
+
+. . . 
+
+<br>
+We have the grid, we are ready to calculate richness.
+
+---
+
+## Mapping species ranges 🐢
+
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.1) 
+```
+
+
+---
+
+## Mapping species ranges 🐢
+
+To make things faster, let's get a smaller dataset of *Testudines*  
+
+
+```{r}
+#| echo: true
+#| eval: true
+testu <- testudines_ea %>% 
+  filter(LEGEND=='Extant (resident)') %>% 
+  group_by(ID_NO) %>% 
+  summarise(BINOMIAL=unique(BINOMIAL),
+            PRESENCE=sum(PRESENCE)) %>% 
+  ungroup() %>% st_cast()
+```
+
+
+. . . 
+
+<br>
+
+This can take a while 
+
+
+---
+
+## Mapping species ranges 🐢
+
+Let's plot 10 species as an example
+
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.5)  +
+  geom_sf(data= testu %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
+```
+
+
+---
+
+## Mapping species ranges 🐢
+
+To calculate number of records (N) and number of species per grid-cell (SR), we will use `st_join()`.
+
+. . .
+
+
+```{r}
+#| echo: true
+#| eval: false
+testudines_grid <- st_join(world_grid, testu) %>%
+  group_by(gridID) %>%
+  summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
+            SR=n_distinct(BINOMIAL, na.rm = TRUE))
+```
+
+
+<br>
+
+This **will** take a while 
+
+. . . 
+
+<br>
+And now, we plot!
+
+---
+
+## Mapping species ranges 🐢
+
+Here's the results :)
+
+. . .
+
+
+```{r}
+#| echo: false
+#| eval: true
+testudines_grid <- readRDS('data/testudines_grid.rds')
+```
+
+```{r}
+#| echo: true
+#| eval: true
+testudines_grid
+```
+
+
+---
+
+## Mapping species ranges 🐢
+
+
+```{r}
+#| echo: false
+#| eval: true
+testudines_grid <- readRDS('data/testudines_grid.rds')
+
+ggplot() + 
+  geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
+  geom_sf(data=world_ea, fill=NA, col='grey70', size=0.2) +
+  theme_bw()
+```
+
+
+---
+
+## References
+
+-   R for Data Science <https://r4ds.hadley.nz>
+-   Geocomputation with R <https://geocompr.robinlovelace.net>
+
+---
+
+# Any doubts? {background-color="#5F9747"}
+

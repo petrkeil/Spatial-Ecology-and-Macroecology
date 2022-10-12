@@ -1,0 +1,1364 @@
+---
+title: 'Spatial Ecology and Macroecology'
+subtitle: 'Practical - Week 2'
+date: 2022-10-10
+author: 'Florencia Grattarola'
+institute: '(Department of Spatial Sciences)'
+format: 
+  revealjs:
+    self-contained: true
+    logo: 'img/Logo_czu_cz_hr.png'
+    auto-stretch: false
+    code-copy: true
+    code-tools: true
+    enter-title-slide: false
+    theme: [assets/monash.scss]
+    controls: true
+    width: 1280
+    height: 720
+    css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
+    highlight-style: github
+    scrollable: true
+    enableEmoji: true
+editor: visual
+---
+
+## What are we going to see today?
+
+We will explore the potential drivers of species distribution.
+
+::: incremental
+1.  Overview of data sources\
+2.  Get data
+    1.  Process raster
+    2.  Visualise data
+3.  Correlations between predictors\
+:::
+
+------------------------------------------------------------------------
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5th4HWNhEfBMtu7blfu7FNLGvYbaljkWFRA&usqp=CAU){.centre top="200" height="200"}
+
+### [worldclim.org](https://www.worldclim.org)
+
+**WorldClim** is a database of high spatial resolution global weather and climate data. You can download gridded weather and climate data for historical (near current) and future conditions.
+
+------------------------------------------------------------------------
+
+![](https://chelsa-climate.org/wp-content/uploads/2016/02/logotest3.gif){.centre top="200" height="200"}
+
+### [chelsa-climate.org](https://chelsa-climate.org)
+
+**CHELSA** (Climatologies at high resolution for the earth's land surface areas) is a very high resolution (30 arc sec, \~1km) global downscaled climate data set. It includes climate layers for various time periods and variables, ranging from the Last Glacial Maximum, to the present, to several future scenarios.
+
+------------------------------------------------------------------------
+
+![](https://zenodo.org/record/4058819/files/screen_lvl2.png){.centre top="200" height="200"}
+
+### [nature.com/articles/s41597-020-00599-8](https://www.nature.com/articles/s41597-020-00599-8)
+
+A global, spatially explicit characterization of 47 **terrestrial habitat types**, as defined in the International Union for Conservation of Nature (IUCN) habitat classification scheme.
+
+![](https://github.com/GuangchuangYu/hexSticker/raw/master/inst/figures/ggplot2.png){height="100"} `Habitatmapping`: <https://github.com/Martin-Jung/Habitatmapping>
+
+------------------------------------------------------------------------
+
+![](https://developers.google.cn/earth-engine/datasets/images/RESOLVE/RESOLVE_ECOREGIONS_2017_sample.png){.centre top="200" height="200"}
+
+### [ecoregions.appspot.com](https://ecoregions.appspot.com)
+
+The **RESOLVE Ecoregions** dataset, updated in 2017, offers a depiction of the 846 terrestrial ecoregions that represent our living planet.
+
+------------------------------------------------------------------------
+
+![](https://ipbes.net/sites/default/files/copernicus.jpg){.centre top="200" height="200"}
+
+### [land.copernicus.eu/pan-european/corine-land-cover](https://land.copernicus.eu/pan-european/corine-land-cover)
+
+The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 classes (from Europe). The inventory was initiated in 1985. Updates have been produced in 2000, 2006, 2012, and 2018.
+
+------------------------------------------------------------------------
+
+![](https://chucktownfloods.cofc.edu/wp-content/uploads/2019/07/NASA-Logo-1024x512.png){.centre top="200" height="200"}
+
+### [modis.gsfc.nasa.gov](https://modis.gsfc.nasa.gov)
+
+**Terra MODIS** and **Aqua MODIS** satellites are viewing the entire Earth's surface every 1 to 2 days, acquiring data in 36 spectral bands or groups of wavelengths.
+
+![](https://github.com/ropensci/MODIStsp/raw/master/man/figures/logo.png){height="100"} `MODIStsp`: <https://github.com/ropensci/MODIStsp/>
+
+------------------------------------------------------------------------
+
+![](https://chucktownfloods.cofc.edu/wp-content/uploads/2019/07/NASA-Logo-1024x512.png){.centre top="200" height="200"}
+
+### [sedac.ciesin.columbia.edu](https://sedac.ciesin.columbia.edu)
+
+**SEDAC**, the Socioeconomic Data and Applications Center, focuses on human interactions in the environment and seeks to develop and operate applications that support the integration of socioeconomic and earth science data.
+
+# [EXCERCISE]{.story} [Drivers]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## Drivers
+
+In today's practical we will focus in the **Asian** continent and assess five different layers:
+
+::: incremental
+-   Annual mean temperature (**WorldClim BIO1**)
+-   Precipitation seasonality (**WorldClim BIO15**)
+-   Elevation (**WorldClim**)
+-   Land-cover (**MODIS Terra MCD12Q1**)
+-   Human footprint index (**SEDEC**)
+:::
+
+# 2. Get data: climatic {background-color="#5F9747"}
+
+## 2. Get data: climatic {auto-animate="true"}
+
+First, let's get a base map of Asia using the `rnaturalearth` package.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+library(rnaturalearth)
+library(sf)
+sf_use_s2(FALSE)
+library(tidyverse)
+```
+
+<br> [Remember to install the package first.]{.font-aside}
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+First, let's get a base map of Asia using the `rnaturalearth` package.
+
+```{r}
+#| echo: true
+#| eval: true
+library(rnaturalearth)
+library(sf)
+sf_use_s2(FALSE)
+library(tidyverse)
+
+Asia <- ne_countries(scale=10,
+                     continent='Asia',
+                     type = 'map_units',
+                     returnclass = 'sf')
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Now, let's dissolve the administrative borders using `st_union()`
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+Asia_union <- st_union(Asia) %>% st_cast()
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Now, let's dissolve the administrative borders using `st_union()`.\
+And transform the layer to an equal area projection. We will use: [WGS 1984 Lambert Asia](https://epsg.io/102012).
+
+```{r}
+#| echo: true
+#| eval: false
+Asia_union <- st_union(Asia) %>% st_cast()
+Asia_union <- st_transform(Asia_union, crs='ESRI:102012')
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Now, let's dissolve the administrative borders using `st_union()`.\
+And transform the layer to an equal area projection. We will use: [WGS 1984 Lambert Asia](https://epsg.io/102012).\
+Let's store that `proj4string` in an object for later.
+
+```{r}
+#| echo: true
+#| eval: true
+Asia_union <- st_union(Asia) %>% st_cast()
+Asia_union <- st_transform(Asia_union, crs='ESRI:102012')
+
+proj_Asia_ea <- '+proj=lcc +lat_0=0 +lon_0=105 +lat_1=30 +lat_2=62 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's see how it looks
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() +
+  geom_sf(data=Asia_union, fill='white') +
+  geom_sf(data=st_as_sfc(st_bbox(Asia_union)), fill=NA, col='red') +
+  theme_bw()
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic
+
+Let's download the **WorldClim** data (version 2.1 climate data for 1970-2000):
+
+::: incremental
+-   Annual mean temperature (`bio1`)\
+-   Annual precipitation (`bio15`)\
+:::
+
+. . .
+
+<br> You can download these data from <https://www.worldclim.org/data/worldclim21.html>
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's read the data. For this we will use the `terra` package.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+library(terra)
+```
+
+<br> [Remember to install the package first.]{.font-aside}
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's read the data. For this we will use the `terra` package.
+
+```{r}
+#| echo: true
+#| eval: false
+library(terra)
+tavg <- rast('data/wc2.1_30s_bio_1.tif')
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's read the data. For this we will use the `terra` package.
+
+```{r}
+#| echo: true
+#| eval: true
+library(terra)
+tavg <- rast('data/wc2.1_30s_bio_1.tif')
+tavg
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's read the data. For this we will use the `terra` package.
+
+```{r}
+#| echo: true
+#| eval: true
+prec <- rast('data/wc2.1_30s_bio_15.tif')
+```
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Let's read the data. For this we will use the `terra` package.
+
+```{r}
+#| echo: true
+#| eval: true
+prec <- rast('data/wc2.1_30s_bio_15.tif')
+prec
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: elevation {auto-animate="true"}
+
+We will also get this data from **WorldClim**.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+elev <- rast('data/wc2.1_30s_elev.tif')
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: elevation {auto-animate="true"}
+
+We will also get this data from **WorldClim**.
+
+```{r}
+#| echo: true
+#| eval: true
+elev <- rast('data/wc2.1_30s_elev.tif')
+elev
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Now, let's get the landcover data. For this we will use the package `MODIStsp`.
+
+. . .
+
+To download **MODIS** data through the NASA *http* server, we need to create a profile at <https://urs.earthdata.nasa.gov/home> to get a user and password.
+
+. . .
+
+Today, I'll present you an example and provide you with the data already processed, but you can do this at home.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+library(MODIStsp)
+```
+
+[Remember to install the package first.]{.font-aside}
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Let's see what `MODIStsp` has to offer.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+MODIStsp_get_prodnames()
+```
+
+. . .
+
+We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v006/), and download data for **Asia** from the year **2020**.
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+With `MODIStsp_get_prodlayers()` you can see all the layers of the product:
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+MODIStsp_get_prodlayers("MCD12Q1")$bandnames
+```
+
+. . .
+
+<br>
+
+There are five different land cover classification schemes, we will be using the primary land cover scheme (**LC1**) which identifies 17 classes defined by the [IGBP](http://www.igbp.net/) (International Geosphere-Biosphere Programme), including 11 natural vegetation classes, 3 human-altered classes, and 3 non-vegetated classes.
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+We will use the function `MODIStsp()` to download data:
+
+. . .
+
+``` r
+MODIStsp(
+  ...,
+  gui = TRUE,
+  out_folder = NULL,
+  out_folder_mod = NULL,
+  opts_file = NULL,
+  selprod = NULL,
+  prod_version = NULL,
+  bandsel = NULL,
+  quality_bandsel = NULL,
+  indexes_bandsel = NULL,
+  sensor = NULL,
+  download_server = NULL,
+  downloader = NULL,
+  user = NULL,
+  password = NULL,
+  download_range = NULL,
+  start_date = NULL,
+  end_date = NULL,
+  spatmeth = NULL,
+  start_x = NULL,
+  end_x = NULL,
+  start_y = NULL,
+  end_y = NULL,
+  bbox = NULL,
+  spafile = NULL,
+  out_projsel = NULL,
+  output_proj = NULL,
+  out_res_sel = NULL,
+  out_res = NULL,
+  resampling = NULL,
+  reprocess = NULL,
+  delete_hdf = NULL,
+  nodata_change = NULL,
+  scale_val = NULL,
+  ts_format = NULL,
+  out_format = NULL,
+  compress = NULL,
+  test = NULL,
+  n_retries = 5,
+  verbose = TRUE,
+  parallel = TRUE
+)
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+We will use the function `MODIStsp()` to download data
+
+```{r}
+#| echo: true
+#| eval: false
+MODIStsp(gui             = FALSE,
+         out_folder      = 'data/',
+         out_folder_mod  = 'data/',
+         selprod         = 'LandCover_Type_Yearly_500m (MCD12Q1)',
+         bandsel         = 'LC1', 
+         sensor          = 'Terra',
+         user            = '' , # your username for NASA http server
+         password        = '',  # your password for NASA http server
+         start_date      = '2020.01.01', 
+         end_date        = '2020.12.31', 
+         verbose         = TRUE,
+         bbox            =  c(-6784249, -1828374, 5602080, 7891185), #bbox of Asia
+         spatmeth        = 'bbox',
+         out_format      = 'GTiff',
+         compress        = 'LZW',
+         out_projsel     = 'User Defined',
+         output_proj     = 'ESRI:102012',
+         delete_hdf      = TRUE,
+         parallel        = TRUE
+)
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+We will use the function `MODIStsp()` to download data
+
+``` r
+GDAL version in use: 3.4.2
+[Fri Oct  7 10:48:35 2022] MODIStsp --> Starting processing
+[Fri Oct  7 10:48:35 2022] Accessing http server at:  https://e4ftl01.cr.usgs.gov/MOTA/MCD12Q1.006/
+[Fri Oct  7 10:48:37 2022] Retrieving list of available ` Terra ` Files for Year 2020
+[Fri Oct  7 10:48:43 2022] Downloading Terra Files for date: 2020_01_01 : 1 of:  220
+[Fri Oct  7 10:48:47 2022] Downloading Terra Files for date: 2020_01_01 : 2 of:  220
+[Fri Oct  7 10:48:58 2022] Downloading Terra Files for date: 2020_01_01 : 3 of:  220
+[Fri Oct  7 10:49:10 2022] Downloading Terra Files for date: 2020_01_01 : 4 of:  220
+[Fri Oct  7 10:49:18 2022] Downloading Terra Files for date: 2020_01_01 : 5 of:  220
+[Fri Oct  7 10:49:25 2022] Downloading Terra Files for date: 2020_01_01 : 6 of:  220
+[Fri Oct  7 10:49:34 2022] Downloading Terra Files for date: 2020_01_01 : 7 of:  220
+[Fri Oct  7 10:49:42 2022] Downloading Terra Files for date: 2020_01_01 : 8 of:  220
+[Fri Oct  7 10:49:45 2022] Downloading Terra Files for date: 2020_01_01 : 9 of:  220
+[Fri Oct  7 10:49:49 2022] Downloading Terra Files for date: 2020_01_01 : 10 of:  220
+[Fri Oct  7 10:49:58 2022] Downloading Terra Files for date: 2020_01_01 : 11 of:  220
+[Fri Oct  7 10:50:09 2022] Downloading Terra Files for date: 2020_01_01 : 12 of:  220
+[Fri Oct  7 10:50:18 2022] Downloading Terra Files for date: 2020_01_01 : 13 of:  220
+[Fri Oct  7 10:50:32 2022] Downloading Terra Files for date: 2020_01_01 : 14 of:  220
+[Fri Oct  7 10:50:40 2022] Downloading Terra Files for date: 2020_01_01 : 15 of:  220
+[Fri Oct  7 10:50:48 2022] Downloading Terra Files for date: 2020_01_01 : 16 of:  220
+[Fri Oct  7 10:51:01 2022] Downloading Terra Files for date: 2020_01_01 : 17 of:  220
+[Fri Oct  7 10:51:09 2022] Downloading Terra Files for date: 2020_01_01 : 18 of:  220
+[Fri Oct  7 10:51:12 2022] Downloading Terra Files for date: 2020_01_01 : 19 of:  220
+[Fri Oct  7 10:51:14 2022] Downloading Terra Files for date: 2020_01_01 : 20 of:  220
+[Fri Oct  7 10:51:17 2022] Downloading Terra Files for date: 2020_01_01 : 21 of:  220
+[Fri Oct  7 10:51:20 2022] Downloading Terra Files for date: 2020_01_01 : 22 of:  220
+[Fri Oct  7 10:51:24 2022] Downloading Terra Files for date: 2020_01_01 : 23 of:  220
+[Fri Oct  7 10:51:30 2022] Downloading Terra Files for date: 2020_01_01 : 24 of:  220
+[Fri Oct  7 10:51:37 2022] Downloading Terra Files for date: 2020_01_01 : 25 of:  220
+[Fri Oct  7 10:51:43 2022] Downloading Terra Files for date: 2020_01_01 : 26 of:  220
+[Fri Oct  7 10:51:49 2022] Downloading Terra Files for date: 2020_01_01 : 27 of:  220
+[Fri Oct  7 10:51:55 2022] Downloading Terra Files for date: 2020_01_01 : 28 of:  220
+[Fri Oct  7 10:51:57 2022] Downloading Terra Files for date: 2020_01_01 : 29 of:  220
+[Fri Oct  7 10:52:03 2022] Downloading Terra Files for date: 2020_01_01 : 30 of:  220
+[Fri Oct  7 10:52:10 2022] Downloading Terra Files for date: 2020_01_01 : 31 of:  220
+[Fri Oct  7 10:52:17 2022] Downloading Terra Files for date: 2020_01_01 : 32 of:  220
+[Fri Oct  7 10:52:25 2022] Downloading Terra Files for date: 2020_01_01 : 33 of:  220
+[Fri Oct  7 10:52:33 2022] Downloading Terra Files for date: 2020_01_01 : 34 of:  220
+[Fri Oct  7 10:52:39 2022] Downloading Terra Files for date: 2020_01_01 : 35 of:  220
+[Fri Oct  7 10:52:48 2022] Downloading Terra Files for date: 2020_01_01 : 36 of:  220
+[Fri Oct  7 10:52:57 2022] Downloading Terra Files for date: 2020_01_01 : 37 of:  220
+[Fri Oct  7 10:53:04 2022] Downloading Terra Files for date: 2020_01_01 : 38 of:  220
+[Fri Oct  7 10:53:09 2022] Downloading Terra Files for date: 2020_01_01 : 39 of:  220
+[Fri Oct  7 10:53:12 2022] Downloading Terra Files for date: 2020_01_01 : 40 of:  220
+[Fri Oct  7 10:53:14 2022] Downloading Terra Files for date: 2020_01_01 : 41 of:  220
+[Fri Oct  7 10:53:17 2022] Downloading Terra Files for date: 2020_01_01 : 42 of:  220
+[Fri Oct  7 10:53:21 2022] Downloading Terra Files for date: 2020_01_01 : 43 of:  220
+[Fri Oct  7 10:53:28 2022] Downloading Terra Files for date: 2020_01_01 : 44 of:  220
+[Fri Oct  7 10:53:34 2022] Downloading Terra Files for date: 2020_01_01 : 45 of:  220
+[Fri Oct  7 10:53:40 2022] Downloading Terra Files for date: 2020_01_01 : 46 of:  220
+[Fri Oct  7 10:53:46 2022] Downloading Terra Files for date: 2020_01_01 : 47 of:  220
+[Fri Oct  7 10:53:51 2022] Downloading Terra Files for date: 2020_01_01 : 48 of:  220
+[Fri Oct  7 10:53:54 2022] Downloading Terra Files for date: 2020_01_01 : 49 of:  220
+[Fri Oct  7 10:54:00 2022] Downloading Terra Files for date: 2020_01_01 : 50 of:  220
+[Fri Oct  7 10:54:07 2022] Downloading Terra Files for date: 2020_01_01 : 51 of:  220
+[Fri Oct  7 10:54:14 2022] Downloading Terra Files for date: 2020_01_01 : 52 of:  220
+[Fri Oct  7 10:54:19 2022] Downloading Terra Files for date: 2020_01_01 : 53 of:  220
+[Fri Oct  7 10:54:25 2022] Downloading Terra Files for date: 2020_01_01 : 54 of:  220
+[Fri Oct  7 10:54:31 2022] Downloading Terra Files for date: 2020_01_01 : 55 of:  220
+[Fri Oct  7 10:54:37 2022] Downloading Terra Files for date: 2020_01_01 : 56 of:  220
+[Fri Oct  7 10:54:44 2022] Downloading Terra Files for date: 2020_01_01 : 57 of:  220
+[Fri Oct  7 10:54:49 2022] Downloading Terra Files for date: 2020_01_01 : 58 of:  220
+[Fri Oct  7 10:54:55 2022] Downloading Terra Files for date: 2020_01_01 : 59 of:  220
+[Fri Oct  7 10:55:00 2022] Downloading Terra Files for date: 2020_01_01 : 60 of:  220
+[Fri Oct  7 10:55:04 2022] Downloading Terra Files for date: 2020_01_01 : 61 of:  220
+[Fri Oct  7 10:55:06 2022] Downloading Terra Files for date: 2020_01_01 : 62 of:  220
+[Fri Oct  7 10:55:14 2022] Downloading Terra Files for date: 2020_01_01 : 63 of:  220
+[Fri Oct  7 10:55:20 2022] Downloading Terra Files for date: 2020_01_01 : 64 of:  220
+[Fri Oct  7 10:55:27 2022] Downloading Terra Files for date: 2020_01_01 : 65 of:  220
+[Fri Oct  7 10:55:32 2022] Downloading Terra Files for date: 2020_01_01 : 66 of:  220
+[Fri Oct  7 10:55:35 2022] Downloading Terra Files for date: 2020_01_01 : 67 of:  220
+[Fri Oct  7 10:55:38 2022] Downloading Terra Files for date: 2020_01_01 : 68 of:  220
+[Fri Oct  7 10:55:40 2022] Downloading Terra Files for date: 2020_01_01 : 69 of:  220
+[Fri Oct  7 10:55:47 2022] Downloading Terra Files for date: 2020_01_01 : 70 of:  220
+[Fri Oct  7 10:55:51 2022] Downloading Terra Files for date: 2020_01_01 : 71 of:  220
+[Fri Oct  7 10:55:55 2022] Downloading Terra Files for date: 2020_01_01 : 72 of:  220
+[Fri Oct  7 10:56:01 2022] Downloading Terra Files for date: 2020_01_01 : 73 of:  220
+[Fri Oct  7 10:56:08 2022] Downloading Terra Files for date: 2020_01_01 : 74 of:  220
+[Fri Oct  7 10:56:14 2022] Downloading Terra Files for date: 2020_01_01 : 75 of:  220
+[Fri Oct  7 10:56:20 2022] Downloading Terra Files for date: 2020_01_01 : 76 of:  220
+[Fri Oct  7 10:56:26 2022] Downloading Terra Files for date: 2020_01_01 : 77 of:  220
+[Fri Oct  7 10:56:34 2022] Downloading Terra Files for date: 2020_01_01 : 78 of:  220
+[Fri Oct  7 10:56:43 2022] Downloading Terra Files for date: 2020_01_01 : 79 of:  220
+[Fri Oct  7 10:56:49 2022] Downloading Terra Files for date: 2020_01_01 : 80 of:  220
+[Fri Oct  7 10:56:53 2022] Downloading Terra Files for date: 2020_01_01 : 81 of:  220
+[Fri Oct  7 10:56:57 2022] Downloading Terra Files for date: 2020_01_01 : 82 of:  220
+[Fri Oct  7 10:56:59 2022] Downloading Terra Files for date: 2020_01_01 : 83 of:  220
+[Fri Oct  7 10:57:02 2022] Downloading Terra Files for date: 2020_01_01 : 84 of:  220
+[Fri Oct  7 10:57:05 2022] Downloading Terra Files for date: 2020_01_01 : 85 of:  220
+[Fri Oct  7 10:57:13 2022] Downloading Terra Files for date: 2020_01_01 : 86 of:  220
+[Fri Oct  7 10:57:18 2022] Downloading Terra Files for date: 2020_01_01 : 87 of:  220
+[Fri Oct  7 10:57:23 2022] Downloading Terra Files for date: 2020_01_01 : 88 of:  220
+[Fri Oct  7 10:57:26 2022] Downloading Terra Files for date: 2020_01_01 : 89 of:  220
+[Fri Oct  7 10:57:29 2022] Downloading Terra Files for date: 2020_01_01 : 90 of:  220
+[Fri Oct  7 10:57:33 2022] Downloading Terra Files for date: 2020_01_01 : 91 of:  220
+[Fri Oct  7 10:57:38 2022] Downloading Terra Files for date: 2020_01_01 : 92 of:  220
+[Fri Oct  7 10:57:42 2022] Downloading Terra Files for date: 2020_01_01 : 93 of:  220
+[Fri Oct  7 10:57:46 2022] Downloading Terra Files for date: 2020_01_01 : 94 of:  220
+[Fri Oct  7 10:57:51 2022] Downloading Terra Files for date: 2020_01_01 : 95 of:  220
+[Fri Oct  7 10:57:56 2022] Downloading Terra Files for date: 2020_01_01 : 96 of:  220
+[Fri Oct  7 10:58:01 2022] Downloading Terra Files for date: 2020_01_01 : 97 of:  220
+[Fri Oct  7 10:58:08 2022] Downloading Terra Files for date: 2020_01_01 : 98 of:  220
+[Fri Oct  7 10:58:15 2022] Downloading Terra Files for date: 2020_01_01 : 99 of:  220
+[Fri Oct  7 10:58:23 2022] Downloading Terra Files for date: 2020_01_01 : 100 of:  220
+[Fri Oct  7 10:58:30 2022] Downloading Terra Files for date: 2020_01_01 : 101 of:  220
+[Fri Oct  7 10:58:38 2022] Downloading Terra Files for date: 2020_01_01 : 102 of:  220
+[Fri Oct  7 10:58:41 2022] Downloading Terra Files for date: 2020_01_01 : 103 of:  220
+[Fri Oct  7 10:58:44 2022] Downloading Terra Files for date: 2020_01_01 : 104 of:  220
+[Fri Oct  7 10:58:46 2022] Downloading Terra Files for date: 2020_01_01 : 105 of:  220
+[Fri Oct  7 10:58:49 2022] Downloading Terra Files for date: 2020_01_01 : 106 of:  220
+[Fri Oct  7 10:58:51 2022] Downloading Terra Files for date: 2020_01_01 : 107 of:  220
+[Fri Oct  7 10:58:56 2022] Downloading Terra Files for date: 2020_01_01 : 108 of:  220
+[Fri Oct  7 10:59:01 2022] Downloading Terra Files for date: 2020_01_01 : 109 of:  220
+[Fri Oct  7 10:59:04 2022] Downloading Terra Files for date: 2020_01_01 : 110 of:  220
+[Fri Oct  7 10:59:08 2022] Downloading Terra Files for date: 2020_01_01 : 111 of:  220
+[Fri Oct  7 10:59:11 2022] Downloading Terra Files for date: 2020_01_01 : 112 of:  220
+[Fri Oct  7 10:59:14 2022] Downloading Terra Files for date: 2020_01_01 : 113 of:  220
+[Fri Oct  7 10:59:19 2022] Downloading Terra Files for date: 2020_01_01 : 114 of:  220
+[Fri Oct  7 10:59:25 2022] Downloading Terra Files for date: 2020_01_01 : 115 of:  220
+[Fri Oct  7 10:59:31 2022] Downloading Terra Files for date: 2020_01_01 : 116 of:  220
+[Fri Oct  7 10:59:36 2022] Downloading Terra Files for date: 2020_01_01 : 117 of:  220
+[Fri Oct  7 10:59:41 2022] Downloading Terra Files for date: 2020_01_01 : 118 of:  220
+[Fri Oct  7 10:59:48 2022] Downloading Terra Files for date: 2020_01_01 : 119 of:  220
+[Fri Oct  7 10:59:53 2022] Downloading Terra Files for date: 2020_01_01 : 120 of:  220
+[Fri Oct  7 10:59:55 2022] Downloading Terra Files for date: 2020_01_01 : 121 of:  220
+[Fri Oct  7 10:59:59 2022] Downloading Terra Files for date: 2020_01_01 : 122 of:  220
+[Fri Oct  7 11:00:05 2022] Downloading Terra Files for date: 2020_01_01 : 123 of:  220
+[Fri Oct  7 11:00:07 2022] Downloading Terra Files for date: 2020_01_01 : 124 of:  220
+[Fri Oct  7 11:00:15 2022] Downloading Terra Files for date: 2020_01_01 : 125 of:  220
+[Fri Oct  7 11:00:20 2022] Downloading Terra Files for date: 2020_01_01 : 126 of:  220
+[Fri Oct  7 11:00:24 2022] Downloading Terra Files for date: 2020_01_01 : 127 of:  220
+[Fri Oct  7 11:00:28 2022] Downloading Terra Files for date: 2020_01_01 : 128 of:  220
+[Fri Oct  7 11:00:30 2022] Downloading Terra Files for date: 2020_01_01 : 129 of:  220
+[Fri Oct  7 11:00:33 2022] Downloading Terra Files for date: 2020_01_01 : 130 of:  220
+[Fri Oct  7 11:00:35 2022] Downloading Terra Files for date: 2020_01_01 : 131 of:  220
+[Fri Oct  7 11:00:38 2022] Downloading Terra Files for date: 2020_01_01 : 132 of:  220
+[Fri Oct  7 11:00:41 2022] Downloading Terra Files for date: 2020_01_01 : 133 of:  220
+[Fri Oct  7 11:00:51 2022] Downloading Terra Files for date: 2020_01_01 : 134 of:  220
+[Fri Oct  7 11:00:57 2022] Downloading Terra Files for date: 2020_01_01 : 135 of:  220
+[Fri Oct  7 11:01:01 2022] Downloading Terra Files for date: 2020_01_01 : 136 of:  220
+[Fri Oct  7 11:01:04 2022] Downloading Terra Files for date: 2020_01_01 : 137 of:  220
+[Fri Oct  7 11:01:07 2022] Downloading Terra Files for date: 2020_01_01 : 138 of:  220
+[Fri Oct  7 11:01:11 2022] Downloading Terra Files for date: 2020_01_01 : 139 of:  220
+[Fri Oct  7 11:01:16 2022] Downloading Terra Files for date: 2020_01_01 : 140 of:  220
+[Fri Oct  7 11:01:23 2022] Downloading Terra Files for date: 2020_01_01 : 141 of:  220
+[Fri Oct  7 11:01:29 2022] Downloading Terra Files for date: 2020_01_01 : 142 of:  220
+[Fri Oct  7 11:01:36 2022] Downloading Terra Files for date: 2020_01_01 : 143 of:  220
+[Fri Oct  7 11:01:42 2022] Downloading Terra Files for date: 2020_01_01 : 144 of:  220
+[Fri Oct  7 11:01:44 2022] Downloading Terra Files for date: 2020_01_01 : 145 of:  220
+[Fri Oct  7 11:01:47 2022] Downloading Terra Files for date: 2020_01_01 : 146 of:  220
+[Fri Oct  7 11:01:50 2022] Downloading Terra Files for date: 2020_01_01 : 147 of:  220
+[Fri Oct  7 11:01:55 2022] Downloading Terra Files for date: 2020_01_01 : 148 of:  220
+[Fri Oct  7 11:02:00 2022] Downloading Terra Files for date: 2020_01_01 : 149 of:  220
+[Fri Oct  7 11:02:04 2022] Downloading Terra Files for date: 2020_01_01 : 150 of:  220
+[Fri Oct  7 11:02:09 2022] Downloading Terra Files for date: 2020_01_01 : 151 of:  220
+[Fri Oct  7 11:02:11 2022] Downloading Terra Files for date: 2020_01_01 : 152 of:  220
+[Fri Oct  7 11:02:14 2022] Downloading Terra Files for date: 2020_01_01 : 153 of:  220
+[Fri Oct  7 11:02:16 2022] Downloading Terra Files for date: 2020_01_01 : 154 of:  220
+[Fri Oct  7 11:02:19 2022] Downloading Terra Files for date: 2020_01_01 : 155 of:  220
+[Fri Oct  7 11:02:21 2022] Downloading Terra Files for date: 2020_01_01 : 156 of:  220
+[Fri Oct  7 11:02:23 2022] Downloading Terra Files for date: 2020_01_01 : 157 of:  220
+[Fri Oct  7 11:02:26 2022] Downloading Terra Files for date: 2020_01_01 : 158 of:  220
+[Fri Oct  7 11:02:33 2022] Downloading Terra Files for date: 2020_01_01 : 159 of:  220
+[Fri Oct  7 11:02:37 2022] Downloading Terra Files for date: 2020_01_01 : 160 of:  220
+[Fri Oct  7 11:02:44 2022] Downloading Terra Files for date: 2020_01_01 : 161 of:  220
+[Fri Oct  7 11:02:51 2022] Downloading Terra Files for date: 2020_01_01 : 162 of:  220
+[Fri Oct  7 11:02:55 2022] Downloading Terra Files for date: 2020_01_01 : 163 of:  220
+[Fri Oct  7 11:02:57 2022] Downloading Terra Files for date: 2020_01_01 : 164 of:  220
+[Fri Oct  7 11:03:00 2022] Downloading Terra Files for date: 2020_01_01 : 165 of:  220
+[Fri Oct  7 11:03:07 2022] Downloading Terra Files for date: 2020_01_01 : 166 of:  220
+[Fri Oct  7 11:03:13 2022] Downloading Terra Files for date: 2020_01_01 : 167 of:  220
+[Fri Oct  7 11:03:19 2022] Downloading Terra Files for date: 2020_01_01 : 168 of:  220
+[Fri Oct  7 11:03:21 2022] Downloading Terra Files for date: 2020_01_01 : 169 of:  220
+[Fri Oct  7 11:03:24 2022] Downloading Terra Files for date: 2020_01_01 : 170 of:  220
+[Fri Oct  7 11:03:26 2022] Downloading Terra Files for date: 2020_01_01 : 171 of:  220
+[Fri Oct  7 11:03:28 2022] Downloading Terra Files for date: 2020_01_01 : 172 of:  220
+[Fri Oct  7 11:03:36 2022] Downloading Terra Files for date: 2020_01_01 : 173 of:  220
+[Fri Oct  7 11:03:42 2022] Downloading Terra Files for date: 2020_01_01 : 174 of:  220
+[Fri Oct  7 11:03:46 2022] Downloading Terra Files for date: 2020_01_01 : 175 of:  220
+[Fri Oct  7 11:03:51 2022] Downloading Terra Files for date: 2020_01_01 : 176 of:  220
+[Fri Oct  7 11:03:55 2022] Downloading Terra Files for date: 2020_01_01 : 177 of:  220
+[Fri Oct  7 11:03:58 2022] Downloading Terra Files for date: 2020_01_01 : 178 of:  220
+[Fri Oct  7 11:04:00 2022] Downloading Terra Files for date: 2020_01_01 : 179 of:  220
+[Fri Oct  7 11:04:03 2022] Downloading Terra Files for date: 2020_01_01 : 180 of:  220
+[Fri Oct  7 11:04:05 2022] Downloading Terra Files for date: 2020_01_01 : 181 of:  220
+[Fri Oct  7 11:04:10 2022] Downloading Terra Files for date: 2020_01_01 : 182 of:  220
+[Fri Oct  7 11:04:18 2022] Downloading Terra Files for date: 2020_01_01 : 183 of:  220
+[Fri Oct  7 11:04:25 2022] Downloading Terra Files for date: 2020_01_01 : 184 of:  220
+[Fri Oct  7 11:04:31 2022] Downloading Terra Files for date: 2020_01_01 : 185 of:  220
+[Fri Oct  7 11:04:36 2022] Downloading Terra Files for date: 2020_01_01 : 186 of:  220
+[Fri Oct  7 11:04:38 2022] Downloading Terra Files for date: 2020_01_01 : 187 of:  220
+[Fri Oct  7 11:04:46 2022] Downloading Terra Files for date: 2020_01_01 : 188 of:  220
+[Fri Oct  7 11:04:51 2022] Downloading Terra Files for date: 2020_01_01 : 189 of:  220
+[Fri Oct  7 11:04:56 2022] Downloading Terra Files for date: 2020_01_01 : 190 of:  220
+[Fri Oct  7 11:04:59 2022] Downloading Terra Files for date: 2020_01_01 : 191 of:  220
+[Fri Oct  7 11:05:01 2022] Downloading Terra Files for date: 2020_01_01 : 192 of:  220
+[Fri Oct  7 11:05:03 2022] Downloading Terra Files for date: 2020_01_01 : 193 of:  220
+[Fri Oct  7 11:05:05 2022] Downloading Terra Files for date: 2020_01_01 : 194 of:  220
+[Fri Oct  7 11:05:08 2022] Downloading Terra Files for date: 2020_01_01 : 195 of:  220
+[Fri Oct  7 11:05:12 2022] Downloading Terra Files for date: 2020_01_01 : 196 of:  220
+[Fri Oct  7 11:05:16 2022] Downloading Terra Files for date: 2020_01_01 : 197 of:  220
+[Fri Oct  7 11:05:18 2022] Downloading Terra Files for date: 2020_01_01 : 198 of:  220
+[Fri Oct  7 11:05:20 2022] Downloading Terra Files for date: 2020_01_01 : 199 of:  220
+[Fri Oct  7 11:05:22 2022] Downloading Terra Files for date: 2020_01_01 : 200 of:  220
+[Fri Oct  7 11:05:24 2022] Downloading Terra Files for date: 2020_01_01 : 201 of:  220
+[Fri Oct  7 11:05:26 2022] Downloading Terra Files for date: 2020_01_01 : 202 of:  220
+[Fri Oct  7 11:05:28 2022] Downloading Terra Files for date: 2020_01_01 : 203 of:  220
+[Fri Oct  7 11:05:31 2022] Downloading Terra Files for date: 2020_01_01 : 204 of:  220
+[Fri Oct  7 11:05:34 2022] Downloading Terra Files for date: 2020_01_01 : 205 of:  220
+[Fri Oct  7 11:05:39 2022] Downloading Terra Files for date: 2020_01_01 : 206 of:  220
+[Fri Oct  7 11:05:45 2022] Downloading Terra Files for date: 2020_01_01 : 207 of:  220
+[Fri Oct  7 11:05:47 2022] Downloading Terra Files for date: 2020_01_01 : 208 of:  220
+[Fri Oct  7 11:05:49 2022] Downloading Terra Files for date: 2020_01_01 : 209 of:  220
+[Fri Oct  7 11:05:53 2022] Downloading Terra Files for date: 2020_01_01 : 210 of:  220
+[Fri Oct  7 11:05:58 2022] Downloading Terra Files for date: 2020_01_01 : 211 of:  220
+[Fri Oct  7 11:06:01 2022] Downloading Terra Files for date: 2020_01_01 : 212 of:  220
+[Fri Oct  7 11:06:04 2022] Downloading Terra Files for date: 2020_01_01 : 213 of:  220
+[Fri Oct  7 11:06:06 2022] Downloading Terra Files for date: 2020_01_01 : 214 of:  220
+[Fri Oct  7 11:06:08 2022] Downloading Terra Files for date: 2020_01_01 : 215 of:  220
+[Fri Oct  7 11:06:12 2022] Downloading Terra Files for date: 2020_01_01 : 216 of:  220
+[Fri Oct  7 11:06:17 2022] Downloading Terra Files for date: 2020_01_01 : 217 of:  220
+[Fri Oct  7 11:06:23 2022] Downloading Terra Files for date: 2020_01_01 : 218 of:  220
+[Fri Oct  7 11:06:28 2022] Downloading Terra Files for date: 2020_01_01 : 219 of:  220
+[Fri Oct  7 11:06:30 2022] Downloading Terra Files for date: 2020_01_01 : 220 of:  220
+[Fri Oct  7 11:06:31 2022] [Fri Oct  7 11:06:31 2022] 220 files for date: 2020.01.01 were successfully downloaded!
+[Fri Oct  7 11:06:31 2022] Processing and Reprojecting Terra LC1 files for date: 2020_01_01
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Let's read the processed layer.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+land <- rast('data/MCD12Q1.006_LC_Prop1_doy2020001_aid0001.tif')
+land
+```
+
+## 2. Get data: anthropogenic
+
+Read the layer.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+footp <- rast('data/wildareas-v3-2009-human-footprint.tif')
+footp
+```
+
+
+# 2.1. Process raster {background-color="#5F9747"}
+
+## 2.1. Process raster {auto-animate="true"}
+
+We will use the package `terra` to process the rasters.\
+First we need to create a new raster to use as a base.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+r <- rast(res=100000, ext(vect(Asia_union)), crs=proj_Asia_ea)
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+We will use the package `terra` to process the rasters.\
+First we need to create a new raster to use as a base.
+
+```{r}
+#| echo: true
+#| eval: false
+r <- rast(res=100000, ext(vect(Asia_union)), crs=proj_Asia_ea)
+r
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+tavg <- crop(tavg, ext(vect(Asia))+1)
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.
+
+```{r}
+#| echo: true
+#| eval: false
+tavg <- crop(tavg, ext(vect(Asia))+1)
+tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.
+
+```{r}
+#| echo: true
+#| eval: false
+tavg <- crop(tavg, ext(vect(Asia))+1)
+tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
+tavg <- resample(tavg, r, method='bilinear')
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.\
+And finally we will use `mask()` to intersect the layer with the Asia polygon.
+
+```{r}
+#| echo: true
+#| eval: false
+tavg <- crop(tavg, ext(vect(Asia))+1)
+tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
+tavg <- resample(tavg, r, method='bilinear')
+tavg <- mask(tavg, vect(Asia_union))
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+Then, we will crop the global layer by the **bounding box** of Asia (+1 degree).\
+We will project the layer to the equal area projection.\
+We will `resample()` the layer to our target resolution.\
+And finally we will use `mask()` to intersect the layer with the Asia polygon.
+
+```{r}
+#| echo: true
+#| eval: false
+tavg <- crop(tavg, ext(vect(Asia))+1)
+tavg <- project(tavg, proj_Asia_ea, method='bilinear') # reproject to equal area
+tavg <- resample(tavg, r, method='bilinear')
+tavg <- mask(tavg, vect(Asia_union))
+tavg
+```
+
+```{r}
+#| echo: false
+#| eval: true
+tavg <- rast('data/tavg.tif')
+tavg
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster
+
+We will do the same for the other continuous layers.
+
+```{r}
+#| echo: true
+#| eval: false
+prec <- crop(prec, ext(vect(Asia))+1)
+prec <- project(prec, proj_Asia_ea, method='bilinear') # reproject to equal area
+prec <- resample(prec, r, method='bilinear')
+prec <- mask(prec, vect(Asia_union))
+prec
+```
+
+```{r}
+#| echo: false
+#| eval: true
+prec <- rast('data/prec.tif')
+prec
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster
+
+We will do the same for the other continuous layers.
+
+```{r}
+#| echo: true
+#| eval: false
+elev <- crop(elev, ext(vect(Asia))+1)
+elev <- project(elev, proj_Asia_ea, method='bilinear') # reproject to equal area
+elev <- resample(elev, r, method='bilinear')
+elev <- mask(elev, vect(Asia_union))
+elev
+```
+
+```{r}
+#| echo: false
+#| eval: true
+elev <- rast('data/elev.tif')
+elev
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+For land cover we will use a different projection method.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+land <- crop(land, ext(vect(Asia))+1)
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+For land cover we will use a different projection method.
+
+```{r}
+#| echo: true
+#| eval: false
+land <- crop(land, ext(vect(Asia))+1)
+land <- project(land, proj_Asia_ea, method='near') # reproject to equal area
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+For land cover we will use a different projection method.\
+Then we `resample()` and `mask()`.
+
+```{r}
+#| echo: true
+#| eval: false
+land <- crop(land, ext(vect(Asia))+1)
+land <- project(land, proj_Asia_ea, method='near') # reproject to equal area
+land <- resample(land, r, method='near')
+land <- mask(land, vect(Asia_union))
+land
+```
+
+```{r}
+#| echo: false
+#| eval: true
+land <- rast('data/land.tif')
+land
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster
+
+For human footprint we will also use a different projection method.
+
+```{r}
+#| echo: true
+#| eval: false
+footp <- crop(footp, ext(vect(Asia))+1)
+footp <- project(footp, proj_Asia_ea, method='near') # reproject to equal area
+footp <- resample(footp, r, method='near')
+footp <- mask(footp, vect(Asia_union))
+footp <- footp %>% classify(cbind(128, NA)) # 128 is NA value in the original layer
+footp
+```
+
+```{r}
+#| echo: false
+#| eval: true
+footp <- rast('data/footp.tif')
+footp
+```
+
+# 2.2. Visualise data {background-color="#5F9747"}
+
+## 2.2. Visualise data
+
+We will use the package `tmap`.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+library(tmap)
+tmap_mode(mode ='view')
+```
+
+. . .
+
+-   Annual mean temperature (WorldClim BIO1)
+-   Precipitation seasonality (WorldClim BIO15)
+-   Elevation (WorldClim)
+-   Landcover (MODIS Terra MCD12Q1)
+-   Human footprint index (SEDAC)
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data {auto-animate="true"}
+
+Annual mean temperature (WorldClim BIO1)
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+tm_shape(tavg) +
+  tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10) 
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data {auto-animate="true"}
+
+Annual mean temperature (WorldClim BIO1)
+
+```{r}
+#| echo: true
+#| eval: true
+tm_shape(tavg) +
+  tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Precipitation seasonality (WorldClim BIO15)
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+tm_shape(prec) +
+  tm_raster(palette = 'RdBu', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Elevation (WorldClim)
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+tm_shape(elev) +
+  tm_raster(palette = 'BrBG', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Land-cover (MODIS Terra MCD12Q1). We need to make sure values are factors.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+land <- as.factor(land$land)
+```
+
+. . .
+
+Then we can add values to the levels.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+levels(land[[1]]) <- data.frame(ID=c(1,2,3,11,12,13,14,15,16,21,22,31,32,41,42,43),
+           label=c('Barren',
+                   'Permanent Snow and Ice',
+                   'Water Bodies',
+                   'Evergreen Needleleaf Forest',
+                   'Evergreen Broadleaf Forests',
+                   'Deciduous Needleleaf Forests',
+                   'Deciduous Broadleaf Forests',
+                   'Mixed Broadleaf/Needleleaf Forests',
+                   'Mixed Broadleaf Evergreen/Deciduous Forests',
+                   'Open Forests',
+                   'Sparse Forests',
+                   'Dense Herbaceous',
+                   'Sparse Herbaceous',
+                   'Dense Shrublands',
+                   'Shrubland/Grassland Mosaics',
+                   'Sparse Shrubland'))
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Land-cover (MODIS Terra MCD12Q1)
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+tm_shape(land) +
+  tm_raster(palette = 'Set1', style= "cat") +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Human footprint index (SEDAC)
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+tm_shape(footp) +
+  tm_raster(palette = 'viridis', style= "cont") +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+# 3. Correlations between predictors {background-color="#5F9747"}
+
+## 3. Correlations between predictors {auto-animate="true"}
+
+Let's get values per grid-cell.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+tavg[] 
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors {auto-animate="true"}
+
+Let's get values per grid-cell.\
+Rename the field.
+
+```{r}
+#| echo: true
+#| eval: true
+tavg[] %>% 
+  as_tibble() %>% 
+  rename(tavg=wc2.1_30s_bio_1)
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors {auto-animate="true"}
+
+Let's get values per grid-cell.\
+Rename the field.\
+Transform the `NaN` values into `NA`, and store the values in an object.
+
+```{r}
+#| echo: true
+#| eval: true
+tavg_values <- tavg[] %>% 
+  as_tibble() %>% 
+  rename(tavg=wc2.1_30s_bio_1) %>% 
+  mutate(tavg=ifelse(is.nan(tavg), NA, tavg))
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+We will do the same with the other layers
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+prec_values <- prec[] %>% 
+  as_tibble() %>% 
+  rename(prec=wc2.1_30s_bio_15) %>% 
+  mutate(prec=ifelse(is.nan(prec), NA, prec))
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+We will do the same with the other layers
+
+```{r}
+#| echo: true
+#| eval: true
+elev_values <- elev[] %>% 
+  as_tibble() %>% 
+  rename(elev=wc2.1_30s_elev) %>% 
+  mutate(elev=ifelse(is.nan(elev), NA, elev))
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+We will do the same with the other layers
+
+```{r}
+#| echo: true
+#| eval: true
+land_values <- land[] %>% 
+  as_tibble() %>% 
+  rename(land=label) %>% 
+  mutate(land=ifelse(is.nan(land), NA, land))
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+We will do the same with the other layers
+
+```{r}
+#| echo: true
+#| eval: true
+footp_values <- footp[] %>% 
+  as_tibble() %>% 
+  rename(footp=`wildareas-v3-2009-human-footprint`) %>% 
+  mutate(footp=ifelse(is.nan(footp), NA, footp))
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+Let's see all the values together.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+predictors  <- tibble(tavg_values,
+                      prec_values, 
+                      elev_values,
+                      land_values,
+                      footp_values)
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+Let's see all the values together.
+
+```{r}
+#| echo: true
+#| eval: true
+summary(predictors)
+```
+
+## 3. Correlations between predictors
+
+Let's see how these values correlate.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+pairs(predictors, cex=0.1)
+```
+
+. . .
+
+What can this plot tell you?
+
+# [EXTRA]{.story} [Can we explore any pattern with the hotspots of turtle species richness from last class?]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns . . .
+
+```{r}
+#| echo: true
+#| eval: true
+grid_testudines_Asia <- readRDS('data/grid_testudines_Asia.rds')
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns . . .
+
+```{r}
+#| echo: false
+#| eval: true
+tm_shape(grid_testudines_Asia) +
+  tm_fill('SR', palette = 'YlOrBr') +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(grid_testudines_Asia) +
+  tm_fill('SR', palette = 'YlOrBr') +
+  tm_view(bbox = st_bbox(Asia))
+
+tm_shape(tavg) +
+  tm_raster(palette = 'OrRd', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+
+tm_shape(prec) +
+  tm_raster(palette = 'RdBu', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+
+tm_shape(elev) +
+  tm_raster(palette = 'BrBG', midpoint = NA, style= "cont", n=10) +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+. . .
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(grid_testudines_Asia) +
+  tm_fill('SR', palette = 'YlOrBr') +
+  tm_view(bbox = st_bbox(Asia))
+
+tm_shape(land) +
+  tm_raster(palette = 'Set1', style= "cat") +
+  tm_view(bbox = st_bbox(Asia))
+
+tm_shape(footp) +
+  tm_raster(palette = 'viridis', style= "cont") +
+  tm_view(bbox = st_bbox(Asia))
+```
+
+------------------------------------------------------------------------
+
+# Any doubts? {background-color="#5F9747"}
