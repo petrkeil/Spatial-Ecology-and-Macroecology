@@ -15,15 +15,17 @@ library(terra)
 library(tidyverse)
 ```
 
-
 ```{r}
-shape1 <- readRDS("data/PA_herpailurus_pos_blobs.RDs")
-shape2 <- readRDS("data/PA_herpailurus_pre_blobs.RDs")
+shape1 <- readRDS("data/PA_post.RDs")
+shape2 <- readRDS("data/PA_pre.RDs")
 shape12<-rbind(shape1, shape2)
-hist(log10(shape12$blobArea))
-plot(shape12)
+
+m <- glm(presabs ~ effort + log(area) + env.elev + env.bio_1 + env.bio_2 +
+      env.bio_3 + env.bio_4 + env.npp + env.tree, 
+    family = "binomial", data = shape12)
 ```
 
 ```{r}
+plot(shape12$X, shape12$Y)
 
 ```
