@@ -28,8 +28,8 @@ Data inputs:
   - SEDAC Human Footprint Index (raster): [wildareas-v3-2009-human-footprint.tif](Practical_classes/Week3_predictors/data/wildareas-v3-2009-human-footprint-geotiff).  
   
 Data outputs:
-  - Administrative borders of Asia (shapefile): [Asia.shp](Practical_classes/Week3_gridding_and plotting/data).  
-  - Asian continent  (shapefile): [Asia_union.shp](Practical_classes/Week3_gridding_and plotting/data).
+  - Administrative borders of Asia (shapefile): [Asia.shp](/Week3_gridding_and plotting/data/).  
+  - Asian continent  (shapefile): [Asia_union.shp](/Week3_gridding_and plotting/data/).
 
 ### Week 4 - 17 October (**Petr**). Species Distribution Models (SDM) in R. Principle, techniques, fitting models, predicted vs observed maps, interpretation, predicting & forecasting.
 ### Week 5 - 24 October (**Francois**, Flo). Modelling patterns of biodiversity.
