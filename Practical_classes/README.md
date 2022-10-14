@@ -21,11 +21,11 @@ Data outputs:
 
 ### Week 3 - 10 October (**Flo**). Drivers.
 Data inputs:
-  - Worldclim Annual mean temperature (raster): [wc2.1_30s_bio_1.tif](Practical_classes/Week3_predictors/data).  
-  - Worldclim Precipitation seasonality (raster): [wc2.1_30s_bio_15.tif](Practical_classes/Week3_predictors/data).  
-  - Worldclim Elevation (raster): [wc2.1_30s_elev.tif](Practical_classes/Week3_predictors/data).    
-  - MODIS Terra Land-cover (raster): [MCD12Q1.006_LC_Prop1_doy2020001_aid0001.tif](Practical_classes/Week3_predictors/data).     
-  - SEDAC Human Footprint Index (raster): [wildareas-v3-2009-human-footprint.tif](Practical_classes/Week3_predictors/data/wildareas-v3-2009-human-footprint-geotiff).  
+  - Worldclim Annual mean temperature (raster): [wc2.1_30s_bio_1.tif](/Practical_classes/Week3_predictors/data).  
+  - Worldclim Precipitation seasonality (raster): [wc2.1_30s_bio_15.tif](/Practical_classes/Week3_predictors/data).  
+  - Worldclim Elevation (raster): [wc2.1_30s_elev.tif](/Practical_classes/Week3_predictors/data).    
+  - MODIS Terra Land-cover (raster): [MCD12Q1.006_LC_Prop1_doy2020001_aid0001.tif](/Practical_classes/Week3_predictors/data).     
+  - SEDAC Human Footprint Index (raster): [wildareas-v3-2009-human-footprint.tif](/Practical_classes/Week3_predictors/data/wildareas-v3-2009-human-footprint-geotiff).  
   
 Data outputs:
   - Administrative borders of Asia (shapefile): [Asia.shp](/Week3_gridding_and plotting/data/).  
