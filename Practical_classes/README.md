@@ -10,14 +10,14 @@ Data inputs:
 
 ### Week 2 - 3 October (**Flo**). Gridding and plotting biodiversity data.
 Data inputs:
-  - Administrative borders of the Czech Republic (shapefile): [CZE_adm0.shp](/Practical_classes/Week2_gridding_and plotting/data).  
-  - Grid of the Czech Republic (shapefile): [KvadratyCR_JTSK.shp](/Practical_classes/Week2_gridding_and plotting/data).    
-  - IUCN range maps of the *Testudines* of the world (shapefile): [data_0.shp](/Practical_classes/Week2_gridding_and plotting/data/testudines).
+  - Administrative borders of the Czech Republic (shapefile): [CZE_adm0.shp](/Practical_classes/Week2_gridding_and_plotting/data).  
+  - Grid of the Czech Republic (shapefile): [KvadratyCR_JTSK.shp](/Practical_classes/Week2_gridding_and_plotting/data).    
+  - IUCN range maps of the *Testudines* of the world (shapefile): [data_0.shp](/Practical_classes/Week2_gridding_and_plotting/data/testudines).
 
 Data outputs:
-  - Cleaned GBIF records of the Mammals of the Czech Republic (rds): [mammalsCZ.rds](/Practical_classes/Week2_gridding_and plotting/data/mammalsCZ.rds). 
-  - Grid of the world, hexagons of 1 degree size (rds): [world_grid.rds](/Practical_classes/Week2_gridding_and plotting/data/world_grid.rds).    
-  - Grid of species richness of the *Testudines* of the world (rds): [testudines_grid.rds](/Practical_classes/Week2_gridding_and plotting/data/testudines_grid.rds).      
+  - Cleaned GBIF records of the Mammals of the Czech Republic (rds): [mammalsCZ.rds](/Practical_classes/Week2_gridding_and_plotting/data/mammalsCZ.rds). 
+  - Grid of the world, hexagons of 1 degree size (rds): [world_grid.rds](/Practical_classes/Week2_gridding_and_plotting/data/world_grid.rds).    
+  - Grid of species richness of the *Testudines* of the world (rds): [testudines_grid.rds](/Practical_classes/Week2_gridding_and_plotting/data/testudines_grid.rds).      
 
 ### Week 3 - 10 October (**Flo**). Drivers.
 Data inputs:
@@ -28,8 +28,8 @@ Data inputs:
   - SEDAC Human Footprint Index (raster): [wildareas-v3-2009-human-footprint.tif](/Practical_classes/Week3_predictors/data/wildareas-v3-2009-human-footprint-geotiff).  
   
 Data outputs:
-  - Administrative borders of Asia (shapefile): [Asia.shp](/Practical_classes/Week3_gridding_and plotting/data).  
-  - Asian continent  (shapefile): [Asia_union.shp](/Practical_classes/Week3_gridding_and plotting/data).
+  - Administrative borders of Asia (shapefile): [Asia.shp](/Practical_classes/Week3_predictors/data).  
+  - Asian continent  (shapefile): [Asia_union.shp](/Practical_classes/Week3_predictors/data).
 
 ### Week 4 - 17 October (**Petr**). Species Distribution Models (SDM) in R. Principle, techniques, fitting models, predicted vs observed maps, interpretation, predicting & forecasting.
 ### Week 5 - 24 October (**Francois**, Flo). Modelling patterns of biodiversity.
