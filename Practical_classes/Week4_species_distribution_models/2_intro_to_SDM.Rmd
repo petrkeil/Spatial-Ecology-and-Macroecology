@@ -89,7 +89,7 @@ This is the legend to the **bioclimatic variables**, which you can also find at 
 - BIO12 - Annual Precipitation
 - BIO15 - Precipitation Seasonality
 
-# The actuall modelling
+# Three types of approaches
 
 **Presence-only methods** - Don't need data on absences. They only estimate relative
 *habitat suitability*, not probability. Sensitive to spatial biases. Example: MaxEnt.
@@ -99,7 +99,7 @@ This is the legend to the **bioclimatic variables**, which you can also find at 
 **Presence-absence methods** - Use presence/absence survey data. They estimate true 
 probability. Sensitive to imperfect detections. Example: GLM.
 
-## Presence-only methods - MaxEnt
+# Presence-only methods - MaxEnt
 
 The best intro: [Cory Merrow's tutorial](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1600-0587.2013.07872.x)
 
