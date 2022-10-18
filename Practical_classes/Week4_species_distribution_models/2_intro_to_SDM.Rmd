@@ -35,9 +35,10 @@ To do:
 
 ## Resources
 
-- R-related overview of the different modelling approaches in [dismo package](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf).
-- Damaris Zurell's tutorial.
-- Comprehensive SDM class with videos and such.
+- Species distribution modelling with R.J. Hijmans & Jane Elith [dismo package](https://rspatial.org/raster/sdm/).
+- Damaris Zurell's tutorial: [https://damariszurell.github.io/SDM-Intro/](https://damariszurell.github.io/SDM-Intro/)
+- ENM2020: A free online course and set of resources on modeling species niches
+and distributions: [https://journals.ku.edu/jbi/article/view/15016](https://journals.ku.edu/jbi/article/view/15016)
 
 ## **Yaguarundí** (*Herpailurus yaguarundi*)
 
@@ -88,17 +89,27 @@ This is the legend to the **bioclimatic variables**, which you can also find at 
 - BIO12 - Annual Precipitation
 - BIO15 - Precipitation Seasonality
 
-# The actuall modelling
+# Three types of approaches
 
-**Presence-only methods** 
+**Presence-only methods** - Don't need data on absences. They only estimate relative
+*habitat suitability*, not probability. Sensitive to spatial biases. Example: MaxEnt.
 
-**Presence-pseudo absence methods**
+**Presence-pseudo absence methods** - Employ arbitrary ways to make artificial absences.
 
-**Presence-absence methods**
+**Presence-absence methods** - Use presence/absence survey data. They estimate true 
+probability. Sensitive to imperfect detections. Example: GLM.
 
-## Presence-only methods - MaxEnt
+# Presence-only methods - MaxEnt
 
-Fit the MaxEnt model
+The best intro: [Cory Merrow's tutorial](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1600-0587.2013.07872.x)
+
+Two main advantages:
+- Good performance
+- Ease of use
+
+How MaxEnt works: *"MaxEnt takes a list of species presence locations as input, often called presence-only (PO) data, as well as a set of environmental predictors (e.g. precipitation, temperature) across a user-defined landscape that is divided into grid cells. From this landscape, MaxEnt extracts a sample of background locations that it contrasts against the presence locations (section III.A). Presence is unknown at background locations"* Merrow et al. (2013) Ecography.
+
+### Fit the MaxEnt model
 
 ```{r}
 library(dismo)
@@ -106,16 +117,19 @@ mx <- dismo::maxent(x = PO.predictors, p = PTS)
 ```
 
 ```{r}
+# show variable importance
+plot(mx)
+
 # show the predictions
 mx.raster <- predict(mx, x = PO.predictors)
+
+# show response curves
+response(mx)
 
 # map the predicted environmental suitability
 plot(mx.raster)
 plot(yaguarundi_IUCN, col=NA, lwd=2, add=T)
 plot(PTS, add=T)
-
-# show response curves
-response(mx)
 ```
 
 # Presence-absence data
@@ -135,6 +149,11 @@ ggplot() +
 ```
 
 # Presence-absence methods - random forest
+
+- Popular machine-learning approach
+- Based on resampling of the data, and performing multiple **classification and regression trees (CART)**, whose predictions are then averaged
+- Easy to use, miminal assumptions about the data
+- Can be used for exploratory analysis
 
 Fitting the random forest model
 
@@ -252,6 +271,14 @@ plot(Latam_countries, col=NA, lwd=2, add=T)
 all.preds <- raster::stack(mx.raster, rf.raster, m.glm.raster, m.gam.raster)
 names(all.preds) <- c("MaxEnt", "Random Forest", "GLM", "GAM")
 plot(all.preds)
+```
+
+------------------------------------
+
+And here is the simplest application of **model averaging**, a.k.a. **ensemble modelling**:
+
+```{r}
+plot(mean(all.preds))
 ```
 
 # Things to consider
