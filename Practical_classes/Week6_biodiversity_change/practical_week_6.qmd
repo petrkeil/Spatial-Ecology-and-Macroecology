@@ -1,0 +1,19 @@
+---
+title: "Practical Class 6: Biodiversity changes"
+author: "François Leroy"
+format:
+  html:
+    toc: true
+    toc_float: true
+editor: visual
+---
+
+**Content of the workshop of today**
+
+We will continue to work with the North American BBS that we worked with already. Last week, we assessed several metrics of biodiversity for the year 2019. However, we can wonder: how has bird biodiversity changed through time (*e.g.* from 1980 to 2021)?
+
+To answer this question, we need **time-series** *i.e.*, data which have been harvested for several years at the same location. This is the case of the BBS: each road has been visited once a year for a very long time. Today, we will work with data from 1968 to 2021 and assess how had biodiversity changed through this period for the different BBS roads.
+
+Also, when working with time-series, one thing to consider is how the repeated samples have been made through the years. Were they sampled for the same amount of time? By the same number of volunteers...? This is what is often called in ecology the *sampling effort* or the *study design*. Fortunately, the BBS data collection is standardized, which means that the volunteers have to follow a protocol when counting the birds. Thus, we can compare the data through time without having to account for the sampling effort.  
+
+# Assessing temporal change
