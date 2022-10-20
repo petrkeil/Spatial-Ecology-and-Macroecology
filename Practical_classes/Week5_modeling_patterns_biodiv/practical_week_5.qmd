@@ -23,7 +23,7 @@ The steps are as follow:
 5. Fit a linear model to predict species richness using a set of predictors
 
 Finally, the last part of the workshop will be for you to use the tools we used
-during the class to work on another metric of biodiversity: the Shannon index.
+during the class to work on two other metrics of biodiversity: the Shannon index (*i.e.* diversity) and the Pielou index (*i.e.* evenness).
 
 # Download the North American BBS
 
