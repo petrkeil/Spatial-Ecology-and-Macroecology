@@ -177,7 +177,7 @@ routes_shp <- left_join(routes_shp, sr2019,
 
 **Now that you have computed the species richness, try to map it by adding it to the map we made at the beginning of the class**
 
-```{r, echo=FALSE}
+```{r, echo=F}
 ## Map
 ggplot()+
   geom_sf(data = countries_shp)+
@@ -306,7 +306,7 @@ weather$EndTime <- round(hour(weather$EndTime) + (minute(weather$EndTime)/60),
 
 **Now that you have `StartTime` and `EndTime` in decimal hours: create a new column `avgTime` which contains the mean hour of the day at which the census has been made (with 2 decimals).**
 
-```{r, echo=FALSE}
+```{r, echo=F}
 weather$avgTime <- round(rowMeans(weather[,c("StartTime","EndTime")], na.rm = T), 2)
 ```
 
@@ -390,7 +390,7 @@ You can see that we have 3239 roads and 635 species.
 
 -   **Task 1:** Compute the shannon index using the `diversity()` function. You should obtain a named vector which looks like this (using `head()`)
 
-```{r, message=F, warning=F, echo=FALSE}
+```{r, message=F, warning=F, echo=F}
 library(vegan)
 ## Compute the Shannon index
 h.2019 <- diversity(abundance2019, index = "shannon")
@@ -473,7 +473,7 @@ Using the vegan package, you can compute it from the Shannon index `H` that you 
 Now, repeat the same task as above for the evenness index.
 Especially, map it and compare it to species richness and Shannon index.
 
-```{r, echo = F}
+```{r, echo=F}
 #" Compute evenness
 J <- h.2019/specnumber(abundance2019)
 
