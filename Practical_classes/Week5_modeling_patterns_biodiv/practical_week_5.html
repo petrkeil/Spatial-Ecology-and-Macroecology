@@ -122,7 +122,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#map" id="toc-map" class="nav-link" data-scroll-target="#map">Map</a></li>
   <li><a href="#model-species-richness-using-linear-regressions" id="toc-model-species-richness-using-linear-regressions" class="nav-link" data-scroll-target="#model-species-richness-using-linear-regressions">Model species richness using linear regressions</a></li>
   </ul></li>
-  <li><a href="#exercice-modeling-shannon-index" id="toc-exercice-modeling-shannon-index" class="nav-link" data-scroll-target="#exercice-modeling-shannon-index">Exercice: modeling Shannon index</a>
+  <li><a href="#exercice-modeling-shannon-index-and-evenness" id="toc-exercice-modeling-shannon-index-and-evenness" class="nav-link" data-scroll-target="#exercice-modeling-shannon-index-and-evenness">Exercice: modeling Shannon index and evenness</a>
   <ul class="collapse">
   <li><a href="#now-it-is-up-to-you" id="toc-now-it-is-up-to-you" class="nav-link" data-scroll-target="#now-it-is-up-to-you">Now it is up to you</a></li>
   </ul></li>
@@ -1111,8 +1111,8 @@ F-statistic: 5.882 on 15 and 3223 DF,  p-value: 3.264e-12</code></pre>
 <p><strong>Now, let’s interpret the output of the model</strong></p>
 </section>
 </section>
-<section id="exercice-modeling-shannon-index" class="level1">
-<h1>Exercice: modeling Shannon index</h1>
+<section id="exercice-modeling-shannon-index-and-evenness" class="level1">
+<h1>Exercice: modeling Shannon index and evenness</h1>
 <p>The goal of this exercise will be to fit a linear model to an other index of diversity: the Shannon index <span class="math inline">\(H\)</span>. This index takes into account both the species richness (that we worked on just before) and the evenness (<em>i.e.</em> relative abundance between the species). It is defined as follow:</p>
 <p><span class="math display">\[H = -\sum_i^R p_i\ln p_i\]</span></p>
 <p>With <span class="math inline">\(R\)</span> the total number of species and <span class="math inline">\(p_i\)</span> the proportion of individuals. For each species<span class="math inline">\(_i\)</span> with <span class="math inline">\(n_i\)</span> individuals, <span class="math inline">\(p_i = \frac{n_i}{N}\)</span> (with <span class="math inline">\(N\)</span> the total number of individuals)</p>
@@ -1220,6 +1220,15 @@ F-statistic: 11.22 on 15 and 3223 DF,  p-value: &lt; 2.2e-16</code></pre>
 <ul>
 <li><strong>Task 6:</strong> interpret the output and compare it to the species richness model output. Is this different? Is it surprising?</li>
 </ul>
+<p><strong>Bonus:</strong> as said above, Shannon index is a summary of species richness and relative abundances. The latter can also be called <strong>evenness</strong>. Several ways to compute the evenness exist (<em>e.g.</em> gini index, Pielou index…). Here we will use the Pielou index <span class="math inline">\(J\)</span>, which formal definition is:</p>
+<p><span class="math display">\[J = \frac{H}{log(R)}\]</span></p>
+<p>Using the vegan package, you can compute it from the Shannon index <code>H</code> that you created just before as follow <code>J &lt;- H/specnumber(abundance2019)</code></p>
+<p>Now, repeat the same task as above for the evenness index. Especially, map it and compare it to species richness and Shannon index.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="practical_week_5_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 </section>
 

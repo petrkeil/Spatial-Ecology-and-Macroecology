@@ -329,7 +329,7 @@ summary(lm_model)
 
 **Now, let's interpret the output of the model**
 
-# Exercice: modeling Shannon index
+# Exercice: modeling Shannon index and evenness
 
 The goal of this exercise will be to fit a linear model to an other index of diversity: the Shannon index $H$.
 This index takes into account both the species richness (that we worked on just before) and the evenness (*i.e.* relative abundance between the species).
@@ -441,3 +441,47 @@ summary(lm_model_shannon)
 
 * **Task 6:** interpret the output and compare it to the species richness model output.
 Is this different? Is it surprising?
+
+**Bonus:** as said above, Shannon index is a summary of species richness and
+relative abundances. The latter can also be called **evenness**. Several ways to compute
+the evenness exist (*e.g.* gini index, Pielou index...). Here we will use the Pielou index $J$,
+which formal definition is:
+
+$$J = \frac{H}{log(R)}$$
+
+Using the vegan package, you can compute it from the Shannon index `H` that you created just before
+as follow `J <- H/specnumber(abundance2019)`
+
+Now, repeat the same task as above for the evenness index. Especially, map it and compare it to
+species richness and Shannon index.
+
+```{r, echo = F}
+#" Compute evenness
+J <- h.2019/specnumber(abundance2019)
+
+###########
+## Create a dataframe from the evenness vector
+pielou.df <- as.data.frame(J) %>% rownames_to_column("RouteDataID") %>% mutate(RouteDataID = as.numeric(RouteDataID))
+
+## Merge with the sr2019 dataframe
+sr2019 <-
+left_join(sr2019,
+          pielou.df,
+          by = "RouteDataID")
+
+## Merge the sr2019 with the routes_shp
+routes_shp <-
+  left_join(routes_shp,
+            sr2019 %>% select(J, CountryNum, StateNum, Route),
+            by = c("CountryNum", "StateNum", "Route"))
+###########
+## Map
+ggplot()+
+  geom_sf(data = countries_shp)+
+  geom_sf(data = na.omit(routes_shp), aes(color = J), size = .5)+
+  scale_color_viridis_c(limits = c(min(J), .2))+
+  ggtitle("Pielou index of each BBS road for year 2019")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = .5))
+
+```
