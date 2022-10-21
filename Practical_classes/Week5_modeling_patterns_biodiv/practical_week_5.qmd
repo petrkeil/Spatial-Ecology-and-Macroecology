@@ -4,13 +4,11 @@ author: "François Leroy"
 format:
   html:
     toc: true
-    toc_float: true
-editor: visual
 ---
 
 **Content of the practical work of today:**
 
-The point of this class is to put you in the situation where you have to download, explore and exploit a large biodiversity dataset.
+The point of this class is to put you in the situation where you have to download, explore and analyse a large biodiversity dataset.
 It is made to show you the steps that you are likely to follow when you are working with macroecological datasets.
 We will work with one of the most famous and qualitative dataset in ecology: the North American Breeding Bird Survey (BBS).
 
@@ -20,7 +18,7 @@ The steps are as follow:
 2.  Explore the data through metadata
 3.  Map the spatial extent of your dataset
 4.  Assess and map the avian species richness for the year 2019
-5.  Fit a linear model to predict species richness using a set of predictors
+5.  Explain by which environmental variables species richness is driven using a linear regression
 
 Finally, the last part of the workshop will be for you to use the tools we used during the class to work on two other metrics of biodiversity: the Shannon index (*i.e.* diversity) and the Pielou index (*i.e.* evenness).
 
@@ -99,7 +97,7 @@ ggplot()+
   theme_bw()
 ```
 
-# Compute map and model species richness
+# Compute, map and model species richness
 
 Species richness represents the total number of species at one location.
 It is one of the most commonly used metric of biodiversity as it is really straight forward to assess.
@@ -189,24 +187,28 @@ ggplot()+
 
 ```
 
-## Model species richness using linear regressions
+## Assessing the drivers of species richness using linear regression
 
 Linear regression is the most iconic machine learning method.
-The main assumption is that there is a linear relationship between the variable you want to predict (*a.k.a.* the target, the predicted variable, the output) and a set of predictors (*a.k.a.* covariates, features).
+The main assumption is that there is a linear relationship between the variable you want to explain (*a.k.a.* the target, the predicted variable, the output, dependent variable)
+and a set of explaining variables (*a.k.a.* predictors, covariates, features, independent variables).
+For instance today, we will try to explain how species richness is driven by several weather variables. 
+That is: species richness is the target while the weather parameters are the predictors.
 
-The relationship has a form of a linear function:
+The relationship between the target and the predictors has a form of a linear function:
 
 $$y = \beta _1x_1 + \beta _2x_2 \ldots \beta _nx_n + \beta _0$$
 
 With $n$ the number of covariates.
-Thus, $y$ can be represented in an (n+1)-dimensional space (called an hyperspace when $n+1 > 3$).
-The goal of fitting a linear regression (but also of most of the machine learning algorithms) is to find the hyperplane which fits the most to $y$ (*i.e.* which explains most of the variance).
+Thus, this equation can be represented in an (n+1)-dimensional space (called an hyperspace when $n+1 > 3$).
+Moreover, the values of the $\beta$s will indicate both the sign and the strenght of the relationship (*e.g.* $\beta_1$ will show if there is a negative/positive influence of $x_1$ on $y$).
+The goal of fitting a linear regression (but also of most of the machine learning algorithms) is to find the hyperplane which fits the most to $y$ (*i.e.* which explains most of its variance).
 In machine learning, you do so by minimizing a *loss function*.
 The loss function for a linear regression is called the **Residual Sum of Square** (*i.e. RSS*).
 
-$$RSS = \sum _{i = 1}^n (y_i - \hat y_i)^2$$
-
-Here, we will use weather data as covariates ($x_1\ldots x_n$) in order to predict the species richness for year 2019 ($y$).
+$$RSS = \sum _{i = 1}^j (y_i - \hat y_i)^2$$
+with $j$ the number of observations in your dataset.
+Here, we will use weather data as covariates (*i.e.* $x_1\ldots x_n$) in order to predict the species richness for year 2019 ($y$).
 Weather data is stored in the `weather.csv` file.
 
 ```{r, message=F, warning=F}
@@ -335,12 +337,20 @@ Let's modify them:
 lm_data$StartSky <- factor(lm_data$StartSky)
 lm_data$Month <- factor(lm_data$Month)
 lm_data$avgWind <- factor(lm_data$avgWind, order = T)
-
-## We can look at the classes of the data
-str(lm_data)
 ```
 
-We can now learn the model:
+We also need to normalize the quantitative continuous variables (here, the temperature and time)
+
+```{r}
+lm_data$avgTemp <- scale(lm_data$avgTemp)
+lm_data$avgTime <- scale(lm_data$avgTime)
+
+## We can look at the correlation of the variables
+pairs(lm_data)
+```
+
+
+Now, let's fit the model. Fitting the model means assessing the best hyperplane. 
 
 ```{r}
 lm_model <- lm(sr_2019 ~ ., data = lm_data) ## modeling sr_2019 as a function of all the other variables
@@ -348,9 +358,9 @@ lm_model <- lm(sr_2019 ~ ., data = lm_data) ## modeling sr_2019 as a function of
 summary(lm_model)
 ```
 
-**Now, let's interpret the output of the model**
+**Interpret the output of the model**
 
-# Exercice: modeling Shannon index and evenness
+# Exercice: assessing drivers of Shannon index and evenness
 
 The goal of this exercise will be to fit a linear model to an other index of diversity: the Shannon index $H$.
 This index takes into account both the species richness (that we worked on just before) and the evenness (*i.e.* relative abundance between the species).

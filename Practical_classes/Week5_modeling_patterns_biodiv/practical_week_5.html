@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.1.251">
+<meta name="generator" content="quarto-1.0.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,15 +12,10 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
-  vertical-align: middle;
-}
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -59,7 +54,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
+code span.bu { } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -72,7 +67,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.im { } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -109,20 +104,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-  <nav id="TOC" role="doc-toc" class="toc-active">
+  <nav id="TOC" role="doc-toc">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
   <li><a href="#download-the-north-american-bbs" id="toc-download-the-north-american-bbs" class="nav-link active" data-scroll-target="#download-the-north-american-bbs">Download the North American BBS</a></li>
   <li><a href="#explore-the-metadata" id="toc-explore-the-metadata" class="nav-link" data-scroll-target="#explore-the-metadata">Explore the metadata</a></li>
   <li><a href="#map-the-bbs" id="toc-map-the-bbs" class="nav-link" data-scroll-target="#map-the-bbs">Map the BBS</a></li>
-  <li><a href="#compute-map-and-model-species-richness" id="toc-compute-map-and-model-species-richness" class="nav-link" data-scroll-target="#compute-map-and-model-species-richness">Compute map and model species richness</a>
+  <li><a href="#compute-map-and-model-species-richness" id="toc-compute-map-and-model-species-richness" class="nav-link" data-scroll-target="#compute-map-and-model-species-richness">Compute, map and model species richness</a>
   <ul class="collapse">
   <li><a href="#compute" id="toc-compute" class="nav-link" data-scroll-target="#compute">Compute</a></li>
   <li><a href="#map" id="toc-map" class="nav-link" data-scroll-target="#map">Map</a></li>
-  <li><a href="#model-species-richness-using-linear-regressions" id="toc-model-species-richness-using-linear-regressions" class="nav-link" data-scroll-target="#model-species-richness-using-linear-regressions">Model species richness using linear regressions</a></li>
+  <li><a href="#assessing-the-drivers-of-species-richness-using-linear-regression" id="toc-assessing-the-drivers-of-species-richness-using-linear-regression" class="nav-link" data-scroll-target="#assessing-the-drivers-of-species-richness-using-linear-regression">Assessing the drivers of species richness using linear regression</a></li>
   </ul></li>
-  <li><a href="#exercice-modeling-shannon-index-and-evenness" id="toc-exercice-modeling-shannon-index-and-evenness" class="nav-link" data-scroll-target="#exercice-modeling-shannon-index-and-evenness">Exercice: modeling Shannon index and evenness</a>
+  <li><a href="#exercice-assessing-drivers-of-shannon-index-and-evenness" id="toc-exercice-assessing-drivers-of-shannon-index-and-evenness" class="nav-link" data-scroll-target="#exercice-assessing-drivers-of-shannon-index-and-evenness">Exercice: assessing drivers of Shannon index and evenness</a>
   <ul class="collapse">
   <li><a href="#now-it-is-up-to-you" id="toc-now-it-is-up-to-you" class="nav-link" data-scroll-target="#now-it-is-up-to-you">Now it is up to you</a></li>
   </ul></li>
@@ -154,14 +149,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <p><strong>Content of the practical work of today:</strong></p>
-<p>The point of this class is to put you in the situation where you have to download, explore and exploit a large biodiversity dataset. It is made to show you the steps that you are likely to follow when you are working with macroecological datasets. We will work with one of the most famous and qualitative dataset in ecology: the North American Breeding Bird Survey (BBS).</p>
+<p>The point of this class is to put you in the situation where you have to download, explore and analyse a large biodiversity dataset. It is made to show you the steps that you are likely to follow when you are working with macroecological datasets. We will work with one of the most famous and qualitative dataset in ecology: the North American Breeding Bird Survey (BBS).</p>
 <p>The steps are as follow:</p>
 <ol type="1">
 <li>Download the data and set up your R environment</li>
 <li>Explore the data through metadata</li>
 <li>Map the spatial extent of your dataset</li>
 <li>Assess and map the avian species richness for the year 2019</li>
-<li>Fit a linear model to predict species richness using a set of predictors</li>
+<li>Explain by which environmental variables species richness is driven using a linear regression</li>
 </ol>
 <p>Finally, the last part of the workshop will be for you to use the tools we used during the class to work on two other metrics of biodiversity: the Shannon index (<em>i.e.</em> diversity) and the Pielou index (<em>i.e.</em> evenness).</p>
 <section id="download-the-north-american-bbs" class="level1">
@@ -267,7 +262,7 @@ CRS:           +proj=laea +lon_0=-68.91 +lat_0=1.28 +datum=WGS84 +units=m +no_de
 </div>
 </section>
 <section id="compute-map-and-model-species-richness" class="level1">
-<h1>Compute map and model species richness</h1>
+<h1>Compute, map and model species richness</h1>
 <p>Species richness represents the total number of species at one location. It is one of the most commonly used metric of biodiversity as it is really straight forward to assess. Data about the species can be found in folder <code>50-StopData/1997ToPresent_SurveyWide/</code>. They are spread on 10 excel spreadsheets (<em>do not forget to unzip them !!</em>). In order to not repeat 10 times the loading process, we will automate it:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
@@ -738,7 +733,7 @@ CRS:           +proj=laea +lon_0=-68.91 +lat_0=1.28 +datum=WGS84 +units=m +no_de
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">Route =</span> <span class="fu">unique</span>(Route))           <span class="do">## Keep the route info</span></span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sr2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 5
+<pre><code># A tibble: 6 x 5
   RouteDataID sr_2019 CountryNum StateNum Route
         &lt;dbl&gt;   &lt;int&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;
 1     6370730      49        840 06       170  
@@ -768,14 +763,14 @@ CRS:           +proj=laea +lon_0=-68.91 +lat_0=1.28 +datum=WGS84 +units=m +no_de
 </div>
 </div>
 </section>
-<section id="model-species-richness-using-linear-regressions" class="level2">
-<h2 class="anchored" data-anchor-id="model-species-richness-using-linear-regressions">Model species richness using linear regressions</h2>
-<p>Linear regression is the most iconic machine learning method. The main assumption is that there is a linear relationship between the variable you want to predict (<em>a.k.a.</em> the target, the predicted variable, the output) and a set of predictors (<em>a.k.a.</em> covariates, features).</p>
-<p>The relationship has a form of a linear function:</p>
+<section id="assessing-the-drivers-of-species-richness-using-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="assessing-the-drivers-of-species-richness-using-linear-regression">Assessing the drivers of species richness using linear regression</h2>
+<p>Linear regression is the most iconic machine learning method. The main assumption is that there is a linear relationship between the variable you want to explain (<em>a.k.a.</em> the target, the predicted variable, the output, dependent variable) and a set of explaining variables (<em>a.k.a.</em> predictors, covariates, features, independent variables). For instance today, we will try to explain how species richness is driven by several weather variables. That is: species richness is the target while the weather parameters are the predictors.</p>
+<p>The relationship between the target and the predictors has a form of a linear function:</p>
 <p><span class="math display">\[y = \beta _1x_1 + \beta _2x_2 \ldots \beta _nx_n + \beta _0\]</span></p>
-<p>With <span class="math inline">\(n\)</span> the number of covariates. Thus, <span class="math inline">\(y\)</span> can be represented in an (n+1)-dimensional space (called an hyperspace when <span class="math inline">\(n+1 &gt; 3\)</span>). The goal of fitting a linear regression (but also of most of the machine learning algorithms) is to find the hyperplane which fits the most to <span class="math inline">\(y\)</span> (<em>i.e.</em> which explains most of the variance). In machine learning, you do so by minimizing a <em>loss function</em>. The loss function for a linear regression is called the <strong>Residual Sum of Square</strong> (<em>i.e.&nbsp;RSS</em>).</p>
-<p><span class="math display">\[RSS = \sum _{i = 1}^n (y_i - \hat y_i)^2\]</span></p>
-<p>Here, we will use weather data as covariates (<span class="math inline">\(x_1\ldots x_n\)</span>) in order to predict the species richness for year 2019 (<span class="math inline">\(y\)</span>). Weather data is stored in the <code>weather.csv</code> file.</p>
+<p>With <span class="math inline">\(n\)</span> the number of covariates. Thus, this equation can be represented in an (n+1)-dimensional space (called an hyperspace when <span class="math inline">\(n+1 &gt; 3\)</span>). Moreover, the values of the <span class="math inline">\(\beta\)</span>s will indicate both the sign and the strenght of the relationship (<em>e.g.</em> <span class="math inline">\(\beta_1\)</span> will show if there is a negative/positive influence of <span class="math inline">\(x_1\)</span> on <span class="math inline">\(y\)</span>). The goal of fitting a linear regression (but also of most of the machine learning algorithms) is to find the hyperplane which fits the most to <span class="math inline">\(y\)</span> (<em>i.e.</em> which explains most of its variance). In machine learning, you do so by minimizing a <em>loss function</em>. The loss function for a linear regression is called the <strong>Residual Sum of Square</strong> (<em>i.e.&nbsp;RSS</em>).</p>
+<p><span class="math display">\[RSS = \sum _{i = 1}^j (y_i - \hat y_i)^2\]</span></p>
+<p>with <span class="math inline">\(j\)</span> the number of observations in your dataset. Here, we will use weather data as covariates (<em>i.e.</em> <span class="math inline">\(x_1\ldots x_n\)</span>) in order to predict the species richness for year 2019 (<span class="math inline">\(y\)</span>). Weather data is stored in the <code>weather.csv</code> file.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>weather <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/weather.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1055,21 +1050,20 @@ attr(,"package")
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>StartSky <span class="ot">&lt;-</span> <span class="fu">factor</span>(lm_data<span class="sc">$</span>StartSky)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>Month <span class="ot">&lt;-</span> <span class="fu">factor</span>(lm_data<span class="sc">$</span>Month)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>avgWind <span class="ot">&lt;-</span> <span class="fu">factor</span>(lm_data<span class="sc">$</span>avgWind, <span class="at">order =</span> T)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="do">## We can look at the classes of the data</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(lm_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>tibble [3,239 × 6] (S3: tbl_df/tbl/data.frame)
- $ sr_2019 : int [1:3239] 49 50 33 35 49 42 21 28 42 70 ...
- $ avgTemp : num [1:3239] 17.2 25 23.6 17.8 21.9 ...
- $ avgTime : num [1:3239] 7.06 7.38 7.28 7.14 7.37 8.14 8.11 7.16 8.66 8.25 ...
- $ avgWind : Ord.factor w/ 6 levels "0"&lt;"1"&lt;"2"&lt;"3"&lt;..: 1 1 2 1 3 2 3 2 3 4 ...
- $ StartSky: Factor w/ 6 levels "0","1","2","4",..: 1 1 1 1 1 2 1 3 4 3 ...
- $ Month   : Factor w/ 4 levels "4","5","6","7": 1 1 1 2 2 2 1 2 2 2 ...</code></pre>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>avgWind <span class="ot">&lt;-</span> <span class="fu">factor</span>(lm_data<span class="sc">$</span>avgWind, <span class="at">order =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We also need to normalize the quantitative continuous variables (here, the temperature and time)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>avgTemp <span class="ot">&lt;-</span> <span class="fu">scale</span>(lm_data<span class="sc">$</span>avgTemp)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>lm_data<span class="sc">$</span>avgTime <span class="ot">&lt;-</span> <span class="fu">scale</span>(lm_data<span class="sc">$</span>avgTime)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="do">## We can look at the correlation of the variables</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(lm_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="practical_week_5_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>We can now learn the model:</p>
+<p>Now, let’s fit the model. Fitting the model means assessing the best hyperplane.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(sr_2019 <span class="sc">~</span> ., <span class="at">data =</span> lm_data) <span class="do">## modeling sr_2019 as a function of all the other variables</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1085,9 +1079,9 @@ Residuals:
 
 Coefficients:
             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) 18.25043    5.78575   3.154 0.001623 ** 
-avgTemp      0.08629    0.04907   1.758 0.078784 .  
-avgTime      1.21006    0.43300   2.795 0.005227 ** 
+(Intercept) 28.87271    4.96951   5.810 6.86e-09 ***
+avgTemp      0.49833    0.28341   1.758 0.078784 .  
+avgTime      0.77990    0.27907   2.795 0.005227 ** 
 avgWind.L   -8.39176    4.15407  -2.020 0.043452 *  
 avgWind.Q   -2.11181    3.78027  -0.559 0.576447    
 avgWind.C    0.05343    2.79287   0.019 0.984739    
@@ -1109,32 +1103,38 @@ Multiple R-squared:  0.02665,   Adjusted R-squared:  0.02212
 F-statistic: 5.882 on 15 and 3223 DF,  p-value: 3.264e-12</code></pre>
 </div>
 </div>
-<p><strong>Now, let’s interpret the output of the model</strong></p>
+<p><strong>Interpret the output of the model</strong></p>
 </section>
 </section>
-<section id="exercice-modeling-shannon-index-and-evenness" class="level1">
-<h1>Exercice: modeling Shannon index and evenness</h1>
+<section id="exercice-assessing-drivers-of-shannon-index-and-evenness" class="level1">
+<h1>Exercice: assessing drivers of Shannon index and evenness</h1>
 <p>The goal of this exercise will be to fit a linear model to an other index of diversity: the Shannon index <span class="math inline">\(H\)</span>. This index takes into account both the species richness (that we worked on just before) and the evenness (<em>i.e.</em> relative abundance between the species). It is defined as follow:</p>
 <p><span class="math display">\[H = -\sum_i^R p_i\ln p_i\]</span></p>
 <p>With <span class="math inline">\(R\)</span> the total number of species and <span class="math inline">\(p_i\)</span> the proportion of individuals. For each species<span class="math inline">\(_i\)</span> with <span class="math inline">\(n_i\)</span> individuals, <span class="math inline">\(p_i = \frac{n_i}{N}\)</span> (with <span class="math inline">\(N\)</span> the total number of individuals)</p>
 <p>We are going to compute the Shannon index for the year 2019. For this, we will use the function <code>diversity()</code> from the <code>vegan</code> package.</p>
 <p>First, let’s format the data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute the total abundance for each road and each species</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>sp2019<span class="sc">$</span>abundance <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(sp2019[,<span class="dv">8</span><span class="sc">:</span><span class="dv">57</span>])</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="do">## The diversity function needs a dataset formated as: roads x species</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>abundance2019 <span class="ot">&lt;-</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  sp2019 <span class="sc">%&gt;%</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(RouteDataID, AOU, abundance) <span class="sc">%&gt;%</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"AOU"</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> <span class="st">"abundance"</span>,</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"RouteDataID"</span>)</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(abundance2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.1.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tibble' was built under R version 4.1.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute the total abundance for each road and each species</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>sp2019<span class="sc">$</span>abundance <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(sp2019[,<span class="dv">8</span><span class="sc">:</span><span class="dv">57</span>])</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="do">## The diversity function needs a dataset formated as: roads x species</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>abundance2019 <span class="ot">&lt;-</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  sp2019 <span class="sc">%&gt;%</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(RouteDataID, AOU, abundance) <span class="sc">%&gt;%</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"AOU"</span>,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> <span class="st">"abundance"</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"RouteDataID"</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(abundance2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 3239  635</code></pre>
 </div>
@@ -1162,7 +1162,7 @@ F-statistic: 5.882 on 15 and 3223 DF,  p-value: 3.264e-12</code></pre>
 </ul>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="practical_week_5_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+<p><img src="practical_week_5_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <ul>
@@ -1170,7 +1170,7 @@ F-statistic: 5.882 on 15 and 3223 DF,  p-value: 3.264e-12</code></pre>
 </ul>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>tibble [3,239 × 6] (S3: tbl_df/tbl/data.frame)
+<pre><code>tibble [3,239 x 6] (S3: tbl_df/tbl/data.frame)
  $ h.2019  : num [1:3239] 2.95 2.79 3.4 3.48 3.22 ...
  $ avgTemp : num [1:3239] 15 11 7 9.5 15 10.5 18.5 16 6 9 ...
  $ avgTime : num [1:3239] 7.06 6.62 7.3 6.98 7.15 6.66 7.14 7.6 7.4 6.64 ...
@@ -1227,7 +1227,7 @@ F-statistic: 11.22 on 15 and 3223 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Now, repeat the same task as above for the evenness index. Especially, map it and compare it to species richness and Shannon index.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="practical_week_5_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+<p><img src="practical_week_5_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -1304,8 +1304,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      let href = ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
