@@ -113,7 +113,7 @@ How MaxEnt works: *"MaxEnt takes a list of species presence locations as input, 
 
 ```{r}
 library(dismo)
-mx <- dismo::maxent(x = PO.predictors, p = PTS)
+mx <- maxent(x = PO.predictors, p = PTS)
 ```
 
 ```{r}
