@@ -33,6 +33,8 @@ There are two ways to assess changes of biodiversity:
 
 # Temporal changes of species richness
 
+## Using simple linear regression
+
 We will first see how species richness has changed through time for the different BBS roads.
 
 ```{r}
@@ -92,6 +94,7 @@ species_richness %>%
   #### and plot the value of species richness against time
   ggplot(aes(x = Year, y = sr))+
   geom_point()+
+  geom_smooth(method = "lm")+
   theme_bw()
 ```
 
@@ -155,6 +158,57 @@ ggplot()+
   ggtitle("Change of species richness between 2000-2021 for each BBS road")+
   theme_bw()+
   theme(plot.title = element_text(hjust = .5))
+```
+
+## Using polynomial regression
+
+Polynomial regression is a specific case of a linear regression. Even though the final function
+is not linear, the coefficients of each order of $x$ are linear:
+
+$$y = \beta_1x_1 + \beta_2x_1^2 + \beta_3x_1^3 \ldots \beta _nx_1^n + \beta_0$$
+Let's use a time series of another random road:
+
+```{r}
+species_richness %>% 
+  filter(CountryNum == 840,
+         StateNum == "25",
+         Route == "025") %>% 
+  #### and plot the value of species richness against time
+  ggplot(aes(x = Year, y = sr))+
+  geom_point()+
+  # geom_smooth(method = "lm")+
+  theme_bw()
+```
+As you can see, this time the relationship does not really seem linear. So let's fit
+polynomial regressions (*i.e.* quadratic, cubic...) and see how the regressions look like. 
+
+```{r}
+poly_data <- 
+  species_richness %>% 
+  filter(CountryNum == 840,
+         StateNum == "25",
+         Route == "025")
+
+poly_1 <- lm(sr ~ poly(Year, 1), data = poly_data)
+poly_2 <- lm(sr ~ poly(Year, 2), data = poly_data)
+poly_3 <- lm(sr ~ poly(Year, 3), data = poly_data)
+poly_4 <- lm(sr ~ poly(Year, 4), data = poly_data)
+
+ggplot()+
+  geom_line(aes(x = poly_data$Year, y = poly_1$fitted.values, color = "poly_1"))+
+  geom_line(aes(x = poly_data$Year, y = poly_2$fitted.values, color = "poly_2"))+
+  geom_line(aes(x = poly_data$Year, y = poly_3$fitted.values, color = "poly_3"))+
+  geom_line(aes(x = poly_data$Year, y = poly_4$fitted.values, color = "poly_4"))+
+  geom_point(aes(x = Year, y = sr), data = poly_data)+
+  theme_bw()
+```
+You can see that the higher the order of the polynomial, the higher the flexibility of the model.
+
+```{r, echo=F}
+paste0("R² poly1 = ", summary(poly_1)$adj.r.squared)
+paste0("R² poly2 = ", summary(poly_2)$adj.r.squared)
+paste0("R² poly3 = ", summary(poly_3)$adj.r.squared)
+paste0("R² poly4 = ", summary(poly_4)$adj.r.squared)
 ```
 
 # Assessing colonization, extinction and persistence

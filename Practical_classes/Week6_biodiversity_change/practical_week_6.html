@@ -106,7 +106,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#assessing-temporal-change-of-diversity" id="toc-assessing-temporal-change-of-diversity" class="nav-link active" data-scroll-target="#assessing-temporal-change-of-diversity">Assessing temporal change of diversity</a></li>
-  <li><a href="#temporal-changes-of-species-richness" id="toc-temporal-changes-of-species-richness" class="nav-link" data-scroll-target="#temporal-changes-of-species-richness">Temporal changes of species richness</a></li>
+  <li><a href="#temporal-changes-of-species-richness" id="toc-temporal-changes-of-species-richness" class="nav-link" data-scroll-target="#temporal-changes-of-species-richness">Temporal changes of species richness</a>
+  <ul class="collapse">
+  <li><a href="#using-simple-linear-regression" id="toc-using-simple-linear-regression" class="nav-link" data-scroll-target="#using-simple-linear-regression">Using simple linear regression</a></li>
+  <li><a href="#using-polynomial-regression" id="toc-using-polynomial-regression" class="nav-link" data-scroll-target="#using-polynomial-regression">Using polynomial regression</a></li>
+  </ul></li>
   <li><a href="#assessing-colonization-extinction-and-persistence" id="toc-assessing-colonization-extinction-and-persistence" class="nav-link" data-scroll-target="#assessing-colonization-extinction-and-persistence">Assessing colonization, extinction and persistence</a></li>
   </ul>
 </nav>
@@ -149,6 +153,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="temporal-changes-of-species-richness" class="level1">
 <h1>Temporal changes of species richness</h1>
+<section id="using-simple-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="using-simple-linear-regression">Using simple linear regression</h2>
 <p>We will first see how species richness has changed through time for the different BBS roads.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
@@ -215,7 +221,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### and plot the value of species richness against time</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> sr))<span class="sc">+</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)<span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="practical_week_6_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -250,6 +257,66 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><img src="practical_week_6_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="using-polynomial-regression" class="level2">
+<h2 class="anchored" data-anchor-id="using-polynomial-regression">Using polynomial regression</h2>
+<p>Polynomial regression is a specific case of a linear regression. Even though the final function is not linear, the coefficients of each order of <span class="math inline">\(x\)</span> are linear:</p>
+<p><span class="math display">\[y = \beta_1x_1 + \beta_2x_1^2 + \beta_3x_1^3 \ldots \beta _nx_1^n + \beta_0\]</span></p>
+<p>Let’s use a time series of another random road:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>species_richness <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CountryNum <span class="sc">==</span> <span class="dv">840</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>         StateNum <span class="sc">==</span> <span class="st">"25"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         Route <span class="sc">==</span> <span class="st">"025"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">#### and plot the value of species richness against time</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> sr))<span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># geom_smooth(method = "lm")+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="practical_week_6_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As you can see, this time the relationship does not really seem linear. So let’s fit polynomial regressions (<em>i.e.</em> quadratic, cubic…) and see how the regressions look like.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>poly_data <span class="ot">&lt;-</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  species_richness <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CountryNum <span class="sc">==</span> <span class="dv">840</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         StateNum <span class="sc">==</span> <span class="st">"25"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>         Route <span class="sc">==</span> <span class="st">"025"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>poly_1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sr <span class="sc">~</span> <span class="fu">poly</span>(Year, <span class="dv">1</span>), <span class="at">data =</span> poly_data)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>poly_2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sr <span class="sc">~</span> <span class="fu">poly</span>(Year, <span class="dv">2</span>), <span class="at">data =</span> poly_data)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>poly_3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sr <span class="sc">~</span> <span class="fu">poly</span>(Year, <span class="dv">3</span>), <span class="at">data =</span> poly_data)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>poly_4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sr <span class="sc">~</span> <span class="fu">poly</span>(Year, <span class="dv">4</span>), <span class="at">data =</span> poly_data)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>()<span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_data<span class="sc">$</span>Year, <span class="at">y =</span> poly_1<span class="sc">$</span>fitted.values, <span class="at">color =</span> <span class="st">"poly_1"</span>))<span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_data<span class="sc">$</span>Year, <span class="at">y =</span> poly_2<span class="sc">$</span>fitted.values, <span class="at">color =</span> <span class="st">"poly_2"</span>))<span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_data<span class="sc">$</span>Year, <span class="at">y =</span> poly_3<span class="sc">$</span>fitted.values, <span class="at">color =</span> <span class="st">"poly_3"</span>))<span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_data<span class="sc">$</span>Year, <span class="at">y =</span> poly_4<span class="sc">$</span>fitted.values, <span class="at">color =</span> <span class="st">"poly_4"</span>))<span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> sr), <span class="at">data =</span> poly_data)<span class="sc">+</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="practical_week_6_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>You can see that the higher the order of the polynomial, the higher the flexibility of the model.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "R² poly1 = 0.152154474989737"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "R² poly2 = 0.350569287307634"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "R² poly3 = 0.707473782067586"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "R² poly4 = 0.702284540611484"</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="assessing-colonization-extinction-and-persistence" class="level1">
 <h1>Assessing colonization, extinction and persistence</h1>
