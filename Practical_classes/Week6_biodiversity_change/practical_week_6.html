@@ -303,15 +303,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>You can see that the higher the order of the polynomial, the higher the flexibility of the model.</p>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"R² poly1 = "</span>, <span class="fu">summary</span>(poly_1)<span class="sc">$</span>adj.r.squared)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "R² poly1 = 0.152154474989737"</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"R² poly2 = "</span>, <span class="fu">summary</span>(poly_2)<span class="sc">$</span>adj.r.squared)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "R² poly2 = 0.350569287307634"</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"R² poly3 = "</span>, <span class="fu">summary</span>(poly_3)<span class="sc">$</span>adj.r.squared)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "R² poly3 = 0.707473782067586"</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">"R² poly4 = "</span>, <span class="fu">summary</span>(poly_4)<span class="sc">$</span>adj.r.squared)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "R² poly4 = 0.702284540611484"</code></pre>
 </div>
@@ -322,6 +326,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Assessing colonization, extinction and persistence</h1>
 <div class="cell">
 
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load the colonization/extinction data </span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>col_ext <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/col_ext.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 

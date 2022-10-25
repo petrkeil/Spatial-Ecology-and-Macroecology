@@ -204,7 +204,7 @@ ggplot()+
 ```
 You can see that the higher the order of the polynomial, the higher the flexibility of the model.
 
-```{r, echo=F}
+```{r}
 paste0("R² poly1 = ", summary(poly_1)$adj.r.squared)
 paste0("R² poly2 = ", summary(poly_2)$adj.r.squared)
 paste0("R² poly3 = ", summary(poly_3)$adj.r.squared)
@@ -213,7 +213,66 @@ paste0("R² poly4 = ", summary(poly_4)$adj.r.squared)
 
 # Assessing colonization, extinction and persistence
 
-```{r}
+```{r, eval=F, echo=FALSE}
+##### DON'T RUN #########
+col_ext <- data.frame()
+## Loop over each road
+for(i in 1:nrow(unique(species[,c("CountryNum", "StateNum", "Route")]))){
+  
+  # Get the route id
+  road_id <- unique(species[,c("CountryNum", "StateNum", "Route")])[i,]
+  
+  # Filter the data for the specific route
+  road_data <- species %>% 
+    filter(CountryNum == road_id$CountryNum,
+           StateNum == road_id$StateNum,
+           Route == road_id$Route)
+  
+  # Get the species for time1
+  sptime1 <- road_data[road_data$Year == 2000,] %>% pull(AOU)
+  
+  ## Loop over each year and compute the colonization and extinction
+  for(year in unique(road_data$Year)){
+    
+    ## get the species
+    sptimex <- road_data[road_data$Year == year,] %>% pull(AOU)
+    
+    ## colonization
+    col <- length(sptimex[!(sptimex %in% sptime1)])
+    
+    ## extinction
+    ext <- length(sptime1[!(sptime1 %in% sptimex)])
+    
+    ## Fill the colonization/extinction dataset
+    col_ext <- 
+      rbind(col_ext,
+            cbind(unique(road_data[,c("CountryNum", "StateNum", "Route")]), col, ext, year))
+  }
+  
+}
+# saveRDS(col_ext, "data/col_ext.rds")
+##############
+```
 
+```{r}
+## Load the colonization/extinction data 
+col_ext <- readRDS("data/col_ext.rds")
+```
+
+```{r}
+ggplot()+
+  geom_point(aes(x = Year, y = sr), data = species_richness %>% 
+               filter(CountryNum == 840,
+                      StateNum == "35",
+                      Route == "005"))+
+  geom_point(aes(x = year, y = col,  colour = "colonization"), 
+             data = col_ext %>% filter(CountryNum == 840,
+                                       StateNum == "35",
+                                       Route == "005"))+
+  geom_point(aes(x = year, y = ext, color = "extinction"), 
+             data = col_ext %>% filter(CountryNum == 840,
+                                       StateNum == "35",
+                                       Route == "005"))+
+  theme_bw()
 ```
 
