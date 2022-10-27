@@ -111,7 +111,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#using-simple-linear-regression" id="toc-using-simple-linear-regression" class="nav-link" data-scroll-target="#using-simple-linear-regression">Using simple linear regression</a></li>
   <li><a href="#using-polynomial-regression" id="toc-using-polynomial-regression" class="nav-link" data-scroll-target="#using-polynomial-regression">Using polynomial regression</a></li>
   </ul></li>
-  <li><a href="#assessing-colonization-extinction-and-persistence" id="toc-assessing-colonization-extinction-and-persistence" class="nav-link" data-scroll-target="#assessing-colonization-extinction-and-persistence">Assessing colonization, extinction and persistence</a></li>
+  <li><a href="#assessing-colonization-and-extinction" id="toc-assessing-colonization-and-extinction" class="nav-link" data-scroll-target="#assessing-colonization-and-extinction">Assessing colonization and extinction</a></li>
   </ul>
 </nav>
 </div>
@@ -148,7 +148,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>There are two ways to assess changes of biodiversity:</p>
 <ol type="1">
 <li><p>We can simply measure biodiversity (for instance with species richness) and then see how this metric has changed through time. This is called a <strong>temporal trend</strong>.</p></li>
-<li><p>We can use metrics which are representing temporal dynamic of biodiversity. Here, we will study the three metrics responsible of the change of species richness: <em>colonization</em>, <em>extinction</em> and <em>persistence</em>.</p></li>
+<li><p>We can use metrics which are representing temporal dynamic of biodiversity. Here, we will study the two metrics responsible of the change of species richness: <em>colonization</em> and <em>extinction</em>.</p></li>
 </ol>
 </section>
 <section id="temporal-changes-of-species-richness" class="level1">
@@ -320,16 +320,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>[1] "R² poly4 = 0.702284540611484"</code></pre>
 </div>
 </div>
+<p><strong>Look at the values of the <code>R²</code>: which polynomial regression seems to be the best?</strong></p>
 </section>
 </section>
-<section id="assessing-colonization-extinction-and-persistence" class="level1">
-<h1>Assessing colonization, extinction and persistence</h1>
+<section id="assessing-colonization-and-extinction" class="level1">
+<h1>Assessing colonization and extinction</h1>
+<p>We have seen that we can compute the temporal trend of a species richness by fitting a linear regression on it. However, the variation of species richness <span class="math inline">\(\Delta SR\)</span>:</p>
+<p><span class="math display">\[\Delta SR = SR_{t_2}-SR_{t_1}\]</span></p>
+<p>Which is the difference in the number of species between 2 time steps. We can assess <span class="math inline">\(SR_{t_1}\)</span> and <span class="math inline">\(SR_{t_2}\)</span> by using colonization <span class="math inline">\(C\)</span>, extinction <span class="math inline">\(E\)</span> and persistence <span class="math inline">\(P\)</span>. We can rewrite <span class="math inline">\(\Delta SR\)</span> as:</p>
+<p><span class="math display">\[\Delta SR = C + P - (E+P) = C - E\]</span></p>
 <div class="cell">
 
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load the colonization/extinction data </span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>col_ext <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/col_ext.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>()<span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> Year, <span class="at">y =</span> sr), <span class="at">data =</span> species_richness <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>               <span class="fu">filter</span>(CountryNum <span class="sc">==</span> <span class="dv">840</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                      StateNum <span class="sc">==</span> <span class="st">"35"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                      Route <span class="sc">==</span> <span class="st">"005"</span>))<span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> col,  <span class="at">colour =</span> <span class="st">"colonization"</span>), </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> col_ext <span class="sc">%&gt;%</span> <span class="fu">filter</span>(CountryNum <span class="sc">==</span> <span class="dv">840</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                                       StateNum <span class="sc">==</span> <span class="st">"35"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                                       Route <span class="sc">==</span> <span class="st">"005"</span>))<span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> ext, <span class="at">color =</span> <span class="st">"extinction"</span>), </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> col_ext <span class="sc">%&gt;%</span> <span class="fu">filter</span>(CountryNum <span class="sc">==</span> <span class="dv">840</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                                       StateNum <span class="sc">==</span> <span class="st">"35"</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                                       Route <span class="sc">==</span> <span class="st">"005"</span>))<span class="sc">+</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="practical_week_6_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
 </div>
 </section>
 

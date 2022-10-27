@@ -29,7 +29,7 @@ There are two ways to assess changes of biodiversity:
 
 1.  We can simply measure biodiversity (for instance with species richness) and then see how this metric has changed through time. This is called a **temporal trend**.
 
-2.  We can use metrics which are representing temporal dynamic of biodiversity. Here, we will study the three metrics responsible of the change of species richness: *colonization*, *extinction* and *persistence*.
+2.  We can use metrics which are representing temporal dynamic of biodiversity. Here, we will study the two metrics responsible of the change of species richness: *colonization* and *extinction*.
 
 # Temporal changes of species richness
 
@@ -211,7 +211,18 @@ paste0("R² poly3 = ", summary(poly_3)$adj.r.squared)
 paste0("R² poly4 = ", summary(poly_4)$adj.r.squared)
 ```
 
-# Assessing colonization, extinction and persistence
+**Look at the values of the `R²`: which polynomial regression seems to be the best?**
+
+# Assessing colonization and extinction
+
+We have seen that we can compute the temporal trend of a species richness by fitting a linear regression on it.
+However, the variation of species richness $\Delta SR$:
+
+$$\Delta SR = SR_{t_2}-SR_{t_1}$$
+Which is the difference in the number of species between 2 time steps. We can assess $SR_{t_1}$
+and $SR_{t_2}$ by using colonization $C$, extinction $E$ and persistence $P$. We can rewrite $\Delta SR$ as:
+
+$$\Delta SR = C + P - (E+P) = C - E$$
 
 ```{r, eval=F, echo=FALSE}
 ##### DON'T RUN #########
@@ -243,10 +254,13 @@ for(i in 1:nrow(unique(species[,c("CountryNum", "StateNum", "Route")]))){
     ## extinction
     ext <- length(sptime1[!(sptime1 %in% sptimex)])
     
+    ## persistence
+    pers <- length(sptime1[sptime1 %in% sptimex])
+    
     ## Fill the colonization/extinction dataset
     col_ext <- 
       rbind(col_ext,
-            cbind(unique(road_data[,c("CountryNum", "StateNum", "Route")]), col, ext, year))
+            cbind(unique(road_data[,c("CountryNum", "StateNum", "Route")]), col, ext, pers, year))
   }
   
 }
