@@ -769,8 +769,7 @@ CRS:           +proj=laea +lon_0=-68.91 +lat_0=1.28 +datum=WGS84 +units=m +no_de
 <p>The relationship between the target and the predictors has a form of a linear function:</p>
 <p><span class="math display">\[y = \beta _1x_1 + \beta _2x_2 \ldots \beta _nx_n + \beta _0\]</span></p>
 <p>With <span class="math inline">\(n\)</span> the number of covariates. Thus, this equation can be represented in an (n+1)-dimensional space (called an hyperspace when <span class="math inline">\(n+1 &gt; 3\)</span>). Moreover, the values of the <span class="math inline">\(\beta\)</span>s will indicate both the sign and the strenght of the relationship (<em>e.g.</em> <span class="math inline">\(\beta_1\)</span> will show if there is a negative/positive influence of <span class="math inline">\(x_1\)</span> on <span class="math inline">\(y\)</span>). The goal of fitting a linear regression (but also of most of the machine learning algorithms) is to find the hyperplane which fits the most to <span class="math inline">\(y\)</span> (<em>i.e.</em> which explains most of its variance). In machine learning, you do so by minimizing a <em>loss function</em>. The loss function for a linear regression is called the <strong>Residual Sum of Square</strong> (<em>i.e.&nbsp;RSS</em>).</p>
-<p><span class="math display">\[RSS = \sum _{i = 1}^j (y_i - \hat y_i)^2\]</span></p>
-<p>with <span class="math inline">\(j\)</span> the number of observations in your dataset. Here, we will use weather data as covariates (<em>i.e.</em> <span class="math inline">\(x_1\ldots x_n\)</span>) in order to predict the species richness for year 2019 (<span class="math inline">\(y\)</span>). Weather data is stored in the <code>weather.csv</code> file.</p>
+<p><span class="math display">\[RSS = \sum _{i = 1}^j (y_i - \hat y_i)^2\]</span> with <span class="math inline">\(j\)</span> the number of observations in your dataset. Here, we will use weather data as covariates (<em>i.e.</em> <span class="math inline">\(x_1\ldots x_n\)</span>) in order to predict the species richness for year 2019 (<span class="math inline">\(y\)</span>). Weather data is stored in the <code>weather.csv</code> file.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>weather <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/weather.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1223,7 +1222,7 @@ F-statistic: 11.22 on 15 and 3223 DF,  p-value: &lt; 2.2e-16</code></pre>
 </ul>
 <p><strong>Bonus:</strong> as said above, Shannon index is a summary of species richness and relative abundances. The latter can also be called <strong>evenness</strong>. Several ways to compute the evenness exist (<em>e.g.</em> gini index, Pielou index…). Here we will use the Pielou index <span class="math inline">\(J\)</span>, which formal definition is:</p>
 <p><span class="math display">\[J = \frac{H}{log(R)}\]</span></p>
-<p>Using the vegan package, you can compute it from the Shannon index <code>H</code> that you created just before as follow <code>J &lt;- H/specnumber(abundance2019)</code></p>
+<p>Using the vegan package, you can compute it from the Shannon index <code>H</code> that you created just before as follow <code>J &lt;- H/log(specnumber(abundance2019))</code></p>
 <p>Now, repeat the same task as above for the evenness index. Especially, map it and compare it to species richness and Shannon index.</p>
 <div class="cell">
 <div class="cell-output-display">

@@ -432,13 +432,13 @@ summary(lm_model_shannon)
 
 $$J = \frac{H}{log(R)}$$
 
-Using the vegan package, you can compute it from the Shannon index `H` that you created just before as follow `J <- H/specnumber(abundance2019)`
+Using the vegan package, you can compute it from the Shannon index `H` that you created just before as follow `J <- H/log(specnumber(abundance2019))`
 
 Now, repeat the same task as above for the evenness index. Especially, map it and compare it to species richness and Shannon index.
 
 ```{r, echo=F}
 #" Compute evenness
-J <- h.2019/specnumber(abundance2019)
+J <- h.2019/log(specnumber(abundance2019))
 
 ###########
 ## Create a dataframe from the evenness vector
@@ -460,7 +460,7 @@ routes_shp <-
 ggplot()+
   geom_sf(data = countries_shp)+
   geom_sf(data = na.omit(routes_shp), aes(color = J), size = .5)+
-  scale_color_viridis_c(limits = c(min(J), .2))+
+  scale_color_viridis_c()+
   ggtitle("Pielou index of each BBS road for year 2019")+
   theme_bw()+
   theme(plot.title = element_text(hjust = .5))
