@@ -1,0 +1,128 @@
+---
+title: "Spatio-temporal beta-diversity"
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc_float: true
+editor: visual
+---
+
+```{r}
+knitr::opts_chunk$set(
+  message = F,
+  warning = F
+)
+```
+
+```{r}
+rm(list = ls())
+library(vegan)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(sf)
+library(ggplot2)
+library(tmap)
+```
+
+```{r}
+## Data management
+## Get the file names
+file_list <- list.files("data/50-StopData/1997ToPresent_SurveyWide/",
+                        full.names = T)
+## Create the dataframe that will contain the data
+species <- data.frame()
+## Loop over each file
+for(i in 1:length(file_list)){
+  ## Load the file and temporary store it
+  d <- read_csv(file_list[i])
+  ## Bind to the species dataframe
+  species <- rbind(species, d)
+  ## Remove the temporary data
+  rm(d)
+}
+## Filter data for 2019
+sp2019 <- species[species$Year == 2019,]
+```
+
+```{r, echo=F}
+## Create the function to visualize distance
+"coldiss" <- function(D, nc = 4, byrank = TRUE, diag = FALSE)
+{
+	require(gclus)
+
+	if (max(D)>1) D <- D/max(D)
+
+	if (byrank) {
+		spe.color <- dmat.color(1-D, cm.colors(nc))
+	}
+	else {
+		spe.color <- dmat.color(1-D, byrank=FALSE, cm.colors(nc))
+	}
+
+	spe.o <- order.single(1-D)
+	speo.color <- spe.color[spe.o, spe.o]
+	
+	op <- par(mfrow=c(1,2), pty="s")
+
+	if (diag) {
+		plotcolors(spe.color, rlabels=attributes(D)$Labels, 
+			main="Dissimilarity Matrix", 
+			dlabels=attributes(D)$Labels)
+		plotcolors(speo.color, rlabels=attributes(D)$Labels[spe.o], 
+			main="Ordered Dissimilarity Matrix", 
+			dlabels=attributes(D)$Labels[spe.o])
+	}
+	else {
+		plotcolors(spe.color, rlabels=attributes(D)$Labels, 
+			main="Dissimilarity Matrix")
+		plotcolors(speo.color, rlabels=attributes(D)$Labels[spe.o], 
+			main="Ordered Dissimilarity Matrix")
+	}
+
+	par(op)
+}
+```
+
+As $\beta$-diversity is a pairwise analysis (*i.e.* each road is compared to all the other roads), we will work at the size of the California state (StateNum = 25).
+
+```{r}
+# Map
+routes <- read.csv(file = "data/routes.csv")
+crs_NA <- "+proj=laea +lon_0=-68.91 +lat_0=1.28 +datum=WGS84 +units=m +no_defs"
+routes_shp <- st_as_sf(routes,
+                       coords = c("Longitude", "Latitude"), ## specify the columns containing the longitude and latitude
+                       crs = 4326) %>% 
+  st_transform(crs = crs_NA)
+
+## Map it
+tmap_mode("view")
+tm_shape(routes_shp  %>% filter(StateNum == 25))+
+  tm_dots(col = "blue")+
+  tm_layout(earth.boundary = c(-180, -90, 180, 90))
+```
+
+```{r, eval=F}
+## Create the site x species binary matrix for the state
+binary_2019 <- 
+  sp2019 %>%
+  filter(StateNum == 25) %>% 
+  mutate(presence = 1) %>% 
+  select(RouteDataID, AOU, presence) %>%
+  pivot_wider(names_from = "AOU",
+              values_from = "presence",
+              values_fill = 0) %>%
+  column_to_rownames(var = "RouteDataID")
+```
+
+```{r, eval=F}
+m <- vegdist(binary_2019, method = "bray", binary = TRUE)
+```
+
+```{r, eval=F}
+coldiss(m)
+```
+
+# Spatial $\beta$-diversity
