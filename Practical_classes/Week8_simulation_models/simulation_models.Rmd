@@ -1,0 +1,173 @@
+---
+title: "Simulation models and cellular automata in ecology"
+author: "Petr Keil"
+date: "11/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+
+```{r, message = FALSE, warning = FALSE}
+library(raster)
+library(caTools)
+```
+
+
+# General goals
+
+- to get a hands-on experience with simulations, i.e. with something else than statistical models
+- to exercise a more low-level R programming with indexing, loops, and arrays
+- to create something that moves around and feels alive
+- to exercise problem solving
+- you can work single, or in pairs or groups
+
+# Specific goals
+
+## Create a uni-dimensional cellular automaton
+
+![](https://upload.wikimedia.org/wikipedia/commons/e/e2/One-d-cellular-automate-rule-30.gif)
+```{r}
+M <- matrix(nrow = 100, ncol = 201)
+M[] <- 0
+M[1,101] <- 1
+M
+
+# we can plot it as a raster
+plot(raster(M))
+```
+
+```{r}
+window <- function(x)
+{
+  if(identical(x, c(1,1,1))) return(0)
+  if(identical(x, c(1,1,0))) return(0)
+  if(identical(x, c(1,0,1))) return(0)
+  if(identical(x, c(1,0,0))) return(1)
+  if(identical(x, c(0,1,1))) return(1)
+  if(identical(x, c(0,1,0))) return(1)
+  if(identical(x, c(0,0,1))) return(1)
+  if(identical(x, c(0,0,0))) return(0)
+} 
+
+for(t in 2:nrow(M))
+{
+  for(i in 2:(ncol(M)-1))
+  {
+    x <- M[t-1, (i-1):(i+1)]
+    M[t,i] <- window(x)
+  }  
+}
+
+plot(raster(M))
+```
+
+## Create Conway's game of life cellular automaton
+
+```{r}
+  side <- 50
+  steps <- 30
+  M <- array(0, c(side, side, steps))
+  
+  M[,,1] <- rbinom(side^2, 1, 0.4)
+  plot(raster(M[,,1]))
+  
+  window <- function(x)
+  {
+    is.alive <- x[2,2] == 1
+    is.dead  <- x[2,2] == 0
+    x[2,2] <- 0
+    
+    # the rules of the game of life
+    if(is.alive & sum(x)<2) return(0)
+    if(is.alive & sum(x)==2)return(1)
+    if(is.alive & sum(x)==3)return(1)
+    if(is.alive & sum(x)>3) return(0)
+    if(is.dead & sum(x)==3) return(1)
+    else(return(0))
+  }
+  
+  x <- matrix(c(0,0,1,0,1,0,0,0,0),3,3)
+  x
+  window(x)
+  
+  for(t in 2:steps)
+  {
+    for(i in 2:(side-1))
+    {
+      for(j in 2:(side-1))
+      {
+        x <- M[(i-1):(i+1), (j-1):(j+1), t-1]
+        M[i, j, t] <- window(x)
+      }
+    }  
+  }
+  
+  write.gif(M, filename = "conway.gif", col="jet", delay=15)
+```
+
+
+```{r}
+# library that allows the animated .gif export
+library(caTools)
+# The game.of.life() function ------------------
+# Arguments:
+# side - side of the game of life arena (matrix)
+# steps - number of animation steps
+# filename - name of the animated gif file
+game.of.life <- function(side, steps, filename){
+  
+  # the sideXside matrix, filled up with binomially
+  # distributed individuals
+  X <- matrix(nrow=side, ncol=side)
+  X[] <- rbinom(side^2,1,0.4)
+  
+  # array that stores all of the simulation steps
+  # (so that it can be exported as a gif)
+  storage <- array(0, c(side, side, steps))
+  # the simulation                                             
+  for (i in 1:steps)
+  {
+     # make the shifted copies of the original array
+     allW = cbind( rep(0,side) , X[,-side] )
+     allNW = rbind(rep(0,side),cbind(rep(0,side-1),X[-side,-side]))
+     allN = rbind(rep(0,side),X[-side,])
+     allNE = rbind(rep(0,side),cbind(X[-side,-1],rep(0,side-1)))
+     allE = cbind(X[,-1],rep(0,side))
+     allSE = rbind(cbind(X[-1,-1],rep(0,side-1)),rep(0,side))
+     allS = rbind(X[-1,],rep(0,side))
+     allSW = rbind(cbind(rep(0,side-1),X[-1,-side]),rep(0,side))
+     
+     # summation of the matrices
+     X2 <- allW + allNW + allN + allNE + allE + allSE + allS + allSW
+     
+     # the rules of GoL are applied using logical subscripting
+     X3 <- X
+     X3[X==0 & X2==3] <- 1
+     X3[X==1 & X2<2] <- 0
+     X3[X==1 & X2>3] <- 0
+     X <- X3
+     
+     # each simulation step is stored
+     storage[,,i] <- X2
+     # note that I am storing the array of Ni values -
+     # - this is in order to make the animation prettier
+   }
+   
+   storage <- storage/max(storage) # scaling the results
+                                   # to a 0-1 scale
+   # writing the results into an animated gif
+   write.gif(storage, filename, col="jet", delay=5)
+}
+game.of.life(side=150, steps=300, file="conway.gif")
+```
+
+
+## Create a simple 1D neutral model
+
+```{r}
+rnorm(19)
+```
