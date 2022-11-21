@@ -5,6 +5,7 @@
 library(raster)  # for plotting rasters and grids
 library(caTools) # for exporting arrays to animated .gif
 
+
 ## USEFUL FUNCTIONS AND OPERATORS FOR CELLULAR AUTOMATA -------------------------
 
 c(data)                  # creates 1-dimensional vector
