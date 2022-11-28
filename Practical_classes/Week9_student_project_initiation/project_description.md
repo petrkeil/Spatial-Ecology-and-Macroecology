@@ -33,7 +33,7 @@ deforestation, spectral variables, ...)
 
 These are **hypothesized** variables that affect the response variable. 
 
-You need to pick at least **3 different data sources** (e.g. GBIF, EarthEnv, Corine).
+You should pick at least **3 different data sources** for the predictors (e.g. WorldClim, EarthEnv, Corine, ...).
 
 You should have some **reason** for why you're picking a specific predictor.
 
