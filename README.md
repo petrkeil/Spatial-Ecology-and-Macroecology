@@ -10,6 +10,30 @@ This is an introduction to geographical patterns of species distributions and bi
 
 Elementary knowledge of R, i.e. participants should be able to turn it on, load data in, and execute basic commands. Prior knowledge of ecology, geography, or statistics is advantageous, but not necessary.
 
+## Exam
+
+Will be in person, and will last between 30-60 minutes. Petr will offer dates throughout the examination period.
+
+## Zapocet - presentation of practice results
+
+Zapocet is given based on your attendance to the practical class (up to 3 absences are tolerated), and you need to either **give a 5-10 min presentation** (on 12.12.2022) or hand in a **2-3 page report**.
+
+Both formats need to contain:
+
+- Introduction of the system (taxon, region, variables) that 
+you analyzed
+- Description of your objectives
+- Brief description of the methods that you will use
+- Results (effect sizes, variable importance, predicted maps)
+- Brief discussion of what the results mean
+- We may ask you for your code
+
+If the presentation or the report need a clear improvement, we may ask you to fix
+it before giving you the zapocet.
+
+If you're doing the written report, ideally send it to Petr at least **one week before
+the oral exam** to give us some time to fix issues.
+
 ## Lectures (Mon 8:45-10:15, lecture hall Z115)
 
 - 26 September - **I. Species geographic distributions - where species live?** Course overview. What is macroecology and spatial ecology. Historical exposition, biogeography, old guys: Humboldt, Wallace, etc. The currencies of macroecology: Probability of occurrence, abundance, endemism, spatial aggregation, rarity. The big questions of macroecology.
@@ -39,30 +63,6 @@ Elementary knowledge of R, i.e. participants should be able to turn it on, load 
 - 28 November (**all**). Mini project II. Work on the project with us, data preparation.
 - 5 December (**all**). Mini project III. Work on the project with us, analysis.
 - 12 December (**all**). Mini project IV: Presentations of results.
-
-## Zapocet - presentation of practice results
-
-Zapocet is given based on your attendance to the practical class (up to 3 absences are tolerated), and you need to either **give a 5-10 min presentation** (on 12.12.2022) or hand in a **2-3 page report**.
-
-Both formats need to contain:
-
-- Introduction of the system (taxon, region, variables) that 
-you analyzed
-- Description of your objectives
-- Brief description of the methods that you will use
-- Results (effect sizes, variable importance, predicted maps)
-- Brief discussion of what the results mean
-- We may ask you for your code
-
-If the presentation or the report need a clear improvement, we may ask you to fix
-it before giving you the zapocet.
-
-If you're doing the written report, ideally send it to Petr at least **one week before
-the oral exam** to give us some time to fix issues.
-
-## Exam
-
-Will be in person, and will last between 30-60 minutes. Petr will offer dates throughout the examination period. 
 
 ## Literature
 
