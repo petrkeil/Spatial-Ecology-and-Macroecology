@@ -12,17 +12,18 @@ Elementary knowledge of R, i.e. participants should be able to turn it on, load 
 
 ## Exam
 
-Will be in person, and will last between 30-60 minutes. Petr will offer dates throughout the examination period.
+Will be in person, it will last between 30-60 minutes, and it will be mostly about the contents of the lectures. Petr will offer dates throughout the examination period.
 
 ## Zapocet - presentation of practice results
 
-Zapocet is given based on your attendance to the practical class (up to 3 absences are tolerated), and you need to either **give a 5-10 min presentation** (on 12.12.2022) or hand in a **2-3 page report**.
+Zapocet is given based on your attendance in the practical class (up to 3 absences are tolerated), and you need to either **give a 5-10 min presentation** (on 12.12.2022) or hand in a **2-3 page report**.
 
 Both formats need to contain:
 
 - Introduction of the system (taxon, region, variables) that 
 you analyzed
-- Description of your objectives
+- Description of your objectives (e.g. to map the species, to estimate its 
+climatic requirements, to map species richness, etc.)
 - Brief description of the methods that you will use
 - Results (effect sizes, variable importance, predicted maps)
 - Brief discussion of what the results mean
