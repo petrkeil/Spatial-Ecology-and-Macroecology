@@ -20,7 +20,7 @@ format:
     highlight-style: github
     scrollable: true
     enableEmoji: true
-editor: visual
+editor: source
 ---
 
 ## What are we going to see today?
@@ -98,7 +98,7 @@ library(tidyverse)
 
 # [LOCAL]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
-# {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/202963740/original.jpeg"}
+#  {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/202963740/original.jpeg"}
 
 ::: footer
 Photo of *Capreolus capreolus* observed in Czech Republic by romanvrbicek licensed CC-BY-NC, via [iNaturalist](https://www.gbif.org/occurrence/3859392197)
@@ -179,7 +179,7 @@ mammalsCZ %>%
 
 . . .
 
-[Note that `crs=4326` is related to the [EPSG:5514](https://epsg.io/4326) CRS: WGS 84]{.font-aside}
+[Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84]{.font-aside}
 
 ## Mapping occurrence records 🦌
 
@@ -497,11 +497,11 @@ N
 
 <br> We are done! No it's **your turn** :)
 
----
+------------------------------------------------------------------------
 
 # [GLOBAL]{.story} [Testudines of the World]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
-# {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/183234344/original.jpg"}
+#  {background-color="black" background-image="https://inaturalist-open-data.s3.amazonaws.com/photos/183234344/original.jpg"}
 
 ::: footer
 Photo of *Emys orbicularis* observed in France by Martin Costechareire licensed CC-BY-NC, via [iNaturalist](https://www.gbif.org/occurrence/3743017591)
@@ -734,12 +734,11 @@ world_grid <- st_make_grid(world_ea,
 world_grid <- readRDS('data/world_grid.rds')
 ```
 
-. . . 
+. . .
 
-<br>
-We have the grid, we are ready to calculate richness.
+<br> We have the grid, we are ready to calculate richness.
 
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
@@ -750,11 +749,11 @@ ggplot() +
   geom_sf(data= world_grid, fill='white', size=0.1) 
 ```
 
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
-To make things faster, let's get a smaller dataset of *Testudines*  
+To make things faster, let's get a smaller dataset of *Testudines*
 
 ```{r}
 #| echo: true
@@ -767,14 +766,13 @@ testu <- testudines_ea %>%
   ungroup() %>% st_cast()
 ```
 
-. . . 
+. . .
 
 <br>
 
-This can take a while 
+This can take a while
 
-
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
@@ -788,7 +786,7 @@ ggplot() +
   geom_sf(data= testu %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
 ```
 
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
@@ -807,14 +805,13 @@ testudines_grid <- st_join(world_grid, testu) %>%
 
 <br>
 
-This **will** take a while 
+This **will** take a while
 
-. . . 
+. . .
 
-<br>
-And now, we plot!
+<br> And now, we plot!
 
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
@@ -834,7 +831,7 @@ testudines_grid <- readRDS('data/testudines_grid.rds')
 testudines_grid
 ```
 
----
+------------------------------------------------------------------------
 
 ## Mapping species ranges 🐢
 
@@ -850,13 +847,13 @@ ggplot() +
   theme_bw()
 ```
 
----
+------------------------------------------------------------------------
 
 ## References
 
 -   R for Data Science <https://r4ds.hadley.nz>
 -   Geocomputation with R <https://geocompr.robinlovelace.net>
 
----
+------------------------------------------------------------------------
 
 # Any doubts? {background-color="#5F9747"}
