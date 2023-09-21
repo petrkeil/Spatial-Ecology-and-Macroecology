@@ -52,9 +52,9 @@ the oral exam** to give us some time to fix issues.
 
 ## Practices  (Mon 12:15-13:45, computer room Z120)
 
-- **Flo**, Frieda joins. Major biodiversity data sources and data types: GBIF, OBIS, Map of Life, IUCN, BIEN, eBIRD, BBS, important atlas projects. Temporal change databases: BioTime, PREDICTS. Open vs. closed data, data quality issues, download through R, licensing and data sharing.
+- **Flo**, Gabriel, Frieda joins. Major biodiversity data sources and data types: GBIF, OBIS, Map of Life, IUCN, BIEN, eBIRD, BBS, important atlas projects. Temporal change databases: BioTime, PREDICTS. Open vs. closed data, data quality issues, download through R, licensing and data sharing.
 - **Flo**, Gabriel, Frieda joins. An example of large-scale biodiversity database, learning the basics and visualizing things. Gridding biodiversity data (geographic ranges, biodiversity), exploring patterns at different resolutions, making pretty maps. 
-- **Flo**, Gabriel joins. Drivers of distributions and diversity: Environmental data, historical data, human-related predictors, climate, soils, land cover. Future climate projected layers. Plotting and exploring associations and correlations.
+- **Flo**, Gabriel, Frieda joins. Drivers of distributions and diversity: Environmental data, historical data, human-related predictors, climate, soils, land cover. Future climate projected layers. Plotting and exploring associations and correlations.
 - **Carmen**, Gabriel, Francois. Species Distribution Models (SDM) in R. Principle, techniques, fitting models, predicted vs observed maps, interpretation, predicting & forecasting.
 - **Francois**, Carmen. Modelling patterns of biodiversity.
 - **Francois**, Carmen. Biodiversity change.
