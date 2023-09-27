@@ -1,8 +1,8 @@
 ---
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 1'
-date: 2022-09-26
-author: 'Florencia Grattarola'
+date: 2023-10-02
+author: 'Florencia Grattarola, Friederike Wölke, Gabriel Ortega'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
