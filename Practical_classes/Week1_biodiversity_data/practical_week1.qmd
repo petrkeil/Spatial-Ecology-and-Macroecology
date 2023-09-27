@@ -41,116 +41,116 @@ editor: visual
 
 Data that can place a particular **species** in a particular **place** and **time** can take many forms.
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Occurrence records**: primary data -- specimens from an herbarium or citizen-science observations.
 
 ![](img/occurrence-records.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Sampling events**: effort is recorded -- tracks, quadrats, camera traps, DNA sampling.
 
 ![](img/sampling-events.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Checklists**: list of taxa -- species associated to a location.
 
 ![](img/checklists.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Range-maps**: expert-based -- maps from field guides.
 
 ![](img/range-map.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Atlases**: info on distribution, abundance, long-term change -- birds from the Czech Republic.
 
 ![](img/atlas.png)
 :::
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
 Data can also be defined as **how** they were collected.
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
+::: {layout-ncol="2"}
 -   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.
 
 ![](img/structured.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
--   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.  
+::: {layout-ncol="2"}
+-   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.
 
 ![](img/semi-structured.png)
 :::
 
---- 
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=2}
--   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.  
+::: {layout-ncol="2"}
+-   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.
 
 ![](img/unstructured.png)
 :::
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
 Finally, data can also be defined as how they are **made available** for others.
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=3}
--   **Disaggregated**: precision is high, but completeness and representativeness is low.  
+::: {layout-ncol="3"}
+-   **Disaggregated**: precision is high, but completeness and representativeness is low.
 
 ![](img/occurrence-records.png)
 
 ![](img/sampling-events.png)
 :::
 
----
+------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol=3}
--   **Aggregated**: precision is low, but completeness and representativeness is high. 
+::: {layout-ncol="3"}
+-   **Aggregated**: precision is low, but completeness and representativeness is high.
 
 ![](img/range-map.png)
 
@@ -160,7 +160,6 @@ Finally, data can also be defined as how they are **made available** for others.
 . . .
 
 While **disaggregated** data can produce reliable results for a limited set of well-covered regions, **aggregated** data types can provide critical information for the extrapolation of biodiversity patterns into less well-sampled regions.
-
 
 # 2. Data sources {background-color="#5F9747"}
 
@@ -315,7 +314,7 @@ BioTime is an open access database global database of assemblage time series for
 [Hudson et al. (2014)](https://doi.org/10.1002/ece3.1303)
 :::
 
-# [EXCERSICE]{.story} [Explore different data sources and find out..]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+# [EXERCISE]{.story} [Explore different data sources and find out..]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
 ## Explore different data sources and find out:
 
@@ -349,20 +348,19 @@ Should take around **10 minutes** :)
 
 ### [dwc.tdwg.org](https://dwc.tdwg.org/terms/)
 
-. . . 
+. . .
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="40%"}
 ![](https://www.tdwg.org/static/pages/about/logos/tdwg_logo.png){.centre top="200" height="200"}
 :::
 
 ::: {.column width="60%"}
-`countryCode`: The standard code for the country in which the Location occurs. Recommended best practice is to use an ISO 3166-1-alpha-2 country code.  
-`recordedBy `: 	A list (concatenated and separated) of names of people, groups, or organizations responsible for recording the original Occurrence.  
+`countryCode`: The standard code for the country in which the Location occurs. Recommended best practice is to use an ISO 3166-1-alpha-2 country code.\
+`recordedBy`: A list (concatenated and separated) of names of people, groups, or organizations responsible for recording the original Occurrence.
+:::
 :::
 
-:::: 
 ------------------------------------------------------------------------
 
 ## 3. Open Data: Licensing
@@ -371,25 +369,23 @@ Open data are licensed under open licenses. Some examples:
 
 . . .
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
-![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/cc-zero.png)  
-[**CC0**: Public domain]{.font-small}  
-  
-![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png)  
-[**CC-BY**: Attribution]{.font-small}  
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/cc-zero.png)\
+[**CC0**: Public domain]{.font-small}
+
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png)\
+[**CC-BY**: Attribution]{.font-small}
 :::
 
 ::: {.column width="50%"}
-![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc.png)  
-[**CC-BY-NC**: Attribution - Non Commercial]{.font-small}  
-  
-![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png)  
-[**CC-BY-SA**: Attribution - Share Alike]{.font-small}  
-:::
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc.png)\
+[**CC-BY-NC**: Attribution - Non Commercial]{.font-small}
 
-::::
+![](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png)\
+[**CC-BY-SA**: Attribution - Share Alike]{.font-small}
+:::
+:::
 
 ------------------------------------------------------------------------
 
@@ -397,7 +393,7 @@ Open data are licensed under open licenses. Some examples:
 
 Data that are **standardized** and have an **open licence** can be shared :)
 
-![](https://upload.wikimedia.org/wikipedia/commons/6/65/To_deposit_or_not_to_deposit%2C_that_is_the_question_-_journal.pbio.1001779.g001.png){.absolute bottom="50" left="100" width="544" height="418"}
+![](https://upload.wikimedia.org/wikipedia/commons/6/65/To_deposit_or_not_to_deposit%252C_that_is_the_question_-_journal.pbio.1001779.g001.png){.absolute bottom="50" left="100" width="544" height="418"}
 
 # [PRACTICE]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
@@ -432,8 +428,7 @@ library(tidyverse) # load
 
 . . .
 
-<br> 
-We will be using many functions from this package, like `filter()`, `mutate()`, and later `read_csv()`.
+<br> We will be using many functions from this package, like `filter()`, `mutate()`, and later `read_csv()`.
 
 ------------------------------------------------------------------------
 
@@ -566,8 +561,7 @@ occ_count(country='CZ',
 
 . . .
 
-<br>
-We are ready to do a download. [Whoop!]{.font-big}\
+<br> We are ready to do a download. [Whoop!]{.font-big}\
 
 ------------------------------------------------------------------------
 
@@ -658,7 +652,7 @@ occ_search(taxonKey=mammaliaTaxonKey,
 ------------------------------------------------------------------------
 
 ## 4. Data download through R
- 
+
 Get **all** occurrences records of mammals from Czech Republic.
 
 ```{r}
@@ -697,7 +691,7 @@ Mammals occurrence records from the Czech Republic
 mammalsCZ
 ```
 
----
+------------------------------------------------------------------------
 
 ## 4. Data download through R
 
@@ -731,14 +725,14 @@ mammalsCZ %>%
 
 . . .
 
-[`distinct()` is used to see unique values]{.font-aside} 
+[`distinct()` is used to see unique values]{.font-aside}
 
 # 5. Data quality {background-color="#5F9747"}
 
 ## 5. Data quality
 
-Data are not 'good' or 'bad', the quality will depend on our goal.  
-Some things we can check:  
+Data are not 'good' or 'bad', the quality will depend on our goal.\
+Some things we can check:
 
 ::: incremental
 -   Base of the record (type of occurrence)
@@ -764,7 +758,7 @@ As an example, we will check the following fields:
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km.
 :::
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -778,11 +772,11 @@ As an example, we will check the following fields:
 mammalsCZ %>% distinct(basisOfRecord)
 ```
 
-. . . 
+. . .
 
 [`distinct()` is used to see unique values]{.font-aside}
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -796,11 +790,11 @@ mammalsCZ %>% distinct(basisOfRecord)
 mammalsCZ %>% group_by(basisOfRecord) %>% count()
 ```
 
-. . . 
+. . .
 
-[`group_by()` is used to group values within a variable]{.font-aside} 
+[`group_by()` is used to group values within a variable]{.font-aside}
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -830,7 +824,7 @@ How many records do we have now?
 nrow(mammalsCZ)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -844,7 +838,7 @@ nrow(mammalsCZ)
 mammalsCZ %>% distinct(taxonRank)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -869,7 +863,7 @@ How many records do we have now?
 nrow(mammalsCZ)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -885,7 +879,7 @@ mammalsCZ %>%
   select(scientificName, coordinateUncertaintyInMeters, stateProvince)
 ```
 
----
+------------------------------------------------------------------------
 
 ## 5. Data quality
 
@@ -898,7 +892,7 @@ mammalsCZ <- mammalsCZ %>%
   filter(coordinateUncertaintyInMeters < 10000) # keeping this
 ```
 
-. . . 
+. . .
 
 <br>
 
@@ -911,7 +905,6 @@ nrow(mammalsCZ)
 ```
 
 ------------------------------------------------------------------------
-
 
 ## How are the records distributed?
 
@@ -947,7 +940,6 @@ ggplot() +
 
 ![](https://github.com/allisonhorst/stats-illustrations/raw/main/other-stats-artwork/debugging.jpg){.r-stretch}
 
----
+------------------------------------------------------------------------
 
 # Any doubts? {background-color="#5F9747"}
-
