@@ -240,7 +240,7 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 **IUCN**'s (International Union for Conservation of Nature) Red List of Threatened Species has evolved to become the world's most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
 
-![](https://avatars.githubusercontent.com/u/29559340?s=200&v=4){height="100"} `redlistr`: <https://github.com/ropensci/rredlist>
+![](https://avatars.githubusercontent.com/u/29559340?s=200&v=4){height="100"} `redlistr`: <https://github.com/red-list-ecosystem/redlistr>
 
 ------------------------------------------------------------------------
 
@@ -314,20 +314,25 @@ BioTime is an open access database global database of assemblage time series for
 [Hudson et al. (2014)](https://doi.org/10.1002/ece3.1303)
 :::
 
-# [EXERCISE]{.story} [Explore different data sources and find out..]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+# [EXERCISE]{.story} [Explore different data sources\...]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
-## Explore different data sources and find out:
+## Imagine you want to start a project:
 
--   What **type of data** they collate?
--   Which **taxa** do they cover?
--   What types of data **formats** are available?
--   Can everyone download the data? Are there any **restrictions**?
--   Which type of *licences* do their data have?
+Chose a taxon, chose **one** data source and try to get distribution data.
 
-Pick only **one** data source.
+Then answer the following 3 questions:
+
+-   What kind of **data types** does the source provide?
+
+-   Which kind of **taxa** are covered by the database generally?
+
+-   How **accessible** is the data? Can anyone download it? Restrictions?
+
+What was your **experience**? What **issues** did you encounter while getting the data?
 
 ::: aside
-Should take around **10 minutes** :)
+Should take around **5 minutes** :) \
+Afterwards we will discuss some of your examples. Please be prepared to share your experience.
 :::
 
 # 3. Open Data {background-color="#5F9747"}
