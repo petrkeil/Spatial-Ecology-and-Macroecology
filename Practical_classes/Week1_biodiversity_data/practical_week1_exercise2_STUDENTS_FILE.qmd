@@ -63,6 +63,17 @@ library(taxize)
 packageVersion("taxize")
 ```
 
+```{r eval=FALSE}
+install.packages("sf")
+```
+
+Same as with **rgbif,** load **sf** and check it's working.
+
+```{r}
+library(sf)
+packageVersion("sf")
+```
+
 # Project variables
 
 It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
