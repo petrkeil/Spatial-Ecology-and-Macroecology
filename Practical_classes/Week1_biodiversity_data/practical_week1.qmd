@@ -28,67 +28,106 @@ editor: visual
 1.  Data types
 2.  Data sources
 3.  Open data
-    -   Data standards
-    -   Licensing
-    -   Data sharing
-4.  Data download through R
-5.  Data quality
+4.  Exercise 1: explore data sources
+5.  Exercise 2: data download and cleaning in R
 :::
 
 # Data types {background-color="#5F9747"}
 
 ## 1. Data types
 
-Data that can place a particular **species** in a particular **place** and **time** can take many forms.
+Data that can place a particular **taxa** in a particular **location** and **time** can take many forms.
 
 ------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol="2"}
--   **Occurrence records**: primary data -- specimens from an herbarium or citizen-science observations.
+**Opportunistic incidence records**
 
-![](img/occurrence-records.png)
+::: columns
+::: {.column width="60%"}
+-   presence-only data from museum, herbarium collection or citizen-science initiatives
+-   single species, spatio-temporally specific, unknown absences
+:::
+
+::: {.column width="40%"}
+![](img/occurrence-records.png){fig-align="center" width="250"}
+:::
+:::
+
+::: fragment
+| PROS                                              | CONS                                                                   |
+|------------------------------------|------------------------------------|
+| huge amounts of data available, easily aggregated | often without details of effort/method, wide variation in data quality |
 :::
 
 ------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol="2"}
--   **Sampling events**: effort is recorded -- tracks, quadrats, camera traps, DNA sampling.
+**Presence-absence data**
 
-![](img/sampling-events.png)
+::: columns
+::: {.column width="60%"}
+-   data from inventories, checklists, atlas, acoustic sensors, DNA sampling or camera-trap sruveys
+-   multiple species, spatio-temporally specific, report searches that did not find the species (absences)
+:::
+
+::: {.column width="40%"}
+![](img/sampling-events.png){fig-align="center" width="250"}
+:::
+:::
+
+::: fragment
+| PROS                                                   | CONS                                                             |
+|------------------------------------|------------------------------------|
+| absences are informative, area and effort are measured | less abundant (too time consuming), methods are species-specific |
 :::
 
 ------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol="2"}
--   **Checklists**: list of taxa -- species associated to a location.
+**Repeated surveys**
 
-![](img/checklists.png)
+::: columns
+::: {.column width="60%"}
+-   monitoring schemes, repeated atlas projects
+-   multiple species, over time, spatially defined, use a standardized protocol
+:::
+
+::: {.column width="40%"}
+![](img/atlas_2.png){fig-align="center" width="250"}
+:::
+:::
+
+::: fragment
+| PRO                                             | CONS                                                         |
+|------------------------------------|------------------------------------|
+| standardised protocols, multiple points in time | expensive: geographically restricted, usually temporally too |
 :::
 
 ------------------------------------------------------------------------
 
 ## 1. Data types
 
-::: {layout-ncol="2"}
--   **Range-maps**: expert-based -- maps from field guides.
+**Range-maps**
 
-![](img/range-map.png)
+::: columns
+::: {.column width="60%"}
+-   outlines of species distributions, IUCN ranges, field guides
+-   single species, expert-drawn
 :::
 
-------------------------------------------------------------------------
+::: {.column width="40%"}
+![](img/range-map.png){fig-align="center" width="250"}
+:::
+:::
 
-## 1. Data types
-
-::: {layout-ncol="2"}
--   **Atlases**: info on distribution, abundance, long-term change -- birds from the Czech Republic.
-
-![](img/atlas.png)
+::: fragment
+| PROS                                                                                      | CONS                                     |
+|------------------------------------|------------------------------------|
+| rough estimates of the outer boundaries of areas within which species are likely to occur | large spatial and temporal uncertainties |
 :::
 
 ------------------------------------------------------------------------
@@ -101,8 +140,12 @@ Data can also be defined as **how** they were collected.
 
 ## 1. Data types
 
+**Structured**
+
 ::: {layout-ncol="2"}
--   **Structured**: standardized sampling protocol, site selection -- sometimes stratified random.
+-   clear survey design (location, target) and standardised sampling protocol
+-   site selection: preselected locations, sometimes stratified random
+-   metadata: informs about the survey methods
 
 ![](img/structured.png)
 :::
@@ -111,8 +154,12 @@ Data can also be defined as **how** they were collected.
 
 ## 1. Data types
 
+**Semi-structured**
+
 ::: {layout-ncol="2"}
--   **Semi-structured**: no standardized sampling protocol, site selection - free, metadata associated with data informs on survey methods.
+-   no survey design but *little* standardised sampling protocol\
+-   site selection: free\
+-   metadata: informs about the observation process and survey methods
 
 ![](img/semi-structured.png)
 :::
@@ -121,8 +168,12 @@ Data can also be defined as **how** they were collected.
 
 ## 1. Data types
 
+**Unstructured** (opportunistic)
+
 ::: {layout-ncol="2"}
--   **Unstructured** (opportunistic): no standardized sampling protocol, site selection -- free, little metadata.
+-   no survey design and no standardised sampling protocol
+-   site selection: free
+-   metadata: almost non
 
 ![](img/unstructured.png)
 :::
@@ -137,8 +188,10 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ## 1. Data types
 
+**Disaggregated**
+
 ::: {layout-ncol="3"}
--   **Disaggregated**: precision is high, but completeness and representativeness is low.
+-   precision is high, but completeness and representativeness are low.
 
 ![](img/occurrence-records.png)
 
@@ -149,17 +202,21 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ## 1. Data types
 
+**Aggregated**
+
 ::: {layout-ncol="3"}
--   **Aggregated**: precision is low, but completeness and representativeness is high.
+-   precision is low, but completeness and representativeness are high.
 
 ![](img/range-map.png)
 
 ![](img/checklists.png)
 :::
 
-. . .
-
+::: fragment
+::: aside
 While **disaggregated** data can produce reliable results for a limited set of well-covered regions, **aggregated** data types can provide critical information for the extrapolation of biodiversity patterns into less well-sampled regions.
+:::
+:::
 
 # 2. Data sources {background-color="#5F9747"}
 
@@ -272,68 +329,21 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](https://www.ala.org.au/app/uploads/2020/06/ALA_Logo_Stacked_RGB.png){.centre top="200" height="200"}
-
-### [ala.org.au](https://www.ala.org.au)
-
-**ALA** (Atlas of Living Australia) is a collaborative, digital, open infrastructure that pulls together Australian biodiversity data from multiple sources, making it accessible and reusable.
-
-![](https://galah.ala.org.au/reference/figures/logo.png){height="100"} `galah`: <https://galah.ala.org.au>
-
-------------------------------------------------------------------------
-
-![](https://living-atlases.gbif.org/assets/img/header/la-logo-header4.svg){.centre top="200" height="200"}
-
-### [living-atlases.gbif.org](https://living-atlases.gbif.org)
-
-The open community around the Atlas of Living Australia platform.
-
-------------------------------------------------------------------------
-
 ![](http://biotime.st-andrews.ac.uk/images/logo.png){.centre top="200" height="200"}
 
 ### [biotime.st-andrews.ac.uk](https://biotime.st-andrews.ac.uk)
 
 BioTime is an open access database global database of assemblage time series for quantifying and understanding biodiversity change.
 
-![](https://avatars.githubusercontent.com/u/29038235?s=200&v=4){height="100"} **BioTime Hub**: <https://github.com/bioTIMEHub>
-
-::: aside
-[Dornelas et al. (2018)](https://doi.org/10.1111/geb.12729)
-:::
+![](https://avatars.githubusercontent.com/u/29038235?s=200&v=4){width="80"} **BioTime Hub**: <https://github.com/bioTIMEHub>
 
 ------------------------------------------------------------------------
 
-![](https://www.predicts.org.uk/images/predicts120.png){.centre top="200" height="200"}
+![](img/Natural_History_Museum_London.png){.centre top="200" width="395"}
 
 ### [nhm.ac.uk/our-science/our-work/biodiversity/predicts](https://www.nhm.ac.uk/our-science/our-work/biodiversity/predicts.html)
 
 **PREDICTS** uses data on local biodiversity around the world to model how human activities affect biological communities. This biodiversity change is shown as the Biodiversity Intactness Index (BII).
-
-::: aside
-[Hudson et al. (2014)](https://doi.org/10.1002/ece3.1303)
-:::
-
-# [EXERCISE]{.story} [Explore different data sources\...]{style="float:right;text-align:right;"} {background-color="#5F9747"}
-
-## Imagine you want to start a project:
-
-Chose a taxon, chose **one** data source and try to get distribution data.
-
-Then answer the following 3 questions:
-
--   What kind of **data types** does the source provide?
-
--   Which kind of **taxa** are covered by the database generally?
-
--   How **accessible** is the data? Can anyone download it? Restrictions?
-
-What was your **experience**? What **issues** did you encounter while getting the data?
-
-::: aside
-Should take around **5 minutes** :) \
-Afterwards we will discuss some of your examples. Please be prepared to share your experience.
-:::
 
 # 3. Open Data {background-color="#5F9747"}
 
@@ -357,7 +367,7 @@ Afterwards we will discuss some of your examples. Please be prepared to share yo
 
 ::: columns
 ::: {.column width="40%"}
-![](https://www.tdwg.org/static/pages/about/logos/tdwg_logo.png){.centre top="200" height="200"}
+![](img/tdwg-logo-home.png){.centre top="200" height="200"}
 :::
 
 ::: {.column width="60%"}
@@ -398,19 +408,44 @@ Open data are licensed under open licenses. Some examples:
 
 Data that are **standardized** and have an **open licence** can be shared :)
 
-![](https://upload.wikimedia.org/wikipedia/commons/6/65/To_deposit_or_not_to_deposit%252C_that_is_the_question_-_journal.pbio.1001779.g001.png){.absolute bottom="50" left="100" width="544" height="418"}
+![](img/data-sharing.png){.absolute bottom="50" left="100" width="544" height="418"}
 
-# [PRACTICE]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+# [EXERCISE 1]{.story} [Explore different data sources\...]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
-As an example we will use the mammals of Czech Republic We will access data through [**GBIF**](https://gbif.org)
+## Imagine you want to start a project:
+
+Chose a taxon, chose **one** data source and try to get distribution data.
+
+Then answer the following 3 questions:
+
+-   What kind of **data types** does the source provide?
+
+-   Which kind of **taxa** are covered by the database generally?
+
+-   How **accessible** is the data? Can anyone download it? Restrictions?
+
+-   What was your **experience**? What **issues** did you encounter while getting the data?
+
+::: aside
+Should take around **5 minutes** :)\
+Afterwards we will discuss some of your examples. Please be prepared to share your experience.
+:::
+
+# [EXERCISE 2]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+We will use the mammals of Czech Republic as an example dataset. We will access data through [**GBIF**](https://gbif.org) using tools available in R.
 
 ## Some preparation before starting to code
 
 . . .
 
--   Create a new project for all your practical sessions.
+-   Create a new project for all your practical sessions (with a Scripts and Data folder inside).
+-   Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).
+-   Keep your code short and easily readable in plain English.
 
 [File]{.font-big} \> [New project]{.font-big} \> [New directory]{.font-big} or [Existing directory]{.font-big}
+
+## Some preparation before starting to code
 
 . . .
 
@@ -437,7 +472,7 @@ library(tidyverse) # load
 
 ------------------------------------------------------------------------
 
-## Data download through R
+## Some preparation before starting to code
 
 We will use **`rgbif`**.
 
@@ -462,6 +497,8 @@ library(rgbif)
 packageVersion('rgbif')
 ```
 
+## Some preparation before starting to code
+
 . . .
 
 We will need the GBIF backbone taxon ID (`taxonKey`) for the *Mammalia* class. For that we will use another package called **`taxize`**.
@@ -479,6 +516,37 @@ library(taxize)
 packageVersion('taxize')
 ```
 
+## Some preparation before starting to code
+
+. . .
+
+Finally, we will install and load `sf`, which is a super useful library for mapping and spatial data analyses.
+
+```{r}
+#| echo: true
+#| eval: false
+install.packages('sf')
+```
+
+```{r}
+#| echo: true
+#| eval: true
+library(sf)
+packageVersion('sf')
+```
+
+## 4. Data download through R
+
+-   Create some variables that will be used later.
+
+```{r}
+#| echo: true
+#| eval: true
+taxa <- "Mammalia"
+country_code <- "CZ" # Two letters ISO code for Czechia
+proj_crs <- 4326 # EPSG code for WGS84
+```
+
 ## 4. Data download through R
 
 So, let's get the taxon ID for the *Mammalia* class
@@ -488,23 +556,28 @@ So, let's get the taxon ID for the *Mammalia* class
 ```{r}
 #| echo: true
 #| eval: true
-get_gbifid_('Mammalia') 
+taxon_key <- get_gbifid_(taxa) %>%
+  bind_rows() %>% # Transform the result of get_gbifid into a dataframe
+  filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
+  pull(usagekey) # Pull the contents of the column "usagekey"
+```
+
+## 4. Data download through R
+
+-   Get a base map that you could use later for plotting or checking the dataset.
+
+```{r warning=FALSE,message=FALSE,echo=TRUE}
+base_map <- rnaturalearth::ne_countries(
+  scale = 110,
+  type = "countries",
+  country = "czechia",
+  returnclass = "sf"
+)
 ```
 
 ------------------------------------------------------------------------
 
 ## 4. Data download through R
-
-So, let's get the taxon ID for the *Mammalia* class
-
-```{r}
-#| echo: true
-#| eval: true
-mammaliaTaxonKey <- get_gbifid_('Mammalia') %>% bind_rows() %>% 
-    filter(matchtype == 'EXACT' & status == 'ACCEPTED') %>%
-    pull(usagekey)
-
-```
 
 . . .
 
@@ -548,7 +621,7 @@ How many occurrence records are in GBIF for the entire **Czech Republic**?
 ```{r}
 #| echo: true
 #| eval: true
-occ_count(country='CZ') # country code for Czech Republic (https://countrycode.org/)
+occ_count(country=country_code) # country code for Czech Republic (https://countrycode.org/)
 ```
 
 . . .
@@ -560,8 +633,10 @@ occ_count(country='CZ') # country code for Czech Republic (https://countrycode.o
 ```{r}
 #| echo: true
 #| eval: true
-occ_count(country='CZ', 
-          taxonKey=mammaliaTaxonKey) 
+occ_count(
+  country = country_code,
+  taxonKey = taxon_key
+)
 ```
 
 . . .
@@ -648,7 +723,7 @@ Get occurrences records of mammals from Czech Republic.
 ```{r}
 #| echo: true
 #| eval: true
-occ_search(taxonKey=mammaliaTaxonKey,
+occ_search(taxonKey=taxon_key,
            country='CZ') 
 ```
 
@@ -663,7 +738,7 @@ Get **all** occurrences records of mammals from Czech Republic.
 ```{r}
 #| echo: true
 #| eval: false
-occ_search(taxonKey=mammaliaTaxonKey,
+occ_search(taxonKey=taxon_key,
            country='CZ',
             limit=6000) 
 ```
@@ -677,11 +752,14 @@ Finally, we store the result in the object `mammalsCZ`.
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ <- occ_search(taxonKey=mammaliaTaxonKey,
-           country='CZ',
-           limit=6000) 
+mammalsCZ <- occ_search(
+  taxonKey = taxon_key, # Key 359 created previously
+  country = country_code, # CZ, ISO code of Czechia
+  limit = 6000, # Max number of records to download
+  hasGeospatialIssue = F # Only records without spatial issues
+)
 
-mammalsCZ <- mammalsCZ$data
+mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data object inside. Here we pull the data out of the list.
 ```
 
 ------------------------------------------------------------------------
@@ -693,7 +771,7 @@ Mammals occurrence records from the Czech Republic
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ
+glimpse(mammalsCZ)
 ```
 
 ------------------------------------------------------------------------
@@ -723,9 +801,10 @@ How many species do we have?
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ %>% 
-  filter(taxonRank=='SPECIES') %>% 
-  distinct(scientificName) %>% nrow()
+mammalsCZ %>%
+  filter(taxonRank == "SPECIES") %>%
+  distinct(scientificName) %>%
+  nrow()
 ```
 
 . . .
@@ -792,7 +871,10 @@ mammalsCZ %>% distinct(basisOfRecord)
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ %>% group_by(basisOfRecord) %>% count()
+mammalsCZ %>%
+  group_by(basisOfRecord) %>%
+  count()
+  
 ```
 
 . . .
@@ -808,14 +890,14 @@ mammalsCZ %>% group_by(basisOfRecord) %>% count()
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ <- mammalsCZ %>% 
-  filter(basisOfRecord=='PRESERVED_SPECIMEN' |
-           basisOfRecord=='HUMAN_OBSERVATION')
+mammalsCZ <- mammalsCZ %>%
+  filter(basisOfRecord == "PRESERVED_SPECIMEN" |
+    basisOfRecord == "HUMAN_OBSERVATION")
 ```
 
 . . .
 
-[Note the use of `|` (OR) to filter the data.]{.font-aside}
+[Note the use of `|` (OR) to filter the data. Another alternative is `filter(basisOfRecord %in% c("PRESERVED_SPECIMEN","HUMAN_OBSERVATION"))`.]{.font-aside}
 
 . . .
 
@@ -879,9 +961,12 @@ nrow(mammalsCZ)
 ```{r}
 #| echo: true
 #| eval: true
-mammalsCZ %>% 
-  filter(coordinateUncertaintyInMeters > 1000) %>% 
-  select(scientificName, coordinateUncertaintyInMeters, stateProvince)
+mammalsCZ %>%
+  filter(coordinateUncertaintyInMeters >= 10000) %>%
+  select(scientificName, 
+         coordinateUncertaintyInMeters, 
+         stateProvince)
+  
 ```
 
 ------------------------------------------------------------------------
@@ -922,23 +1007,42 @@ We'll get to this next week :)
 #| eval: true
 library(sf)
 
-mammalsCZ_sf <- mammalsCZ  %>% 
-  filter(!is.na(decimalLongitude) & 
-           !is.na(decimalLatitude)) %>% 
-    st_as_sf(coords=c('decimalLongitude', 
-                      'decimalLatitude')) %>% 
-    st_set_crs(4326)
-
-Czechia <- rnaturalearth::ne_countries(scale = 110, 
-                                       type = "countries", 
-                                       country = 'czechia', 
-                                       returnclass ="sf")
+mammalsCZ_sf <- mammalsCZ %>%
+  filter(!is.na(decimalLongitude) &
+    !is.na(decimalLatitude)) %>%
+  st_as_sf(coords = c(
+    "decimalLongitude",
+    "decimalLatitude"
+  )) %>%
+  st_set_crs(proj_crs)
 
 ggplot() +
-    geom_sf(data=Czechia, fill='white') + 
-    geom_sf(data=sf::st_intersection(mammalsCZ_sf, Czechia), 
-            aes(col=order)) +
-    theme_bw()
+  geom_sf(data = base_map, fill = "white") +
+  geom_sf(
+    data = sf::st_intersection(mammalsCZ_sf, base_map),
+    aes(col = order)
+  ) +
+  theme_bw()
+```
+
+## How are the records distributed?
+
+And finally, a simple trick to produce separate maps per order.
+
+```{r}
+ggplot() +
+  geom_sf(data = base_map, fill = "white") +
+  geom_sf(
+    data = sf::st_intersection(mammalsCZ_sf, base_map),
+    aes(col = order)
+  ) +
+  theme_bw() +
+  # Added to the previous ggplot
+  facet_wrap(~order) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
+  )
 ```
 
 ------------------------------------------------------------------------
