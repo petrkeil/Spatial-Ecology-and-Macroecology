@@ -410,6 +410,17 @@ Data that are **standardized** and have an **open licence** can be shared :)
 
 ![](img/data-sharing.png){.absolute bottom="50" left="100" width="544" height="418"}
 
+## 3. Open Data: use
+
+
+**Workflow**  
+
+::: incremental
+1.    Identify and download raw data and associated metadata  
+2.    Check data-sharing agreements and licenses  
+3.    Check data quality (e.g., dates, spatial info, taxonomy) and clean data  
+:::
+
 # [EXERCISE 1]{.story} [Explore different data sources\...]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
 ## Imagine you want to start a project:
@@ -535,7 +546,7 @@ library(sf)
 packageVersion('sf')
 ```
 
-## 4. Data download through R
+## Data download through R
 
 -   Create some variables that will be used later.
 
@@ -547,7 +558,7 @@ country_code <- "CZ" # Two letters ISO code for Czechia
 proj_crs <- 4326 # EPSG code for WGS84
 ```
 
-## 4. Data download through R
+## Data download through R
 
 So, let's get the taxon ID for the *Mammalia* class
 
@@ -562,7 +573,7 @@ taxon_key <- get_gbifid_(taxa) %>%
   pull(usagekey) # Pull the contents of the column "usagekey"
 ```
 
-## 4. Data download through R
+## Data download through R
 
 -   Get a base map that you could use later for plotting or checking the dataset.
 
@@ -577,7 +588,7 @@ base_map <- rnaturalearth::ne_countries(
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 . . .
 
@@ -585,7 +596,7 @@ base_map <- rnaturalearth::ne_countries(
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 And now we can use the function `occ_count()` to find out the **number of occurrence records** for the entire Czech Republic.
 
@@ -612,7 +623,7 @@ occ_count(
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 How many occurrence records are in GBIF for the entire **Czech Republic**?
 
@@ -645,7 +656,7 @@ occ_count(
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 To do this, we will use `occ_search()`.
 
@@ -716,7 +727,7 @@ occ_search(
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 Get occurrences records of mammals from Czech Republic.
 
@@ -731,7 +742,7 @@ occ_search(taxonKey=taxon_key,
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 Get **all** occurrences records of mammals from Czech Republic.
 
@@ -764,7 +775,7 @@ mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data obj
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 Mammals occurrence records from the Czech Republic
 
@@ -776,7 +787,7 @@ glimpse(mammalsCZ)
 
 ------------------------------------------------------------------------
 
-## 4. Data download through R
+## Data download through R
 
 Mammals occurrence records from the Czech Republic
 
@@ -811,9 +822,9 @@ mammalsCZ %>%
 
 [`distinct()` is used to see unique values]{.font-aside}
 
-# 5. Data quality {background-color="#5F9747"}
+# Data quality {background-color="#5F9747"}
 
-## 5. Data quality
+## Data quality
 
 Data are not 'good' or 'bad', the quality will depend on our goal.\
 Some things we can check:
@@ -832,7 +843,7 @@ Automated flagging of common spatial and temporal errors in data.
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 As an example, we will check the following fields:
 
@@ -844,7 +855,7 @@ As an example, we will check the following fields:
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `basisOfRecord`: we want preserved specimens or observations
 
@@ -862,7 +873,7 @@ mammalsCZ %>% distinct(basisOfRecord)
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `basisOfRecord`: we want preserved specimens or observations
 
@@ -883,7 +894,7 @@ mammalsCZ %>%
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `basisOfRecord`: we want preserved specimens or observations
 
@@ -913,7 +924,7 @@ nrow(mammalsCZ)
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `taxonRank`: we want records at species level
 
@@ -927,7 +938,7 @@ mammalsCZ %>% distinct(taxonRank)
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `taxonRank`: we want records at species level
 
@@ -952,7 +963,7 @@ nrow(mammalsCZ)
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
 
@@ -971,7 +982,7 @@ mammalsCZ %>%
 
 ------------------------------------------------------------------------
 
-## 5. Data quality
+## Data quality
 
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
 
