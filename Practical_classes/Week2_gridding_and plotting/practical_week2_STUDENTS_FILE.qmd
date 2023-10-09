@@ -70,15 +70,7 @@ library(tidyverse) # load
 
 It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
 
-## Create your project variables
-
-Define here the things you already know you will use later on the script. For instance, we know that we will work with **mammals** from **Czechia** and the data we will get from GBIF are in **WGS84** latitude and longitude.
-
-```{r}
-taxa <- "Mammalia"
-country_code <- "CZ" # Two letters ISO code for Czechia
-proj_crs <- 4326 # EPSG code for WGS84
-```
+# Exercises
 
 ## Mapping occurrence records 🦌
 

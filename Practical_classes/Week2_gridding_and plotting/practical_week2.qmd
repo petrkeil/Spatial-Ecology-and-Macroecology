@@ -752,7 +752,7 @@ Before working with this map, we need to **project** the layer: from lat/lon to 
 
 . . .
 
-<br> Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this.  Find here a cool (Projection Wizard)[https://projectionwizard.org].
+<br> Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this.  Find here a cool [Projection Wizard](https://projectionwizard.org).
 
 ------------------------------------------------------------------------
 
