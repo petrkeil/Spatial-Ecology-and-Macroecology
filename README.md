@@ -1,4 +1,4 @@
-# Spatial-Ecology-and-Macroecology 2022
+# Spatial-Ecology-and-Macroecology 2023
 
 *Petr Keil, Florencia Grattarola, Francois Leroy, Friederike Wölke, Carmen Soria, Gabriel Ortega*
 
