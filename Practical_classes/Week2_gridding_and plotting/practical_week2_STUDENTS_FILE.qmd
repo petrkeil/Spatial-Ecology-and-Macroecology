@@ -101,6 +101,14 @@ mammalsCZ %>%
            crs=4326) %>% head(n=10) %>% knitr::kable()
 ```
 
+```{r}
+mammalsCZ_sf <- mammalsCZ %>% 
+  filter(!is.na(decimalLongitude) & 
+           !is.na(decimalLatitude)) %>% # filter records without coordinates
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326)
+```
+
 Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84.
 
 ### 2.  Create a grid layer of the Czech Republic (`POLYGONS`)
