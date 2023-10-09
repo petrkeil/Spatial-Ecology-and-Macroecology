@@ -47,6 +47,15 @@ Exercises:
 
 # Some preparation before starting to code
 
+## Data download
+
+Please download the following files and store them on you `data` folder:  
+
+-   `mammalsCZ.rds`
+-   `CZE_adm0.gpkg`  
+-   `KvadratyCR_JTSK.gpkg`  
+-   `testudines.gpkg`  
+
 ## Spatial analyses
 
 For geocomputation today we will use the `sf` package.
@@ -934,8 +943,7 @@ Now let's use `st_join()` to calculate the number of species per grid-cell (SR).
 
 ```{r}
 #| echo: true
-#| eval: true
-
+#| eval: false
 testudines_grid <- st_join(world_grid, testudines_extant) %>%
   group_by(gridID) %>%
   summarise(N=sum(!is.na(BINOMIAL)), 

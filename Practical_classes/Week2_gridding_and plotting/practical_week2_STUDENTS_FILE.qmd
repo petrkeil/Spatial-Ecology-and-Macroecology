@@ -11,6 +11,15 @@ editor: visual
 
 # Preparations before starting to code
 
+## Data download
+
+Please download the following files and store them on you `data` folder:  
+
+-   `mammalsCZ.rds`
+-   `CZE_adm0.gpkg`  
+-   `KvadratyCR_JTSK.gpkg`  
+-   `testudines.gpkg`  
+
 ## Spatial analyses
 
 Install the package `sf`
@@ -73,7 +82,7 @@ proj_crs <- 4326 # EPSG code for WGS84
 
 ## Mapping occurrence records 🦌
 
-1.  Get occurrence records of mammals in the Czech Republic (`POINTS`)
+### 1.  Get occurrence records of mammals in the Czech Republic (`POINTS`)
 
 Get the data from last practical (downloaded from GBIF)
 
@@ -102,7 +111,7 @@ mammalsCZ %>%
 
 Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84.
 
-2.  Create a grid layer of the Czech Republic (`POLYGONS`)
+### 2.  Create a grid layer of the Czech Republic (`POLYGONS`)
 
 Load the administrative borders using `st_read`
 
@@ -127,7 +136,7 @@ st_crs(CZ_borders)
 st_crs(CZ_grids)
 ```
 
-3.  Calculate sampling effort (N) and species richness per grid cell (SR)
+### 3.  Calculate sampling effort (N) and species richness per grid cell (SR)
 
 Frist, we will transform the layer's CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`.
 
@@ -187,7 +196,7 @@ mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>%
             SR=n_distinct(species, na.rm = TRUE))
 ```
 
-4.  Visualise **N** and **SR** patterns in Czech Republic
+### 4.  Visualise **N** and **SR** patterns in Czech Republic
 
 Finally, let's plot this. We will do it using `geom_sf()`, a `ggplot` function to visualise sf objects.  
 
@@ -270,7 +279,7 @@ We are done! No it's **your turn** :)
 
 ## Mapping species ranges 🐢
 
-1.   Get testudines' IUCN expert range maps (`POLYGONS`)
+### 1.   Get testudines' IUCN expert range maps (`POLYGONS`)
 
 Read the data (downloaded from IUCN [Spatial Data Download's](https://www.iucnredlist.org/resources/spatial-data-download) page). Take a look at the zip file for more info on metadata, and terms and conditions of use. 
 
@@ -285,7 +294,7 @@ What do the data look like?
 testudines %>% head(n=10) %>% knitr::kable()
 ```
 
-2.   Get a world map
+### 2.   Get a world map
 
 We will download a polygon of the world at medium scale and we will combine all countries into a unique polygon.
 
@@ -349,7 +358,7 @@ st_crs(testudines_ea, parameters = TRUE)$epsg
 st_crs(testudines_ea, parameters = TRUE)$ud_unit
 ```
 
-3.   Create a global 1-degree grid  (`POLYGONS`)
+### 3.   Create a global 1-degree grid  (`POLYGONS`)
 
 We will do this using the function `st_make_grid()`. For the `cellsize` argument we will chose 1 degree, which is \~100km (=100,000m)
 
@@ -371,7 +380,7 @@ ggplot() +
   geom_sf(data= world_grid, fill='white', size=0.1) 
 ```
 
-4.   Calculate the species richness per grid cell (SR)
+### 4.   Calculate the species richness per grid cell (SR)
 
 To do this, let's keep only the *testudines* that are extant (resident) species
 
@@ -416,7 +425,7 @@ Here are the results :)
 testudines_grid %>% head(n=10) %>% knitr::kable()
 ```
 
-5.   Visualise **SR** patterns in the world\
+### 5.   Visualise **SR** patterns in the world\
 
 And now, we plot!
 
