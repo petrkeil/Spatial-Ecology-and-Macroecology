@@ -2,7 +2,7 @@
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 2'
 date: 2022-10-10
-author: 'Florencia Grattarola'
+author: 'Florencia Grattarola & Gabriel Ortega'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
@@ -34,6 +34,15 @@ We will explore the potential drivers of species distribution.
     2.  Visualise data
 3.  Correlations between predictors\
 :::
+
+------------------------------------------------------------------------
+## What are we going to see today?
+
+We will introduce three new packages.
+
+1.  terra: tools to manage and analyze rasters and vectors
+2.  geodata: interface to multiple sources of spatial data
+3.  MODIStsp: pipelines for processing time series from MODIS data
 
 ------------------------------------------------------------------------
 
@@ -99,7 +108,7 @@ The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 cla
 
 ## Drivers
 
-In today's practical we will focus in the **Asian** continent and assess five different layers:
+In today's practical, we will focus on **South-East Asia** and assess five different layers:
 
 ::: incremental
 -   Annual mean temperature (**WorldClim BIO1**)
@@ -113,7 +122,7 @@ In today's practical we will focus in the **Asian** continent and assess five di
 
 ## 2. Get data: climatic {auto-animate="true"}
 
-First, let's get a base map of Asia using the `rnaturalearth` package.
+First, let's get a base map of Asia and crop it to the extent we want.
 
 . . .
 
@@ -132,7 +141,7 @@ library(tidyverse)
 
 ## 2. Get data: climatic {auto-animate="true"}
 
-First, let's get a base map of Asia using the `rnaturalearth` package.
+First, let's get a base map of Asia and crop it to the extent we want.
 
 ```{r}
 #| echo: true
