@@ -1,8 +1,8 @@
 ---
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 2'
-date: 2022-10-03
-author: 'Florencia Grattarola'
+date: 2023-10-09
+author: 'Florencia Grattarola, Friederike Wölke, Gabriel Ortega'
 institute: '(Department of Spatial Sciences)'
 format: 
   revealjs:
@@ -47,9 +47,18 @@ Exercises:
 
 # Some preparation before starting to code
 
+## Data download
+
+Please download the following files and store them on you `data` folder:  
+
+-   `mammalsCZ.rds`
+-   `CZE_adm0.gpkg`  
+-   `KvadratyCR_JTSK.gpkg`  
+-   `testudines.gpkg`  
+
 ## Spatial analyses
 
-For all geocomputationgs today we will use the `sf` package.
+For geocomputation today we will use the `sf` package.
 
 . . .
 
@@ -117,24 +126,6 @@ For all the map plots today we will use the `ggplot` package. It's part of the `
 library(tidyverse) # load
 ```
 
-. . . 
-
-To easily align the figures in a composition we will also use `patchwork`.
-
-```{r}
-#| echo: true
-#| eval: false
-install.packages('patchwork') # install 
-```
-
-. . .
-
-```{r}
-#| echo: true
-#| eval: true
-library(patchwork) # load
-```
-
 
 # [LOCAL]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#5F9747"}
 
@@ -164,6 +155,8 @@ Steps:
 1.  Get occurrence records of mammals in the Czech Republic
 
 . . .
+
+Get the data from last practical (downloaded from GBIF)
 
 ```{r}
 #| echo: true
@@ -227,9 +220,13 @@ mammalsCZ %>%
 
 [Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84]{.font-aside}
 
+------------------------------------------------------------------------
+
 ## Mapping occurrence records 🦌
 
 1.  Get occurrence records of mammals in the Czech Republic\
+
+And we save
 
 . . .
 
@@ -241,6 +238,7 @@ mammalsCZ_sf <- mammalsCZ %>%
   st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
            crs=4326) # this is the projection that the data is in
 ```
+
 
 ------------------------------------------------------------------------
 
@@ -258,7 +256,7 @@ Load the administrative borders using `st_read`
 #| echo: true
 #| eval: true
 
-CZ_borders <- st_read('data/CZE_adm0.shp')
+CZ_borders <- st_read('data/CZE_adm0.gpkg')
 ```
 
 [We'll see how to get this polygon data directly from R later]{.font-aside}
@@ -286,7 +284,7 @@ We will *actually* load a Czech standard grid layer of 100 km^2^ area
 #| echo: true
 #| eval: true
 
-CZ_grids <- st_read('data/KvadratyCR_JTSK.shp')
+CZ_grids <- st_read('data/KvadratyCR_JTSK.gpkg')
 ```
 
 . . .
@@ -355,7 +353,6 @@ Frist, we will transform the layer's CRS to [S-JTSK / Krovak East North](https:/
 #| eval: true
 mammalsCZ_sf <- st_transform(mammalsCZ_sf,  
                              crs = st_crs(CZ_grids)) # the same CRS as the CZ_grids layer
-mammalsCZ_sf
 ```
 
 ## Mapping occurrence records 🦌
@@ -445,7 +442,7 @@ Luckily, `tidyverse` methods also work for `sf` objects :)
 
 . . .
 
-First, we group by grid-cells and then we count values per grid.
+First, we will group by grid-cells and then we count values per grid.
 
 ------------------------------------------------------------------------
 
@@ -453,7 +450,7 @@ First, we group by grid-cells and then we count values per grid.
 
 3.  Calculate sampling effort (N) and species richness per grid cell (SR)
 
-Let's calculate number of records (`N`) and number of species per grid-cell (`SR`)
+Let's calculate the number of records (`N`) and the number of species per grid-cell (`SR`)
 
 . . .
 
@@ -683,10 +680,12 @@ Steps:
 
 . . .
 
+Read the data
+
 ```{r}
 #| echo: true
 #| eval: true
-testudines <- st_read('data/testudines/data_0.shp')
+testudines <- st_read('data/testudines.gpkg')
 ```
 
 . . .
@@ -715,7 +714,7 @@ testudines
 
 2.   Get a world map
 
-We will download a shapefile of the world at medium scale and we will combine all countries into a unique polygon
+We will download a polygon of the world at medium scale and we will combine all countries into a unique polygon
 
 . . .
 
@@ -753,7 +752,7 @@ Before working with this map, we need to **project** the layer: from lat/lon to 
 
 . . .
 
-<br> Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this.
+<br> Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this.  Find here a cool [Projection Wizard](https://projectionwizard.org).
 
 ------------------------------------------------------------------------
 
@@ -803,10 +802,10 @@ Let's transform the data (both the world and the testudines' layers)
 #| echo: true
 #| eval: true
 world_ea <- st_transform(world, crs = 'EPSG:8857') %>% 
-  st_make_valid %>% st_cast
+  st_make_valid() %>% st_cast()
 
 testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% 
-  st_make_valid %>% st_cast
+  st_make_valid() %>% st_cast()
 ```
 
 ## Mapping species ranges 🐢
@@ -875,7 +874,7 @@ world_grid <- readRDS('data/world_grid.rds')
 
 . . .
 
-<br> We have the grid, we are ready to calculate richness. Let's see how it looks
+<br> We have the grid, we are ready to calculate metrics per grid cell. Let's see how it looks
 
 ------------------------------------------------------------------------
 
@@ -944,11 +943,10 @@ Now let's use `st_join()` to calculate the number of species per grid-cell (SR).
 
 ```{r}
 #| echo: true
-#| eval: true
-
+#| eval: false
 testudines_grid <- st_join(world_grid, testudines_extant) %>%
   group_by(gridID) %>%
-  summarise(N=ifelse(n_distinct(BINOMIAL, na.rm = TRUE)==0, 0, n()),
+  summarise(N=sum(!is.na(BINOMIAL)), 
             SR=n_distinct(BINOMIAL, na.rm = TRUE))
 ```
 
@@ -956,17 +954,9 @@ testudines_grid <- st_join(world_grid, testudines_extant) %>%
 
 This **will** take a while ☕️🍪
 
-. . .
-
-<br> And now, we plot!
-
-------------------------------------------------------------------------
-
 ## Mapping species ranges 🐢
 
-5.   Visualise **SR** patterns in the world\
-
-. . .
+4.   Calculate the species richness per grid cell (SR)\
 
 Here are the results :)
 
@@ -974,7 +964,7 @@ Here are the results :)
 
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 testudines_grid <- readRDS('data/testudines_grid.rds')
 ```
 
@@ -988,9 +978,17 @@ testudines_grid
 
 ## Mapping species ranges 🐢
 
+5.   Visualise **SR** patterns in the world\
+
+. . .
+
+And now, we plot!
+
+. . .
+
 ```{r}
 #| echo: false
-#| eval: false
+#| eval: true
 
 ggplot() + 
   geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +

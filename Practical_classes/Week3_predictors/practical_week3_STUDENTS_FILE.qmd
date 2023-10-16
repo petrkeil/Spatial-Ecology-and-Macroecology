@@ -1,0 +1,637 @@
+---
+title: "Students file"
+format: html
+editor: visual
+---
+
+## Drivers
+
+In today's practical, we will focus on **Indonesia** and assess five different layers:
+
+-   Annual mean temperature (**WorldClim BIO1**)
+-   Precipitation seasonality (**WorldClim BIO15**)
+-   Elevation (**SRTM**)
+-   Land-cover (**MODIS Terra MCD12Q1**)
+-   Human footprint index (**SEDAC**)
+
+# 2. Setup your work environment: libraries {background-color="#5F9747"}
+
+## 2.0 Install `pacman`
+
+`pacman` is a handy package to install, load, and unload libraries. If you attempt to load a library that is not installed, `pacman` will try to install it automatically.
+
+```{r echo=TRUE, eval=FALSE}
+install.packages("pacman")
+```
+
+## 2.1 Load your libraries
+
+We will need tidyverse, geodata, terra, MODIStsp, and sf
+
+```{r echo=TRUE, eval=TRUE}
+pacman::p_load(
+  rnaturalearth, # useful base maps
+  geodata, # Get data from multiple sources
+  terra, # Work with rasters and vectorial spatial data
+  MODIStsp, # Get data from MODIS
+  sf,  # Manage spatial data as simple features dataframes
+  tmap, # Cool maps
+  tictoc # Benchmarking
+)
+
+pacman::p_load(tidyverse) # Data wrangling... and.. why not?
+```
+
+## 2.2 Create project variables
+
+We will need:
+
+1.  The polygon and spatial extent of Indonesia.
+
+2.  A planar projection of the area.
+
+3.  The taxa we are going to analyze.
+
+## 2.2 Create project variables
+
+Get a polygon of Indonesia.
+
+```{r echo=TRUE, eval=TRUE}
+country <- ne_countries(
+  country = "indonesia",
+  returnclass = "sf"
+) # We want an object of class sf
+```
+
+## 2.2 Create project variables
+
+Print the extent of the country plus 1 degree. If you work in a small area, you cannot get rid of decimal values in coordinates. However, working in a large area you can round the values to simplify your life!.
+
+```{r echo=TRUE, eval=TRUE}
+
+round(st_bbox(country),0) # Check the extent of the country (round values)
+round(st_bbox(country),0) + c(1,-1,1,1) #This way we add space around the country
+```
+
+Now visit <https://projectionwizard.org/> and use the second set of coordinates above to find the recommended projection for your work today.
+
+## 2.2 Create project variables
+
+Now, let's create an object containing the project CRS. We will not transform our spatial objects to this CRS immediately, but it will be useful later.
+
+```{r echo=TRUE, eval=TRUE}
+project_crs <- 'PROJCS["ProjWiz_Custom_Cylindrical_Equal_Area",
+ GEOGCS["GCS_WGS_1984",
+  DATUM["D_WGS_1984",
+   SPHEROID["WGS_1984",6378137.0,298.257223563]],
+  PRIMEM["Greenwich",0.0],
+  UNIT["Degree",0.0174532925199433]],
+ PROJECTION["Cylindrical_Equal_Area"],
+ PARAMETER["False_Easting",0.0],
+ PARAMETER["False_Northing",0.0],
+ PARAMETER["Central_Meridian",119],
+ PARAMETER["Standard_Parallel_1",0],
+ UNIT["Meter",1.0]]'
+```
+
+## 2.2 Create project variables
+
+Create an extent around Indonesia.
+
+```{r echo=TRUE, eval=TRUE}
+extent <- round(st_bbox(country),0) + c(1,-1,1,1) # Bounding box plus 1 degree
+```
+
+## 2.2 Create project variables
+
+Set the path were you are going to save data. This is required to use the package `geodata`. From now on, every time you try to get a dataset with `geodata` functions, the package will check if the data already exists in your data folder and load it from there.
+
+```{r echo=TRUE, eval=TRUE}
+geodata_path("data/")
+```
+
+# 3. Get raster data {background-color="#5F9747"}
+
+## Recommendations
+
+When working with rasters, there are three basic procedures we can recommend you:
+
+1.  Crop: Cut the rasters to the geographic extent you need. This is a square cut.
+
+2.  Reproject: Make sure that all your rasters are on the same projection. Be aware that reprojecting raster is not the best. Try to reproject your vector data to match the raster.
+
+3.  Mask: Set to NA all the cells outside your polygon(s) of interest.
+
+## 3. Get data: climatic
+
+Let's download the **WorldClim** data (version 2.1 climate data for 1970-2000):
+
+-   Annual mean temperature (`bio1`)\
+-   Annual precipitation (`bio15`)\
+
+<br> You can download these data from <https://www.worldclim.org/data/worldclim21.html> <br> or use the package `geodata`.
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+We will use the function `worldclim_country()` from `geodata`.
+
+```{r echo=TRUE, eval=TRUE}
+tavg <- worldclim_country(
+  var = "tavg",
+  country = "IDN", # IDN is the three letters ISO code for Indonesia.
+  path = 'data/'
+)
+
+tavg <- crop(tavg, extent)
+
+tavg
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: climatic {auto-animate="true"}
+
+Now get the precipitation data from Worldclim.
+
+```{r echo=TRUE, eval=TRUE}
+prec <- worldclim_country(
+  var = "prec",
+  country = "IDN"
+)
+
+prec <- crop(prec, extent)
+
+prec
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: elevation {auto-animate="true"}
+
+We will the function `elevation_30s()` from `geodata`. This data comes from the Shuttle Radar Topographic Mission and are aggregated to 1km resolution.
+
+```{r echo=TRUE, eval=TRUE}
+elev <- elevation_30s(country = "IDN")
+
+elev <- crop(elev, extent)
+
+elev
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Now, let's get the landcover data. For this we will use the package `MODIStsp`.
+
+To download **MODIS** data through the NASA *http* server, we need to create a profile at <https://urs.earthdata.nasa.gov/home> to get a user and password.
+
+Today, I'll present you an example and provide you with the data already processed, but you can do this at home.
+
+```{r echo=TRUE, eval=TRUE}
+MODIStsp_get_prodnames()
+```
+
+We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v006/), and download data for **Indonesia** from the year **2020**.
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+With `MODIStsp_get_prodlayers()` you can see all the layers of the product:
+
+```{r echo=TRUE, eval=TRUE}
+MODIStsp_get_prodlayers("MCD12Q1", prodver = "061")$bandnames
+```
+
+<br>
+
+There are five different land cover classification schemes, we will be using the primary land cover scheme (**LC1**) which identifies 17 classes defined by the [IGBP](http://www.igbp.net/) (International Geosphere-Biosphere Programme), including 11 natural vegetation classes, 3 human-altered classes, and 3 non-vegetated classes.
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+We will use the function `MODIStsp()` to download data:
+
+``` r
+MODIStsp(
+  ...,
+  gui = TRUE,
+  out_folder = NULL,
+  out_folder_mod = NULL,
+  opts_file = NULL,
+  selprod = NULL,
+  prod_version = NULL,
+  bandsel = NULL,
+  quality_bandsel = NULL,
+  indexes_bandsel = NULL,
+  sensor = NULL,
+  download_server = NULL,
+  downloader = NULL,
+  user = NULL,
+  password = NULL,
+  download_range = NULL,
+  start_date = NULL,
+  end_date = NULL,
+  spatmeth = NULL,
+  start_x = NULL,
+  end_x = NULL,
+  start_y = NULL,
+  end_y = NULL,
+  bbox = NULL,
+  spafile = NULL,
+  out_projsel = NULL,
+  output_proj = NULL,
+  out_res_sel = NULL,
+  out_res = NULL,
+  resampling = NULL,
+  reprocess = NULL,
+  delete_hdf = NULL,
+  nodata_change = NULL,
+  scale_val = NULL,
+  ts_format = NULL,
+  out_format = NULL,
+  compress = NULL,
+  test = NULL,
+  n_retries = 5,
+  verbose = TRUE,
+  parallel = TRUE
+)
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+We used the function `MODIStsp()` to download data for you. MODIS require to create a user and password.
+
+``` r
+#| echo: true
+#| eval: false
+MODIStsp(
+  gui = FALSE,
+  out_folder = "data/",
+  out_folder_mod = "data/",
+  selprod = "LandCover_Type_Yearly_500m (MCD12Q1)",
+  prod_version = "061",
+  bandsel = "LC1",
+  sensor = "Terra",
+  user = your_user, # your username for NASA http server
+  password = your_pass, # your password for NASA http server
+  start_date = "2020.01.01",
+  end_date = "2020.12.31",
+  verbose = TRUE,
+  bbox = extent, # bbox covering Indonesia
+  spatmeth = "bbox",
+  out_format = "GTiff",
+  compress = "LZW",
+  out_projsel = "User Defined",
+  output_proj = 4326,
+  delete_hdf = TRUE,
+  parallel = TRUE
+)
+```
+
+------------------------------------------------------------------------
+
+## 2. Get data: land-cover
+
+Let's read the processed layer.
+
+```{r echo=TRUE, eval=TRUE}
+land <- rast("data/LandCover_Type_Yearly_500m_v61/LC1/MCD12Q1_LC1_2020_001.tif")
+
+land <- crop(land , extent)
+
+land
+```
+
+## 2. Get data: anthropogenic
+
+Again using the package `geodata`.
+
+```{r echo=TRUE, eval=TRUE}
+footp <- footprint(year = 2009)
+
+footp <- crop(footp, extent)
+
+footp
+```
+
+## Let's compare our rasters {auto-animate="true"}
+
+Rasters should have the same spatial extent and resolution...
+
+If they don't match... what should we do?
+
+```{r echo=TRUE, eval=TRUE}
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+```
+
+## Let's compare our rasters {auto-animate="true"}
+
+Rasters should have the same spatial extent and resolution...
+
+If they don't match... what should we do?
+
+```{r echo=TRUE, eval=TRUE}
+st_bbox(tavg)
+st_bbox(prec) 
+st_bbox(elev) 
+st_bbox(footp)
+st_bbox(land)
+
+#Compare with the country extent
+st_bbox(country)
+```
+
+# 2.1. Process raster {background-color="#5F9747"}
+
+## 2.1. Process raster {auto-animate="true"}
+
+We will use the package `terra` to process the rasters.\
+First we need to create a new raster to use as a template.
+
+```{r echo=TRUE, eval=TRUE}
+r <- rast(res = 10000, # Target cell size
+          ext(vect(st_transform(country, project_crs))), # Extent of the raster
+          crs = project_crs) %>% # Useful planar projection
+  project(., "epsg:4326") # Projection of our rasters
+r
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+We will `resample()` all of the rasters to our target resolution.
+
+```{r echo=TRUE, eval=TRUE}
+tavg <- resample(tavg, r, method = "bilinear")
+prec <- resample(prec, r, method = "bilinear")
+elev <- resample(elev, r, method = "bilinear")
+footp <- resample(footp, r, method = "near")
+land <- resample(land, r, method = "near")
+```
+
+And we can compare the rasters after resampling.
+
+```{r echo=TRUE, eval=TRUE}
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+```
+
+------------------------------------------------------------------------
+
+## 2.1. Process raster {auto-animate="true"}
+
+And finally we will use `mask()` to intersect the layer with Indonesia.
+
+```{r echo=TRUE, eval=TRUE}
+tavg <- mask(tavg, vect(country))
+prec <- mask(prec, vect(country))
+elev <- mask(elev, vect(country))
+footp <- mask(footp, vect(country))
+land <- mask(land, vect(country))
+```
+
+------------------------------------------------------------------------
+
+# 2.2. Visualise data {background-color="#5F9747"}
+
+## 2.2. Visualise data
+
+We will use the package `tmap`.
+
+```{r echo=TRUE, eval=TRUE}
+tmap_mode(mode = "view")
+```
+
+## 2.2. Visualise data {auto-animate="true"}
+
+Annual mean temperature (WorldClim BIO1)
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(mean(tavg)) +
+  tm_raster(palette = "OrRd", midpoint = NA, style = "cont", n = 10)
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Precipitation seasonality (WorldClim BIO15)
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(mean(prec)) +
+  tm_raster(palette = "RdBu", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Elevation (WorldClim)
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(elev) +
+  tm_raster(palette = "BrBG", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Land-cover (MODIS Terra MCD12Q1). We need to make sure values are factors.
+
+```{r echo=TRUE, eval=TRUE}
+names(land)
+```
+
+```{r echo=TRUE, eval=TRUE}
+land <- as.factor(land$MCD12Q1_LC1_2020_001)
+```
+
+Then we can add values to the levels.
+
+```{r echo=TRUE, eval=TRUE}
+levels(land[[1]]) <- data.frame(
+  ID = c(1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 17),
+  label = c(
+    "Evergreen Needleleaf Forest",
+    "Evergreen Broadleaf Forests",
+    "Deciduous Broadleaf Forests",
+    "Mixed Forests",
+    "Closed Shrublands",
+    "Woody Savannas",
+    "Savannas",
+    "Sparse Forests",
+    "Grassslands",
+    "Permanent Wetlands",
+    "Croplands",
+    "Urban and Built-up Lands",
+    "Cropland/Natural Vegetation Mosaics",
+    "Barren",
+    "Water Bodies"
+  )
+)
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Land-cover (MODIS Terra MCD12Q1)
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(land) +
+  tm_raster(palette = "Set1", style = "cat") +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+## 2.2. Visualise data
+
+Human footprint index (SEDAC)
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(footp) +
+  tm_raster(palette = "viridis", style = "cont") +
+  tm_view(bbox = extent)
+```
+
+# 3. Correlations between predictors {background-color="#5F9747"}
+
+## 3. Correlations between predictors {auto-animate="true"}
+
+Let's get values per grid-cell.
+
+```{r echo=TRUE, eval=TRUE}
+names(tavg)
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+Let's see all the values together.
+
+```{r echo=TRUE, eval=TRUE}
+#| echo: true
+#| eval: true
+predictors <- tibble(
+  "tavg" = values(tavg$IDN_wc2.1_30s_tavg_1) %>% as.vector(),
+  "prec" = values(prec$IDN_wc2.1_30s_prec_1) %>% as.vector(),
+  "elev" = values(elev) %>% as.vector(),
+  "land" = values(land) %>% as.vector(),
+  "footp" = values(footp) %>% as.vector()
+) %>% 
+  mutate(
+    across(everything(), ~replace_na(.x, NA))
+  )
+```
+
+------------------------------------------------------------------------
+
+## 3. Correlations between predictors
+
+Let's see all the values together.
+
+```{r echo=TRUE, eval=TRUE}
+summary(predictors)
+```
+
+## 3. Correlations between predictors
+
+Let's see how these values correlate.
+
+```{r echo=FALSE,warning=FALSE, message=FALSE}
+GGally::ggpairs(predictors, cex = 0.1)
+```
+
+What can this plot tell you?
+
+# [EXTRA]{.story} [Can we explore any pattern with the hotspots of turtle species richness from last class?]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+```{r echo=TRUE, eval=TRUE}
+grid_testudines_Asia <- readRDS("data/grid_testudines_Asia.rds") %>%
+  st_transform(., 4326) %>%
+  st_crop(country)
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+```{r echo=TRUE, eval=TRUE}
+tm_shape(grid_testudines_Asia) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+```{r message=FALSE}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(grid_testudines_Asia) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(mean(tavg)) +
+  tm_raster(palette = "OrRd", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+
+tm_shape(mean(prec)) +
+  tm_raster(palette = "RdBu", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+
+tm_shape(elev) +
+  tm_raster(palette = "BrBG", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+## Turtles of Asia
+
+Let's read the data, plot it and see the patterns
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(grid_testudines_Asia) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(land) +
+  tm_raster(palette = "Set1", style = "cat") +
+  tm_view(bbox = extent)
+
+tm_shape(footp) +
+  tm_raster(palette = "viridis", style = "cont") +
+  tm_view(bbox = extent)
+```
+
+------------------------------------------------------------------------
+
+# Any doubts? {background-color="#5F9747"}

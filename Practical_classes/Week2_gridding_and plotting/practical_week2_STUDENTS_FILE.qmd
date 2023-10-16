@@ -1,5 +1,5 @@
 ---
-title: "Downloading, cleaning and mapping data from GBIF"
+title: "How to plot biodiversity data, explore patterns at different resolutions, and make pretty map"
 authors: 
   -Florencia Grattarola
   -Friederike Woelke
@@ -9,375 +9,430 @@ format: docx
 editor: visual
 ---
 
-# Mammal's of the Czech Republic
+# Preparations before starting to code
 
-We will use the mammals of Czech Republic as an example dataset. We will access data through [**GBIF**](https://gbif.org) using tools available in R.
+## Data download
 
-## Some preparation before starting to code
+Please download the following files and store them on you `data` folder:  
 
--   Create a new project for all your practical sessions (with a Scripts and Data folder inside).
--   Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).
--   Keep your code short and easily readable in plain English.
+-   `mammalsCZ.rds`
+-   `CZE_adm0.gpkg`  
+-   `KvadratyCR_JTSK.gpkg`  
+-   `testudines.gpkg`  
 
-# Install and load libraries
+## Spatial analyses
 
-We will use the long way to install and load packages. I'll recommend you to investigate the short way using the function `p_load()` from the package **`pacman`**
-
-## Install the package `tidyverse`
-
-Tidyverse is a set of libraries for easier manipulation and transformation of data. We will be using many functions from this package, like `filter()`, `mutate()`, and later `read_csv()`.
-
-```{r eval=FALSE}
-install.packages("tidyverse") # install
-```
+Install the package `sf`
 
 ```{r}
-library(tidyverse) # load
+#| eval: false
+install.packages('sf') # install
 ```
 
-## Install the package `rgbif`
+Load the library and check it's working.
 
-We will use **`rgbif`** to download data from GBIF directly into our R session. Rgbif is plenty of functions that allow us to interact with GBIF.
+```{r}
+library(sf) # load
+packageVersion('sf')
+```
 
-```{r eval=FALSE}
-install.packages("rgbif")
+And switch spherical geometry off
+
+```{r}
+sf_use_s2(FALSE) # switch spherical geometry off
+```
+
+## Spatial download
+
+For downloading country-specific and world polygons we will use the `rnaturalearth` package
+
+```{r}
+#| eval: false
+install.packages(c('rnaturalearth', 'rnaturalearthdata')) # the second package is also needed
 ```
 
 To use it, we load the library and check it's working.
 
 ```{r}
-library(rgbif)
-packageVersion("rgbif")
+library(rnaturalearth) # load
+packageVersion('rnaturalearth')
 ```
 
-We will need the GBIF backbone taxon ID (`taxonKey`) for the *Mammalia* class. For that we will use another package called **`taxize`**.
+## Visualisation
 
-```{r eval=FALSE}
-install.packages("taxize")
-```
-
-Same as with **rgbif,** load **taxize** and check it's working.
+For all the map plots today we will use the `ggplot` package. It's part of the `tidyverse`.
 
 ```{r}
-library(taxize)
-packageVersion("taxize")
-```
-
-```{r eval=FALSE}
-install.packages("sf")
-```
-
-Same as with **rgbif,** load **sf** and check it's working.
-
-```{r}
-library(sf)
-packageVersion("sf")
+library(tidyverse) # load
 ```
 
 # Project variables
 
 It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
 
-## Create your project variables
+# Exercises
 
-Define here the things you already know you will use later on the script. For instance, we know that we will work with **mammals** from **Czechia** and the data we will get from GBIF are in **WGS84** latitude and longitude.
+## Mapping occurrence records 🦌
 
-```{r}
-taxa <- "Mammalia"
-country_code <- "CZ" # Two letters ISO code for Czechia
-proj_crs <- 4326 # EPSG code for WGS84
-```
+### 1.  Get occurrence records of mammals in the Czech Republic (`POINTS`)
 
-Let's get the taxon ID for the *Mammalia* class
+Get the data from last practical (downloaded from GBIF)
 
 ```{r}
-taxon_key <- get_gbifid_(taxa) %>%
-  bind_rows() %>% # Transform the result of get_gbifid into a dataframe
-  filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
-  pull(usagekey) # Pull the contents of the column "usagekey"
+mammalsCZ <- readRDS('data/mammalsCZ.rds')
+mammalsCZ %>% head(n=10) %>% knitr::kable()
 ```
 
-It is often useful to have a base map of the study area (in this case the whole Czechia).
-
-```{r warning=FALSE,message=FALSE}
-base_map <- rnaturalearth::ne_countries(
-  scale = 110,
-  type = "countries",
-  country = "czechia",
-  returnclass = "sf"
-)
-```
-
-# Data download
-
-And now we can use the function `occ_count()` to find out the **number of occurrence records** for Czechia.
-
-How many occurrence records are in GBIF for the entire **Czechia**?
+Let's keep only a few fields
 
 ```{r}
-occ_count(country = country_code)
+mammalsCZ <- mammalsCZ %>% select(species, order, eventDate, 
+                                  decimalLongitude, decimalLatitude,
+                                  stateProvince, countryCode, datasetName)
 ```
 
-And how many records for the **mammals** of Czech Republic?
+We will transform our data (table) into an sf object using `st_as_sf()`
 
 ```{r}
-occ_count(
-  country = country_code,
-  taxonKey = taxon_key
-)
+mammalsCZ %>% 
+  filter(!is.na(decimalLongitude) & 
+           !is.na(decimalLatitude)) %>% # filter records without coordinates
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326) %>% head(n=10) %>% knitr::kable()
 ```
-
-Now we are ready to do a download. To do this, we will use `occ_search()`. This function has many options that correspond with fields in GBIF database.
-
-``` r
-occ_search(
-  taxonKey = NULL, # We will put here our taxon_key
-  scientificName = NULL,
-  country = NULL, # We will put here our country_code
-  publishingCountry = NULL,
-  hasCoordinate = NULL, 
-  typeStatus = NULL, 
-  recordNumber = NULL, 
-  lastInterpreted = NULL, 
-  continent = NULL, 
-  geometry = NULL, 
-  geom_big = "asis", 
-  geom_size = 40, 
-  geom_n = 10, 
-  recordedBy = NULL, 
-  recordedByID = NULL, 
-  identifiedByID = NULL, 
-  basisOfRecord = NULL, # Useful for filtering the type of record you want
-  datasetKey = NULL, 
-  eventDate = NULL, 
-  catalogNumber = NULL, 
-  year = NULL, 
-  month = NULL, 
-  decimalLatitude = NULL, 
-  decimalLongitude = NULL, 
-  elevation = NULL, 
-  depth = NULL, 
-  institutionCode = NULL, 
-  collectionCode = NULL, 
-  hasGeospatialIssue = NULL, # We will use this to retrieve only records without known geospatial issues
-  issue = NULL, 
-  search = NULL, 
-  mediaType = NULL, 
-  subgenusKey = NULL, 
-  repatriated = NULL, 
-  phylumKey = NULL, 
-  kingdomKey = NULL, 
-  classKey = NULL, 
-  orderKey = NULL, 
-  familyKey = NULL, 
-  genusKey = NULL, 
-  establishmentMeans = NULL, 
-  protocol = NULL, 
-  license = NULL, 
-  organismId = NULL, 
-  publishingOrg = NULL, 
-  stateProvince = NULL, 
-  waterBody = NULL, 
-  locality = NULL, 
-  limit = 500, # we will modify this to get the amount of records we need
-  start = 0, 
-  fields = "all", 
-  return = NULL, 
-  facet = NULL, 
-  facetMincount = NULL, 
-  facetMultiselect = NULL, 
-  skip_validate = TRUE, 
-  curlopts = list(), ...
-)
-```
-
-------------------------------------------------------------------------
-
-## Data download through R
-
-Get occurrences records of mammals from Czech Republic.
 
 ```{r}
-mammalsCZ <- occ_search(
-  taxonKey = taxon_key, # Key 359 created previously
-  country = country_code, # CZ, ISO code of Czechia
-  limit = 6000, # Max number of records to download
-  hasGeospatialIssue = F # Only records without spatial issues
-)
-
-mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data object inside. Here we pull the data out of the list.
+mammalsCZ_sf <- mammalsCZ %>% 
+  filter(!is.na(decimalLongitude) & 
+           !is.na(decimalLatitude)) %>% # filter records without coordinates
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326)
 ```
 
-# Data exploration
+Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84.
 
-Examine the dataset's variables and their respective data types: Are they numeric, character, or boolean in nature? That will tell you what you can do with every column in the dataset.
+### 2.  Create a grid layer of the Czech Republic (`POLYGONS`)
 
-```{r eval=FALSE}
-glimpse(mammalsCZ)
-```
-
-How many records do we have?
+Load the administrative borders using `st_read`
 
 ```{r}
-nrow(mammalsCZ)
+CZ_borders <- st_read('data/CZE_adm0.gpkg')
+CZ_borders %>% head(n=10) %>% knitr::kable()
 ```
 
-How many species do we have?
+We will *actually* load a Czech standard grid layer of 100 km^2^ area
 
 ```{r}
-mammalsCZ %>%
-  filter(taxonRank == "SPECIES") %>%
-  distinct(scientificName) %>%
-  nrow()
+CZ_grids <- st_read('data/KvadratyCR_JTSK.gpkg')
+CZ_grids %>% head(n=10) %>% knitr::kable()
 ```
 
-`distinct()` is used to see unique values
-
-# Data quality
-
-Data are not 'good' or 'bad', the quality will depend on our goal. Some things we can check:
-
--   Base of the record (type of occurrence)
--   Species names (taxonomic harmonisation)
--   Spatial and temporal (accuracy / precision)
-
-![](https://docs.ropensci.org/CoordinateCleaner/logo.png){width="45"} `CoordinateCleaner`: <https://github.com/ropensci/CoordinateCleaner>
-
-CoordinateCleaner offers advanced data filtering and cleaning capabilities by automatically identifying and flagging common spatial and temporal errors.
-
-## Basic data filtering
-
-As an example of data cleaning procedures, we will check the following fields in our dataset:
-
--   `basisOfRecord`: we want preserved specimens or observations
-
--   `taxonRank`: we want records at species level.
-
--   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km.
-
-### `basisOfRecord`:
-
-We want preserved specimens or observations
+Check the layer's Coordinate Reference System (CRS)
 
 ```{r}
-mammalsCZ %>% distinct(basisOfRecord) %>% knitr::kable()
+st_crs(CZ_borders) == st_crs(CZ_grids)
+
+st_crs(CZ_borders)
+st_crs(CZ_grids)
 ```
 
-Count how many records are in each type of *basisOfRecord*
+### 3.  Calculate sampling effort (N) and species richness per grid cell (SR)
+
+Frist, we will transform the layer's CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`.
 
 ```{r}
-mammalsCZ %>%
-  group_by(basisOfRecord) %>%
-  count() %>% 
-  knitr::kable()
+#| echo: true
+#| eval: true
+mammalsCZ_sf <- st_transform(mammalsCZ_sf,  
+                             crs = st_crs(CZ_grids)) # the same CRS as the CZ_grids layer
+
+mammalsCZ_sf %>% head(n=10) %>% knitr::kable()
 ```
 
-`group_by()` is used to group values within a variable
-
-Filter *basisOfRecord* to get only records that correspond to "preserved specimens" or "human observations".
+Let's plot the sf objects
 
 ```{r}
-mammalsCZ <- mammalsCZ %>%
-  filter(basisOfRecord == "PRESERVED_SPECIMEN" |
-    basisOfRecord == "HUMAN_OBSERVATION")
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=CZ_borders, fill='white') + # first layer is the borders with white fill
+  geom_sf(data=CZ_grids, fill=NA) +  # first layer is the grid cells with no fill
+  geom_sf(data=mammalsCZ_sf) # last layer is the points, that are black by default
 ```
 
-Note the use of `|` (OR) to filter the data. Another alternative is `filter(basisOfRecord %in% c("PRESERVED_SPECIMEN","HUMAN_OBSERVATION"))`
-
-How many records do we have now?
+To calculate number of records and number of species per grid cell, we will use `st_join()`
 
 ```{r}
-nrow(mammalsCZ)
+#| echo: true
+#| eval: true
+st_join(CZ_grids,       # POLYGONS (grid cells)
+        mammalsCZ_sf) %>%   # POINTS
+   head(n=10) %>% knitr::kable()
 ```
 
-### `taxonRank`:
+Now, we need to summarise the data per grid-cell. Luckily, `tidyverse` methods also work for `sf` objects :) We will do it with `group_by()` and `summarise()`.\
 
-We want records at species level
+First, we will group by grid-cells and then we count values per grid.
+So, let's calculate the number of records (`N`) and the number of species per grid-cell (`SR`)
 
 ```{r}
-mammalsCZ %>% distinct(taxonRank) %>% knitr::kable()
+#| echo: true
+#| eval: true
+st_join(CZ_grids, mammalsCZ_sf) %>% 
+  group_by(OBJECTID) %>% # the name of the column that has the index
+  summarise(N=sum(!is.na(species)), # calculates the number of points in the polygon
+            SR=n_distinct(species, na.rm = TRUE)) %>%  # the number of different 'species' in the polygon
+  head(n=10) %>% knitr::kable()
 ```
 
-Let's get records at species level
+Let's store the output into a new object `CZ_mammals_grids`.
 
 ```{r}
-mammalsCZ <- mammalsCZ %>%
-  filter(taxonRank == "SPECIES")
+#| echo: true
+#| eval: true
+mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>% 
+  group_by(OBJECTID) %>% 
+  summarise(N=sum(!is.na(species)), 
+            SR=n_distinct(species, na.rm = TRUE))
 ```
 
-How many records do we have now?
+### 4.  Visualise **N** and **SR** patterns in Czech Republic
+
+Finally, let's plot this. We will do it using `geom_sf()`, a `ggplot` function to visualise sf objects.  
 
 ```{r}
-nrow(mammalsCZ)
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids) +
+  coord_sf(crs=4326)
 ```
 
-### `coordinateUncertaintyInMeters`:
-
-We want uncertainty to be smaller than 10km.
-
-Are there records with precision larger than 10km?
+Where are the nice colours? We need to indicate which column from the object should the grids be filled with.
 
 ```{r}
-mammalsCZ %>%
-  filter(coordinateUncertaintyInMeters >= 10000) %>%
-  select(scientificName, 
-         coordinateUncertaintyInMeters, 
-         stateProvince) %>% 
-  knitr::kable()
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  coord_sf(crs=4326)
 ```
 
-Let's keep records with precision smaller than 10km.
-
+Let's get a nicer color scale. Bear in mind that [we see colors differently](https://davidmathlogic.com/colorblind/). Thus, it's important to consider colorblind safe palettes.  
 ```{r}
-mammalsCZ <- mammalsCZ %>%
-  filter(coordinateUncertaintyInMeters < 10000) # keeping this
-```
-
-How many records do we have now?
-
-```{r}
-nrow(mammalsCZ)
-```
-
-# Basic maps
-
-## How are the records distributed?
-
-```{r}
-library(sf)
-
-mammalsCZ_sf <- mammalsCZ %>%
-  filter(!is.na(decimalLongitude) &
-    !is.na(decimalLatitude)) %>%
-  st_as_sf(coords = c(
-    "decimalLongitude",
-    "decimalLatitude"
-  )) %>%
-  st_set_crs(proj_crs)
-
-ggplot() +
-  geom_sf(data = base_map, fill = "white") +
-  geom_sf(
-    data = sf::st_intersection(mammalsCZ_sf, base_map),
-    aes(col = order)
-  ) +
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) + # fill of the grids
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
   theme_bw()
 ```
 
-And finally, a simple trick to produce separate maps per order.
+Now, here's a better plot :)
+
+The hotspots of species richness are in cities. How can these be the richest areas for mammals?
+Let's have a look at the sampling effort (`N`: number of records per grid cell) and compare both layers.  
 
 ```{r}
-ggplot() +
-  geom_sf(data = base_map, fill = "white") +
-  geom_sf(
-    data = sf::st_intersection(mammalsCZ_sf, base_map),
-    aes(col = order)
-  ) +
-  theme_bw() +
-  # Added to the previous ggplot
-  facet_wrap(~order) +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
-  )
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1) +
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+```
+
+
+What can you say about the hotspots of species richness we found?
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+#| fig-cap: 
+#|   - "Species richness"
+#|   - "Number of records"
+
+SR <- ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
+  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) +
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+
+N <- ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1)+
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+
+SR 
+N
+```
+
+We are done! No it's **your turn** :)
+
+## Mapping species ranges 🐢
+
+### 1.   Get testudines' IUCN expert range maps (`POLYGONS`)
+
+Read the data (downloaded from IUCN [Spatial Data Download's](https://www.iucnredlist.org/resources/spatial-data-download) page). Take a look at the zip file for more info on metadata, and terms and conditions of use. 
+
+```{r}
+testudines <- st_read('data/testudines.gpkg')
+```
+
+
+What do the data look like?
+
+```{r}
+testudines %>% head(n=10) %>% knitr::kable()
+```
+
+### 2.   Get a world map
+
+We will download a polygon of the world at medium scale and we will combine all countries into a unique polygon.
+
+
+```{r}
+world <- ne_countries(scale = 50, returnclass='sf')
+world <- st_union(world) %>% st_make_valid() %>% st_cast() # fixes any problems
+```
+
+Let's see how it looks
+
+```{r}
+ggplot() + 
+  geom_sf(data=world, fill='white')
+```
+
+Before working with this map, we need to **project** the layer: from lat/lon to equal area projection.
+Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this. Find here a cool (Projection Wizard)[https://projectionwizard.org].
+
+Equal-area maps preserve area measure, generally distorting shapes in order to do that
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 3
+#| fig-cap: 
+#|   - "World Geodetic System (EPSG:4326)"
+#|   - "Mollweide (ESRI:54009)"
+#|   - "WGS 84 / Equal Earth Greenwich (EPSG:8857)"
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 4326)
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 'ESRI:54009')
+
+ggplot() + 
+    geom_sf(data=world, fill='white') + 
+    coord_sf(crs = 'EPSG:8857')
+```
+
+We will choose **Equal Earth** (EPSG:8857).
+Let's transform the data (both the world and the testudines' layers)
+
+```{r}
+world_ea <- st_transform(world, crs = 'EPSG:8857') %>% 
+  st_make_valid() %>% st_cast()
+
+testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% 
+  st_make_valid() %>% st_cast()
+```
+
+Let's double check that everything is alright
+
+```{r}
+st_crs(world_ea, parameters = TRUE)$epsg
+st_crs(world_ea, parameters = TRUE)$ud_unit
+st_crs(testudines_ea, parameters = TRUE)$epsg
+st_crs(testudines_ea, parameters = TRUE)$ud_unit
+```
+
+### 3.   Create a global 1-degree grid  (`POLYGONS`)
+
+We will do this using the function `st_make_grid()`. For the `cellsize` argument we will chose 1 degree, which is \~100km (=100,000m)
+
+
+```{r}
+world_grid <- st_make_grid(world_ea, 
+                           cellsize=100000,
+                           square=FALSE) %>%  # this will make hexagons
+  st_intersection(world_ea) %>% 
+  st_sf(gridID=1:length(.))     
+```
+
+We have the grid, we are ready to calculate metrics per grid cell. Let's see how it looks.
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.1) 
+```
+
+### 4.   Calculate the species richness per grid cell (SR)
+
+To do this, let's keep only the *testudines* that are extant (resident) species
+
+```{r}
+#| echo: true
+#| eval: true
+testudines_extant <- testudines_ea %>% 
+  filter(LEGEND=='Extant (resident)') %>% 
+  group_by(ID_NO) %>% 
+  summarise(BINOMIAL=unique(BINOMIAL),
+            PRESENCE=sum(PRESENCE)) %>% 
+  ungroup() %>% st_cast()
+```
+
+This **can** take a while ☕️
+
+Let's plot 10 species as an example
+
+```{r}
+ggplot() + 
+  geom_sf(data= world_grid, fill='white', size=0.5)  +
+  geom_sf(data= testudines_extant %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
+```
+
+
+Now let's use `st_join()` to calculate the number of species per grid-cell (SR).
+
+```{r}
+testudines_grid <- st_join(world_grid, testudines_extant) %>%
+  group_by(gridID) %>%
+  summarise(N=sum(!is.na(BINOMIAL)), 
+            SR=n_distinct(BINOMIAL, na.rm = TRUE))
+```
+
+This **will** take a while ☕️🍪  
+
+Here are the results :)
+
+```{r}
+#| echo: true
+#| eval: true
+testudines_grid %>% head(n=10) %>% knitr::kable()
+```
+
+### 5.   Visualise **SR** patterns in the world\
+
+And now, we plot!
+
+```{r}
+ggplot() + 
+  geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
+  geom_sf(data=world_ea, fill=NA, col='grey70', size=0.2) +
+  theme_bw()
 ```
