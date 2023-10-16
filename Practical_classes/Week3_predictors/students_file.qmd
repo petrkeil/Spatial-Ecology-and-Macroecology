@@ -116,9 +116,9 @@ geodata_path("data/")
 
 When working with rasters, there are three basic procedures we can recommend you:
 
-1.  Reproject: Make sure that all your rasters are on the same projection. Be aware that reprojecting raster is not the best. Try to reproject your vector data to match the raster.
+1.  Crop: Cut the rasters to the geographic extent you need. This is a square cut.
 
-2.  Crop: Cut the rasters to the geographic extent you need. This is a square cut.
+2.  Reproject: Make sure that all your rasters are on the same projection. Be aware that reprojecting raster is not the best. Try to reproject your vector data to match the raster.
 
 3.  Mask: Set to NA all the cells outside your polygon(s) of interest.
 
