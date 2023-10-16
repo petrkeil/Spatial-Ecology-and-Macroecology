@@ -140,7 +140,8 @@ We will use the function `worldclim_country()` from `geodata`.
 ```{r echo=TRUE, eval=TRUE}
 tavg <- worldclim_country(
   var = "tavg",
-  country = "IDN" # IDN is the three letters ISO code for Indonesia.
+  country = "IDN", # IDN is the three letters ISO code for Indonesia.
+  path = 'data/'
 )
 
 tavg <- crop(tavg, extent)
@@ -459,24 +460,23 @@ Then we can add values to the levels.
 
 ```{r echo=TRUE, eval=TRUE}
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 3, 11, 12, 13, 14, 15, 16, 21, 22, 31, 32, 41, 42, 43),
+  ID = c(1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 17),
   label = c(
-    "Barren",
-    "Permanent Snow and Ice",
-    "Water Bodies",
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
-    "Deciduous Needleleaf Forests",
     "Deciduous Broadleaf Forests",
-    "Mixed Broadleaf/Needleleaf Forests",
-    "Mixed Broadleaf Evergreen/Deciduous Forests",
-    "Open Forests",
+    "Mixed Forests",
+    "Closed Shrublands",
+    "Woody Savannas",
+    "Savannas",
     "Sparse Forests",
-    "Dense Herbaceous",
-    "Sparse Herbaceous",
-    "Dense Shrublands",
-    "Shrubland/Grassland Mosaics",
-    "Sparse Shrubland"
+    "Grassslands",
+    "Permanent Wetlands",
+    "Croplands",
+    "Urban and Built-up Lands",
+    "Cropland/Natural Vegetation Mosaics",
+    "Barren",
+    "Water Bodies"
   )
 )
 ```

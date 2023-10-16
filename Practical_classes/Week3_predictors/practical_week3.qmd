@@ -53,9 +53,13 @@ We will introduce three new packages.
 
 ![](https://chelsa-climate.org/wp-content/uploads/2016/02/logotest3.gif){.centre top="200" height="200"} [chelsa-climate.org](https://chelsa-climate.org)
 
+------------------------------------------------------------------------
+
 **CHELSA** (Climatologies at high resolution for the earth's land surface areas) is a very high resolution (30 arc sec, \~1km) global downscaled climate data set. It includes climate layers for various time periods and variables, ranging from the Last Glacial Maximum, to the present, to several future scenarios.
 
 ![](https://zenodo.org/record/4058819/files/screen_lvl2.png){.centre top="200" height="200"}
+
+------------------------------------------------------------------------
 
 ### [nature.com/articles/s41597-020-00599-8](https://www.nature.com/articles/s41597-020-00599-8)
 
@@ -71,11 +75,13 @@ A global, spatially explicit characterization of 47 **terrestrial habitat types*
 
 The **RESOLVE Ecoregions** dataset, updated in 2017, offers a depiction of the 846 terrestrial ecoregions that represent our living planet.
 
-|                                                                                                                                                                                                    |
-|------------------------------------------------------------------------|
-| ![](https://ipbes.net/sites/default/files/copernicus.jpg){.centre top="200" height="200"}                                                                                                          |
-| \### [land.copernicus.eu/pan-european/corine-land-cover](https://land.copernicus.eu/pan-european/corine-land-cover)                                                                                |
-| The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 classes (from Europe). The inventory was initiated in 1985. Updates have been produced in 2000, 2006, 2012, and 2018. |
+------------------------------------------------------------------------
+
+![](https://ipbes.net/sites/default/files/copernicus.jpg){.centre top="200" height="200"}                                                                                                          
+### [land.copernicus.eu/pan-european/corine-land-cover](https://land.copernicus.eu/pan-european/corine-land-cover)                                                                                
+The **CORINE** Land Cover (CLC) consists of an inventory of land cover in 44 classes (from Europe). The inventory was initiated in 1985. Updates have been produced in 2000, 2006, 2012, and 2018. 
+
+------------------------------------------------------------------------
 
 ![](https://chucktownfloods.cofc.edu/wp-content/uploads/2019/07/NASA-Logo-1024x512.png){.centre top="200" height="200"}
 
@@ -207,9 +213,9 @@ geodata_path("data/")
 
 When working with rasters, there are three basic procedures we can recommend you:
 
-1.  Reproject: Make sure that all your rasters are on the same projection. Be aware that reprojecting raster is not the best. Try to reproject your vector data to match the raster.
+1.  Crop: Cut the rasters to the geographic extent you need. This is a square cut.
 
-2.  Crop: Cut the rasters to the geographic extent you need. This is a square cut.
+2.  Reproject: Make sure that all your rasters are on the same projection. Be aware that reprojecting raster is not the best. Try to reproject your vector data to match the raster.
 
 3.  Mask: Set to NA all the cells outside your polygon(s) of interest.
 
@@ -550,24 +556,23 @@ Then we can add values to the levels.
 
 ```{r echo=TRUE, eval=TRUE}
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 3, 11, 12, 13, 14, 15, 16, 21, 22, 31, 32, 41, 42, 43),
+  ID = c(1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 17),
   label = c(
-    "Barren",
-    "Permanent Snow and Ice",
-    "Water Bodies",
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
-    "Deciduous Needleleaf Forests",
     "Deciduous Broadleaf Forests",
-    "Mixed Broadleaf/Needleleaf Forests",
-    "Mixed Broadleaf Evergreen/Deciduous Forests",
-    "Open Forests",
+    "Mixed Forests",
+    "Closed Shrublands",
+    "Woody Savannas",
+    "Savannas",
     "Sparse Forests",
-    "Dense Herbaceous",
-    "Sparse Herbaceous",
-    "Dense Shrublands",
-    "Shrubland/Grassland Mosaics",
-    "Sparse Shrubland"
+    "Grassslands",
+    "Permanent Wetlands",
+    "Croplands",
+    "Urban and Built-up Lands",
+    "Cropland/Natural Vegetation Mosaics",
+    "Barren",
+    "Water Bodies"
   )
 )
 ```
