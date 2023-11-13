@@ -1,0 +1,291 @@
+---
+title: "Spatial beta-diversity: assessing community dissimilarity through space"
+format:
+  html:
+    self-contained: true
+    toc: true
+    toc_float: true
+editor: visual
+---
+
+```{r, echo=F}
+knitr::opts_chunk$set(
+  message = F,
+  warning = F
+)
+```
+
+**Content of the workshop of today**: so far, we have seen how to assess biodiversity at given locations and how this diversity changes through time. However, species communities also change through space. This spatial variation of species composition is called $\beta$-diversity.
+
+```{r}
+rm(list = ls())
+library(vegan)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(sf)
+library(ggplot2)
+library(tmap)
+library(gclus)
+source("functions/coldiss.R")
+```
+
+```{r}
+## Data management
+## Get the file names
+file_list <- list.files("data/50-StopData/1997ToPresent_SurveyWide/",
+                        full.names = T)
+## Create the dataframe that will contain the data
+species <- data.frame()
+## Loop over each file
+for(i in 1:length(file_list)){
+  ## Load the file and temporary store it
+  d <- read_csv(file_list[i])
+  ## Bind to the species dataframe
+  species <- rbind(species, d)
+  ## Remove the temporary data
+  rm(d)
+}
+## Filter data for 2019
+sp2019 <- species[species$Year == 2019,]
+```
+
+# Spatial $\beta$-diversity
+
+## Based on binary presence-abscence data
+
+The purpose of $beta$-diversty is to assess the dissimilarity (or similarity) of species composition between 2 locations in space (*e.g.* how different are the species between route x and route y). It exists ([a lot of](https://besjournals.onlinelibrary.wiley.com/doi/10.1046/j.1365-2656.2003.00710.x)) different indices of $beta$-diversity, but they all use three components of the communities to compare: the common species between two localities $a$ and the species found only in each locality $b$, $c$. Each metric of $beta$-diversity can be computed from these 3 components.
+
+```{r, echo=F,  fig.align="center"}
+knitr::include_graphics("figures/jane_710_f2.gif")
+```
+
+Today, we will work with data from 2019 and compute the $Jaccard$ dissimilarity index:
+
+$$\beta = 1 - \frac{a}{a+b+c}$$
+
+Jaccard dissimilarity index is comprised between 0 (the 2 communities are exactly the same) and 1 (the 2 communities are totally different). Jaccard index is used for presence-absence data.  As $\beta$-diversity is a pairwise analysis (*i.e.* each road is compared to all the other roads), the computation needs can increase very fast. Thus, we will work at the size of the Florida state (StateNum = 25).
+
+```{r}
+# Load routes file
+routes <- read.csv(file = "data/routes.csv")
+routes_shp <- st_as_sf(routes,
+                       coords = c("Longitude", "Latitude"), ## specify the columns containing the longitude and latitude
+                       crs = 4326)
+```
+
+```{r, echo=F}
+## Map it
+tmap_mode("view")
+tm_shape(routes_shp  %>% filter(StateNum == 25))+
+  tm_dots(col = "blue", id = "Route")+
+  tm_text("Route", just = "top")+
+  tm_layout(earth.boundary = c(-180, -90, 180, 90))
+```
+
+So far, we will work with binary data, *i.e.* presence-absence only (without considering species abundances).
+
+```{r}
+## Create the site x species binary matrix for the state of Florida
+binary_2019 <-
+  sp2019 %>%
+  filter(StateNum == 25) %>% 
+  mutate(presence = 1) %>% 
+  select(Route, AOU, presence) %>%
+  pivot_wider(names_from = "AOU",
+              values_from = "presence",
+              values_fill = 0) %>%
+  column_to_rownames(var = "Route")
+```
+
+Let's compute the Jaccard dissimilarity index using the `vegdist()` function from the `vegan` package:
+
+```{r}
+## Compute the Jaccard index
+jaccard <- vegdist(binary_2019, method = "jaccard", binary = TRUE)
+
+## Have a look at the matrix
+as.matrix(jaccard)[1:5, 1:5]
+```
+
+```{r, fig.align='center', fig.height=6, fig.width=8}
+## Display the distance matrix
+coldiss(jaccard, diag = TRUE)
+```
+
+Above is displayed the pairwise distance of species composition between the roads. The blue color indicates $Jaccard > 0.5$ (*i.e.* there are less species in common than species different between the 2 communities) and a purple color indicates $Jaccard < 0.5$ (*i.e.* there are more species in common between the 2 roads than species present only at one road). Thus, we can see the roads which have common species compositions and those which have different species composition.
+
+What we can do is to compare the Jaccard dissimilarity to the pairwise distances in space between the roads. Thus, let's compute the euclidean distances between the roads.
+
+```{r, fig.align='center', fig.height=6, fig.width=8}
+## Create the data for the roads of Florida
+routes_florida <-
+  routes %>% 
+  filter(StateNum == 25,
+         Route %in% as.numeric(rownames(binary_2019))) %>% 
+  column_to_rownames("Route") %>% 
+  select(Longitude, Latitude) %>% as.matrix()
+
+## Compute the euclidian distance
+euclidist <- dist(routes_florida,
+                  method = "euclidian")
+
+## Display the euclidian distance matrix
+coldiss(euclidist, diag = T)
+```
+
+The matrix just above is different from the Jaccard distance. This new one represent how far in space the roads are. You can even have a look at the map we made before (the roads with a purple color are closer to each other).
+
+Now let's display the Jaccard distance against the Euclidean distance.
+
+```{r}
+ggplot()+
+  geom_point(aes(x = as.vector(euclidist), 
+                 y = as.vector(jaccard)))+
+  geom_smooth(aes(x = as.vector(euclidist), 
+                  y = as.vector(jaccard)), method = "lm")+
+  theme_bw()
+```
+
+**What can you say about this plot? What is the meaning of displaying** $-Jaccard = f(Euclidean)$?
+
+## Based on abundance data
+
+It is also possible to compute $\beta$-diversity on abundance data. The equivalent of the Jaccard index for abundance data is the Ružička index (aka the weighted Jaccard distance) computed as follow:
+
+$$ R(X,Y) = 1 - \frac{\sum_i^n \min(X_i, Y_i)}{\sum_i^n \max(X_i, Y_i)}$$  
+
+```{r}
+abundance_2019 <- sp2019 %>%
+  filter(StateNum == 25) %>% 
+  mutate(abundance = rowSums(.[8:57])) %>%
+  select(Route, AOU, abundance) %>%
+  pivot_wider(names_from = "AOU",
+              values_from = "abundance",
+              values_fill = 0) %>%
+  column_to_rownames(var = "Route")
+```
+
+```{r}
+## Compute the Ružička index
+ružička <- vegdist(abundance_2019, method = "jaccard")
+## Display the distance matrix
+coldiss(ružička, diag = TRUE)
+```
+
+**But how to use this Jaccard dissimilarity matrix?**
+
+# Clustering
+
+⚠️ Clustering methods deserve an entire class to fully explain how it works. Here, we are giving you a quick way to perform a clustering from the Jaccard distance we computed just before, but there is a lot to know about it (see [this ref](https://link.springer.com/book/10.1007/978-1-4419-7976-6)) ⚠️
+
+Clustering is a convenient way to use pairwise distances. It allows to partition the different sites into several groups according to their distances (using the least-square method that we see during workshop 5). You can use a lot different type of distances (*e.g.* Euclidean, Gower, Bray-Curtis...).
+
+The **first step** to do is to create a dendrodgram using the Jaccard distance. Here we will use the *Ward* clustering method (bottom-up or agglomerative method). The objective of this method is to minimize the within clusters distances.
+
+```{r}
+clust <- hclust(jaccard, method = "ward.D2")
+plot(clust)
+```
+
+On this dendrogram, you can see that the roads which have more similar species communities are closer.
+
+The **second step** of the Ward clustering method is to specify the number of "*clusters*" or groups (it is a constrained clustering method). In order to assess the most optimal number of group, we will use the *silhouette* metric. In short, the silhouette width indicates how far from each other are the k clusters. Thus, the most optimal number of cluster k will be the one for which the silhouette is the highest.
+
+```{r}
+## Let's assess the silhouette width for k = 2 to 15
+for(i in 2:15){
+  print(
+    paste0("For k = ", i,
+         " average distance between clusters is ",
+         summary(silhouette(cutree(clust, k = i), jaccard))$avg.width)
+  )
+}
+```
+
+You can see that the highest silhouette width is for $k = 2$. Here, as an example, we will use $k = 3$.
+
+```{r}
+### Let's use k=3
+cut_clust <- cutree(clust, k = 3)
+
+plot(clust)
+rect.hclust(clust, k = 3)
+```
+
+Now you can see that the roads are partitioned into 3 groups according to their species compositions. Thus, we can map the three groups on a map.
+
+```{r}
+routes_shp <- 
+routes_shp %>% filter(StateNum == 25) %>% 
+  left_join(cut_clust %>% 
+              data.frame() %>% 
+              rename(cluster = ".") %>% 
+              rownames_to_column(var = "Route") %>% 
+              mutate(Route = as.integer(Route),
+                     cluster = as.factor(cluster))) 
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(routes_shp  %>% filter(StateNum == 25))+
+    tm_dots(col = "cluster", id = "Route", colorNA = NULL)+
+    tm_text("Route", just = "top")+
+    tm_layout(earth.boundary = c(-180, -90, 180, 90))
+```
+
+**Have a look at the map: what can we say about the 3 species groups? What are the ecological meanings?**
+
+# Temporal $\beta$-diversity
+
+While spatial $\beta$-diversity assesses the species turnover between 2 sites, temporal $\beta$-diversity represent the turnover of species between 2 time steps at 1 single site.
+
+```{r, echo=F,  fig.align="center"}
+knitr::include_graphics("figures/Fig1.jpg")
+```
+
+Following the notation of the previous figure, the temporal $\beta$-diversity similarity index can be computed as follow: $$\beta = \frac{R}{E+R+C}$$
+
+## Now, it's up to you
+
+-   **Task 1:** Compute the temporal turnover between **2018** and **2019** for each route in Florida. For this, you will need to create 2 dataset by filtering the `species` data: one for 2018 and one for 2019. Be careful to work with the routes that are present in both 2018 and 2019 (*e.g.* using the `dplyr::intersect()` function). Then, you'll have to assess the extinction $E$, colonization $C$ and recurrence $R$ (you can use a `for` loop over each route). Then use the equation provided above to compute the temporal $\beta$-diversity.
+
+```{r, echo=F}
+## Filter data for 2018 and for Florida
+sp2018 <- species[species$Year == 2018,] %>% filter(StateNum == 25)
+sp2019 <- sp2019 %>% filter(StateNum == 25)
+
+## Select the routes that have data in 2018 and 2019
+routes_Florida <- intersect(unique(sp2018$Route), unique(sp2019$Route)) 
+
+for(route in routes_Florida){
+  
+  ## Get the species for the route in 2018 and 2019
+  sp2018_route <- sp2018$AOU[sp2018$Route == route]
+  sp2019_route <- sp2019$AOU[sp2019$Route == route]
+  
+  ## Assess E, R, C
+  E <- length(sp2018_route[!sp2018_route %in% sp2019_route])
+  R <- length(sp2018_route[sp2018_route %in% sp2019_route])
+  C <- length(sp2019_route[!sp2019_route %in% sp2018_route])
+  
+  ## Compute temporal Jaccard similarity 
+  tmp_beta <- R/(E+R+C)
+  
+  routes_shp[routes_shp$Route == as.numeric(route), "temporal_betaDiv"] <- tmp_beta 
+  
+}
+
+```
+
+-   **Task 2:** map the temporal turnover. You should obtain something like this:
+
+```{r, echo=F}
+tm_shape(routes_shp  %>% filter(StateNum == 25))+
+    tm_dots(col = "temporal_betaDiv", id = "Route", colorNA = NULL)+
+    tm_text("Route", just = "top")+
+    tm_layout(earth.boundary = c(-180, -90, 180, 90))
+```
+
+- **Bonus:** perform a cluster analysis of the temporal turnover for birds of Florida
