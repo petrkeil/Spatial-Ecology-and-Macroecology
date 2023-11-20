@@ -109,7 +109,7 @@ for(i in 1:length(file_list)){
 }
 ```
 
-```{r, echo=F}
+```{r, echo=T}
 kableExtra::kable(head(species)) %>%
   kableExtra::kable_paper() %>%
   kableExtra::scroll_box(width = "100%", height = "200px")
@@ -157,7 +157,7 @@ routes_shp <- left_join(routes_shp, sr2019,
 
 **Now that you have computed the species richness, try to map it by adding it to the map we made at the beginning of the class**
 
-```{r, echo=F}
+```{r, echo=T}
 ## Map
 ggplot()+
   geom_sf(data = countries_shp)+
@@ -185,7 +185,7 @@ $$RSS = \sum _{i = 1}^j (y_i - \hat y_i)^2$$ with $j$ the number of observations
 weather <- read_csv("data/weather.csv")
 ```
 
-```{r, echo=F}
+```{r, echo=T}
 kableExtra::kable(head(weather)) %>%
   kableExtra::kable_paper() %>%
   kableExtra::scroll_box(width = "100%", height = "200px")
@@ -240,7 +240,7 @@ weather$EndWind[weather$EndWind == 9] <- NA
 
 **Now that the weather columns are prepared, compute the average number for the wind condition. Watch out: we do not want decimals!!**
 
-```{r, echo=F}
+```{r, echo=T}
 weather$avgWind <- round(rowMeans(weather[,c("StartWind","EndWind")], na.rm = T))
 ```
 
@@ -273,7 +273,7 @@ weather$EndTime <- round(hour(weather$EndTime) + (minute(weather$EndTime)/60),
 
 **Now that you have `StartTime` and `EndTime` in decimal hours: create a new column `avgTime` which contains the mean hour of the day at which the census has been made (with 2 decimals).**
 
-```{r, echo=F}
+```{r, echo=T}
 weather$avgTime <- round(rowMeans(weather[,c("StartTime","EndTime")], na.rm = T), 2)
 ```
 
