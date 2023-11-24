@@ -46,6 +46,15 @@ for (i in vector) # the vector can be e.g. 1:N, or 2:N, or 2:(N-1)
   # do something 
 }
 
+
+for(i in 1:length(x))
+{
+  print(x[i]^2)  
+}
+
+
+
+
 while (test expression)
 {
   # do something  
