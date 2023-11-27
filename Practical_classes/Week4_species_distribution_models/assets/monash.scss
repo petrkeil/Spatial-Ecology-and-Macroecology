@@ -1,0 +1,16 @@
+/*-- scss:defaults --*/
+
+$body-bg: #ffffff;
+$body-color: #191919;
+$link-color: #5F9747;
+
+/*-- scss:rules --*/
+
+.reveal .slide blockquote {
+  border-left: 3px solid $text-muted;
+  padding-left: 0.5em;
+}
+
+section.has-dark-background a{color:#475f97}
+section.has-dark-background a:hover{color:#97475F}
+
