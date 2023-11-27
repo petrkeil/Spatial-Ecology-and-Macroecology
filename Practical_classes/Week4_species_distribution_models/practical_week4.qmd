@@ -1,0 +1,704 @@
+---
+title: 'Spatial Ecology and Macroecology'
+subtitle: 'Practical - Week 4'
+date: 2022-10-23
+author: 'Carmen Soria, François Leroy & Gabriel Ortega'
+institute: '(Department of Spatial Sciences)'
+format: 
+  revealjs:
+    self-contained: true
+    logo: 'img/Logo_czu_cz_hr.png'
+    auto-stretch: false
+    code-copy: true
+    code-tools: true
+    enter-title-slide: false
+    theme: [assets/monash.scss]
+    controls: true
+    width: 1280
+    height: 720
+    css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
+    highlight-style: github
+    scrollable: true
+    enableEmoji: true
+editor: visual
+---
+
+## What are we going to see today?
+
+::: incremental
+A brief introduction to Species Distribution Modelling (SDM)
+
+1.  What are SDMs?
+2.  SDM workflow
+3.  Resources
+4.  SDM approaches
+5.  SDM example (Generalized Linear Models)
+6.  SDMs limitations
+:::
+
+# What are SDMs? {background-color="#5F9747"}
+
+## SDM overview
+
+-   Tool that aims to predict where species could potentially be located from a limited set of observations.
+
+-   It can also used to estimate a species' niche from its distribution.
+
+-   It's a huge field, primarily used in ecology and conservation.
+
+-   It's also a recent field, that quickly changes and advances, and it's full of problems and challenges.
+
+## SDM workflow
+
+ODMAP protocol ([Zurell et al. 2020](https://onlinelibrary.wiley.com/doi/full/10.1111/ecog.04960))
+
+![](img/sdm_workflow.jpg){fig-align="center" width="780"}
+
+## Resources: Tutorials
+
+-   [Introduction to species distribution modelling (SDM) in R](https://damariszurell.github.io/SDM-Intro/) *by Damaris Zurell*
+
+-   [Species distribution modelling practicals (Macroecology and global change course)](https://damariszurell.github.io/EEC-MGC/b1_SpeciesData.html) *by Damaris Zurell*
+
+-   ENM2020: A Free Online Course and Set of Resources on Modeling Species' Niches and Distributions *led by Town Peterson* ([Youtube playlist](https://www.youtube.com/playlist?list=PLhEJuWmv8Jf67qSdifDvgOk5DOJsNNiam), [Schedule and PDFs](https://docs.google.com/spreadsheets/d/1RQu1XRKyYfrnFI2V1g677d0sf8tFxC2xUvb96cbP02s/edit?usp=sharing), [Publication](https://journals.ku.edu/jbi/article/view/15016))
+
+## Resources: Tutorials
+
+-   [Best Practices in Spacies Distribution Modeling: A workshop in R](http://www.earthskysea.org/best-practices-in-species-distribution-modeling-a-workshop-in-r/) *by Adam Smith*
+
+-   [Species distribution modeling in R](https://rspatial.org/raster/sdm/index.html) *by Robert Hijmans and Jane Elith*
+
+-   [A very brief introduction to species distribution models in R](https://jcoliver.github.io/learn-r/011-species-distribution-models.html) *by Jeff Oliver*
+
+-   [SDM course](https://github.com/bobmuscarella/SDM-course) *by Bob Muscarella* (very useful for finding other resources!)
+
+## SDM approaches
+
+Different SDM algorithms need different types of occurrence data. These are the three main approaches:
+
+1.  **Presence-only methods**:
+    1.  Absence data is not necessary.
+    2.  They can only estimate habitat suitability, not the probability of occurrence.
+    3.  They are sensitive to spatial biases.
+    4.  Example:
+        1.  MaxEnt
+
+## SDM approaches
+
+2.  **Presence-absence methods**:
+    1.  Use presence/absence data.
+    2.  Estimate true probability of occurrence.
+    3.  Sensitive to imperfect detections.
+    4.  Examples:
+        1.  Regression-based methods: Generalized Linear models (GLM), Generalized Additive Models (GAM).
+        2.  Machine-learning methods: Random forest (RT), Boosted Regression Trees (BRT).
+
+## SDM approaches
+
+3.  **Presence-pseudo absence methods:**
+    1.  Generate artificial absences to allow using **presence-absence methods.**
+        1.  The [Barbet-Massin et al. (2012) paper](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00172.x) is a good starting point on how to generate them.
+    2.  They inform of the available environmental conditions (also known as background data)
+    3.  Example: GLM, Random forest (and other presence-absence methods).
+
+## SDM approaches
+
+4.  **Ensemble methods:**
+
+    -   If we perform many models, which one do we choose?
+
+    -   We could choose the one that's best suited to our data, or that performs the best.
+
+    -   However, a more popular approach is performing ensemble models.
+
+    -   In this approach, predictions from multiple models are combined or averaged to produce a single model.
+
+    -   The most frequently used package is `biomod`.
+
+# [EXERCISE]{.story} [Data preparation for the Iberian lynx (*Lynx pardinus*)]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## 1. Conceptualisation
+
+::: columns
+::: {.column width="60%"}
+-   **Taxa:** Iberian lynx (*Lynx pardinus*)
+-   **Objective:** find climatically suitable areas
+-   **Biodiversity data:** GBIF observations
+-   **Predictors:** Climatic predictors
+-   **Scale:** Iberian Peninsula
+:::
+
+::: {.column width="40%"}
+![](img/Iberian_Lynx_front.jpg){fig-align="center" width="300"}
+:::
+:::
+
+## 2. Data preparation
+
+### 2.1 Getting species observations (Practical 1)
+
+### 2.2 Checking and cleaning the data
+
+Not all species' observations are reliable, we always need to check their quality before using them.
+
+We will use the `rnaturalearth` and `ggplot2` packages to view the data and `CoordinateCleaner` package and the provided GBIF data.
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(tidyverse, rnaturalearth, rnaturalearthdata, sf, raster, ggplot2, CoordinateCleaner)
+load(file="data/lynx_gbif.RData") # Loading the species observations
+# Set project crs
+proj_crs <- 4326
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+Let's inspect the downloaded occurrences, does it make sense?
+
+```{r}
+#| echo: false
+#| eval: true
+world_map <- ne_countries(scale = "medium", returnclass = "sf")
+ggplot(world_map) +
+  geom_sf() +
+  geom_point(data = lynx_gbif, 
+             aes(x = decimalLongitude, y = decimalLatitude), color = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+All records seem to be located in the Iberian Peninsula 👍
+
+We will use the function `clean_coordinates()` from `CoordinateCleaner` to test for duplicates (`duplicates`), outliers (`outliers`), ensure that the coordinates match the country (`centroids`), and whether the coordinates are near research institutions (`institutions`). This process takes time, so we already provide the output.
+
+```{r}
+#| echo: true
+#| eval: false
+# Not running - time demanding
+# lynx_gbif_clean <- clean_coordinates(lynx_gbif,
+#                                        lon="decimalLongitude",
+#                                        lat="decimalLatitude",
+#                                        countries="countryCode",
+#                                        tests=c("centroids", "outliers", 
+#                                           "duplicates", "institutions"),
+#                                        inst_rad = 1000)
+
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+Let's check the cleaned data set. First we load the cleaned data set.
+
+```{r}
+#| echo: true
+#| eval: true
+load(file='data/gbif_lynx_cleaned.RData')
+```
+
+Then we restrict the map to Western Europe and plot the cleaned occurrences on top.
+
+```{r}
+#| echo: true
+#| eval: true
+# Bounding box for Western and Central mainland Europe
+lon_ext <- c(-10, 20)
+lat_ext <- c(35, 55)
+```
+
+```{r}
+#| echo: true
+#| eval: false
+# Plot cleaned presences
+europe_map <- world_map[which(world_map$continent == "Europe"),]
+ggplot(europe_map) +
+  geom_sf() +
+  coord_sf(xlim = lon_ext, ylim = lat_ext, expand = FALSE) +
+  geom_point(data = lynx_gbif_clean, 
+             aes(x = decimalLongitude, y = decimalLatitude), color = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+Plot of the cleaned presences
+
+```{r}
+#| echo: false
+#| eval: true
+# Plot cleaned presences
+europe_map <- world_map[which(world_map$continent == "Europe"),]
+ggplot(europe_map) +
+  geom_sf() +
+  coord_sf(xlim = lon_ext, ylim = lat_ext, expand = FALSE) +
+  geom_point(data = lynx_gbif_clean, 
+             aes(x = decimalLongitude, y = decimalLatitude), color = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.3 Getting climatic data (Practical 3)
+
+Download the climatic data from WorldClim using the package `geodata`. We download the data for our area of study (Spain and Portugal). The meaning of each bioclimatic variable code can be found [here](https://www.worldclim.org/data/bioclim.html).
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(geodata)
+bioclim_data <- worldclim_country(country = c("Spain", "Portugal"),
+                                  var = "bio",
+                                  path = "data/")
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Generating pseudo-absences
+
+Different SDM algorithms need different types of occurrence data (presence only and presence-absence). Getting absence data is rare, however, we can artificially generate background or pseudoabsence points. For that, we will use the package `dismo`.
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(dismo)  # dismo to generate pseudo-absences
+```
+
+First, we prepare the occurrence data.
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Getting only the occurrence coordinates
+lynx_gbif_obs <- lynx_gbif_clean[,
+    c("decimalLatitude", "decimalLongitude")]
+
+# Transforming it to an sf object
+lynx_gbif_sf <- st_as_sf(lynx_gbif_obs, 
+                         coords = c("decimalLongitude", "decimalLatitude"), 
+                         crs = st_crs(proj_crs))
+
+
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Generating pseudo-absences
+
+Then, prepare the input maps. In this case we are only going to consider the Iberian Peninsula. The `rnaturalearth` at `scale = 110` does not include the Canary or Azores Islands (which we are not interested in). Therefore, we crop the WorldClim bioclim data to this area.
+
+```{r}
+#| echo: true
+#| eval: true
+# Getting the map of Spain and Portugal
+iberia_map <- rnaturalearth::ne_countries(
+  scale = 110,
+  type = "countries",
+  country = c("spain", "portugal"),
+  returnclass = "sf"
+)
+
+## Getting the extent of our area of study
+geographic_extent <- st_bbox(iberia_map)
+
+# Crop bioclim data to desired extent
+bioclim_data <- crop(x = bioclim_data, y = geographic_extent)
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Generating pseudo-absences
+
+`dismo` requires a raster as an input to extract pseudoabsences. We will rasterize the Iberia map using the bioclim data as a base.
+
+```{r}
+#| echo: true
+#| eval: true
+# Rasterize the map (dismo works with rasters)
+iberia_rasterized <- rasterize(iberia_map, bioclim_data)
+iberia_raster <- raster::raster(iberia_rasterized)
+```
+
+We randomly generate pseudo-absences with the function `randomPoints`. This function avoids generating pseudo-absences where there are already presences.
+
+```{r}
+#| echo: true
+#| eval: true
+# Get pseudo-absences
+set.seed(1254)
+random_points <- dismo::randomPoints(iberia_raster, n = 500, p = as_Spatial(lynx_gbif_sf$geometry))
+random_points_sf <- st_as_sf(data.frame(x = random_points[, 1], y = random_points[, 2]), 
+                             coords = c("x", "y"), 
+                             crs = st_crs(proj_crs))
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Generating pseudo-absences
+
+Plotting the presences and pseudo-absences
+
+```{r}
+#| echo: false
+#| eval: true
+# Plot the sf object
+prespseudoabs_plot <- ggplot() +
+  geom_sf(data = iberia_map, fill = "lightgrey", color = "black") +
+  geom_sf(data = random_points_sf, color = "red", size = 1) +
+  geom_sf(data = lynx_gbif_sf, color = "blue", size = 1) +
+  theme_minimal()
+print(prespseudoabs_plot)
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Generating pseudo-absences
+
+Adding pseudo-absences to our presence dataframe
+
+```{r}
+#| echo: true
+#| eval: true
+# Prepare the presences data to contain a column indicating 1 for presence
+lynx_gbif_obs <- data.frame(lynx_gbif_obs, PA=1)
+# Adding that same column to the pseudoabsence data
+lynx_pseudoabs <- data.frame(random_points, PA = 0) 
+names(lynx_pseudoabs) <- c('decimalLongitude','decimalLatitude', 'PA')
+# Binding those data frames
+lynx_gbif_obs <- rbind(lynx_gbif_obs, lynx_pseudoabs)
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Extracting climate data for our presences
+
+Here we extract the climatic data for each of our observations using the function `extract()` from the package `terra`.
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(terra)
+## Adding climate data
+lynx_obs_clim <- cbind(lynx_gbif_obs, 
+                       terra::extract(x = bioclim_data, 
+                                      y = lynx_gbif_obs[,c('decimalLongitude','decimalLatitude')], 
+                                      cells=T) )
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Adding climate data
+
+Explore the climate data for our presence and pseudoabsence data set.
+
+```{r}
+#| echo: true
+#| eval: true
+summary(lynx_obs_clim)
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Spatial thinning
+
+We perform a process called spatial thinning to keep only one presence or pseudoabsence point per raster climate cell. We will be using the `spThin` package.
+
+```{r}
+#| echo: true
+#| eval: true
+#| results: hide
+pacman::p_load(spThin)
+# spThin requires longitude and latitude coordinates, that we already have.
+# It also requires a column with the species name
+lynx_obs_clim$species <- 'Lynx pardinus'
+  
+# Remove adjacent cells of presence/background data:
+xy <- thin(lynx_obs_clim, lat.col='decimalLatitude',long.col='decimalLongitude',
+           spec.col='species', thin.par=30, reps=1, write.files=F,
+           locs.thinned.list.return=T)
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Spatial thinning
+
+We select the maximum number of records after thinning (stored in the first object of the list of xy).
+
+```{r}
+#| echo: true
+#| eval: true
+# Keep the maximum number of records after thinning
+xy_keep <- xy[[1]]
+```
+
+We thin our data set, extracting the cell numbers for the thinned coordinates and using them to subset our data frame of presence and pseudoabsences.
+
+```{r}
+#| echo: true
+#| eval: true
+cells_thinned <- terra::cellFromXY(iberia_raster, xy_keep)
+lynx_thinned <- lynx_obs_clim[lynx_obs_clim$cell %in% cells_thinned,]
+lynx_thinned <- na.omit(lynx_thinned)
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Spatial thinning
+
+Examine spatially the thinned dataset (presences in blue and pseudo absences in red)
+
+```{r}
+#| echo: false
+#| eval: true
+
+# Plot the map and data
+ggplot() +
+  geom_sf(data = iberia_map, fill = 'grey90') +
+  
+  # Add points
+  geom_point(data = lynx_thinned, aes(x = decimalLongitude, y = decimalLatitude, color = as.factor(PA)),
+             shape = 19, size = 1) +
+  
+  # Set point colors
+  scale_color_manual(values = c('red', 'blue')) +
+  
+  # Turn off legend
+  theme(legend.position = "none")
+```
+
+------------------------------------------------------------------------
+
+### 2.6 Testing for collinearity in the data
+
+Before running our models, we should test for **correlation** in our variables and select the ones that are not correlated and that are more relevant to our taxa. We will perform the Spearman correlation test, as we do not know if the data values are normally distributed.
+
+```{r}
+#| echo: true
+#| eval: true
+# Running the correlation analysis for the climatic variables
+cor_matrix <- cor(lynx_thinned[,-c(1:4, 24,25)], method='spearman')
+# Set a correlation threshold (adjust as needed)
+cor_threshold <- 0.7
+
+# Perform hierarchical clustering to examine the hierarchical correlation between variables
+dendrogram <- hclust(as.dist(1 - cor_matrix))
+
+```
+
+We plot the dendrogram
+
+```{r}
+#| echo: true
+#| eval: false
+plot(dendrogram, main = "Dendrogram with Correlation Threshold")
+
+# Add a horizontal line to mark the correlation threshold
+abline(h = 1 - cor_threshold, col = "red", lty = 2)
+```
+
+------------------------------------------------------------------------
+
+### 2.6 Testing for collinearity in the data
+
+```{r}
+#| echo: true
+#| eval: true
+# Plot the dendrogram
+plot(dendrogram, main = "Dendrogram with Correlation Threshold")
+
+# Add a horizontal line to mark the correlation threshold
+abline(h = 1 - cor_threshold, col = "red", lty = 2)
+```
+
+------------------------------------------------------------------------
+
+### 2.6 Testing for collinearity in the data
+
+Which variables should we select from each correlated cluster? **Knowledge on the taxa is essential**
+
+```{r}
+#| echo: false
+#| eval: true
+# Plot the dendrogram
+plot(dendrogram, main = "Dendrogram with Correlation Threshold")
+
+# Add a horizontal line to mark the correlation threshold
+abline(h = 1 - cor_threshold, col = "red", lty = 2)
+```
+
+------------------------------------------------------------------------
+
+### 2.6 Testing for collinearity in the data
+
+In this case, we will keep it simple and select only Annual Mean Temperature (bio 1) and Annual Precipitation (bio 12).
+
+```{r}
+#| echo: true
+#| eval: true
+# Selecting the most relevant and uncorrelated variables
+my_preds <- c( "wc2.1_30s_bio_1", # Annual mean temperature
+               "wc2.1_30s_bio_12") #Annual precipitation
+```
+
+------------------------------------------------------------------------
+
+### 2.7 Preparing the data and separating the data into training and testing
+
+```{r}
+#| echo: true
+#| eval: true
+# Filtering the relevant columns of the data
+lynx_data <- lynx_thinned %>% 
+  dplyr::select(species, PA, decimalLongitude, decimalLatitude, any_of(my_preds))
+
+# Select randomly training data into 70% and 30%
+set.seed(1235)
+train_i <- sample(seq_len(nrow(lynx_data)), size=round(0.7*nrow(lynx_data)))
+
+# Subset the training and testing data
+lynx_train <- lynx_data[train_i,]
+lynx_test <- lynx_data[-train_i,]
+```
+
+We have the data ready to go! 🎉
+
+# [EXERCISE]{.story} [Modelling (*Lynx pardinus*) using GLM]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## 1. Presence-absence methods - GLMs
+
+### Fit the GLM
+
+```{r}
+#| echo: true
+#| eval: true
+m_glm <- glm(PA ~ wc2.1_30s_bio_1 +
+               wc2.1_30s_bio_12,
+             family = "binomial",
+             data = lynx_train)
+```
+
+## 1. Presence-absence methods - GLMs
+
+### Explore the GLM output
+
+```{r}
+#| echo: true
+#| eval: true
+summary(m_glm)
+```
+
+## 1. Presence-absence methods - GLMs
+
+### Habitat suitability prediction
+
+We can use the output of our model to predict the habitat suitability across the entire area of study. To achieve this, we use the function predict, passing the data of the climatic variables considered and our model. The argument type response will return the predicted probabilities from our model.
+
+```{r}
+#| echo: true
+#| eval: false
+glm_predict <- predict(bioclim_data[[my_preds]], m_glm, type = "response")
+plot(glm_predict)
+```
+
+## 1. Presence-absence methods - GLMs
+
+### Habitat suitability prediction
+
+This map shows the probability of occurrence of our species across the study area. This value ranges from 0 (unsuitable) to 1 (suitable).
+
+```{r}
+#| echo: false
+#| eval: true
+glm_predict <- predict(bioclim_data[[my_preds]], m_glm, type = "response")
+plot(glm_predict)
+```
+
+## 1. Presence-absence methods - GLMs
+
+### Model evaluation and habitat suitability prediction
+
+Model evaluation and habitat prediction have been calculated using [Jeff Oliver's tutorial](https://jcoliver.github.io/learn-r/011-species-distribution-models.html).
+
+To obtain a binary map (suitable - unsuitable), we evaluate that model using the observations and pseudo-absences reserved for *testing*, using the function `pa_evaluate()` from the `predicts` package.
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(predicts)
+glm_eval <- pa_evaluate(p = lynx_test[lynx_test$PA == 1, ], # presence data
+                        a = lynx_test[lynx_test$PA == 0, ], # pseudoabsence data
+                        model = m_glm, # model we are evaluating
+                        type = "response")
+```
+
+------------------------------------------------------------------------
+
+### Model evaluation
+
+There are multiple metrics to evaluate SDMs. The **AUC** is a commonly used metric, although it has its [limitations](https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13479). It indicates how good is the model at distinguishing classes (in our case, presence from absence) and ranges from -1 to 1.
+
+An AUC of 1 indicates that our model is able to perfectly discriminate between areas where the species is present from where it is absent. An AUC of -1 is the complete opposite, and an AUC of 0.5 means that our model is no better than random.
+
+```{r}
+#| echo: false
+#| eval: true
+pacman::p_load(predicts)
+glm_eval <- pa_evaluate(p = lynx_test[lynx_test$PA == 1, ], # presence data
+                        a = lynx_test[lynx_test$PA == 0, ], # pseudoabsence data
+                        model = m_glm, # model we are evaluating
+                        type = "response")
+print(glm_eval@stats)
+```
+
+What is the AUC of our model? What does this mean?
+
+## 1. Presence-absence methods - GLMs
+
+### Model prediction
+
+To do this, we need to identify the suitability threshold using the `thresholds` element from the function `pa_evaluate()` We chose `max_spec_sense`, which sets *"the threshold at which the sum of the sensitivity (true positive rate) and specificity (true negative rate) is highest."*
+
+```{r}
+#| echo: true
+#| eval: true
+# Determine minimum threshold for "presence"
+glm_threshold <- glm_eval@thresholds$max_spec_sens
+print(glm_threshold)
+
+```
+
+## 1. Presence-absence methods - GLMs
+
+### Binary map of predicted presence
+
+This map is a categorical classification of whether the cell is suitable or not for the Iberian lynx using our selected threshold.
+
+```{r}
+#| echo: false
+#| eval: true
+# Plot the maps
+plot(iberia_map$geometry, 
+     axes = TRUE, 
+     col = "grey95")
+
+# Only plot areas where probability of occurrence is greater than the threshold
+plot(glm_predict > glm_threshold, 
+     add = TRUE, 
+     legend = FALSE, 
+     col = c(NA, "palegreen3"))
+
+# Add the gbif observations
+points(x = lynx_gbif_clean$decimalLongitude, 
+       y = lynx_gbif_clean$decimalLatitude, 
+       col = "black",
+       pch = "+", 
+       cex = 0.75)
+```
+
+# Any questions? {background-color="#5F9747"}

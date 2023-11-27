@@ -1,0 +1,501 @@
+---
+title: 'Spatial Ecology and Macroecology'
+subtitle: 'Practical - Week 4 Pt.2'
+date: 2022-11-13
+author: 'Carmen Soria & François Leroy'
+institute: '(Department of Spatial Sciences)'
+format: 
+  revealjs:
+    self-contained: true
+    logo: 'img/Logo_czu_cz_hr.png'
+    auto-stretch: false
+    code-copy: true
+    code-tools: true
+    enter-title-slide: false
+    theme: [assets/monash.scss]
+    controls: true
+    width: 1280
+    height: 720
+    css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
+    highlight-style: github
+    scrollable: true
+    enableEmoji: true
+editor: visual
+---
+
+## What are we going to see today?
+
+::: incremental
+Species Distribution Modelling using MaxEnt
+
+1.  Maximum entropy principle
+2.  Maxent in SDMs
+3.  Maxent - Data preparation
+4.  Maxent - Modelling
+:::
+
+# Maximum Entropy {background-color="#5F9747"}
+
+## Maximum Entropy Principle
+
+-   **Entropy** is a measure of uncertainty or disorder in a system.
+
+-   The principle of **maximum entropy** states that *the most appropriate distribution to model a given set of data is the one with highest entropy among all those that satisfy the constraints of our prior knowledge*.
+
+-   It allows you to find the distribution that makes the fewest assumptions about your data (the one with maximal information entropy)
+
+## Maxent SDMs
+
+-   Maxent (Maximum Entropy) is a statistical modeling approach based on the Maximum Entropy principle.
+
+-   It finds the probability distribution that maximizes entropy, subject to the constraints imposed by the available information (e.g. environmental variables).
+
+-   It requires presence data (presence-background model) and it is widely used for SDMs.
+
+-   It provides estimates of *relative suitability*, not occupancy probability.
+
+## Maxent SDMs
+
+-   *"MaxEnt takes a list of species presence locations as input, often called presence-only (PO) data, as well as a set of environmental predictors (e.g. precipitation, temperature) across a user-defined landscape that is divided into grid cells. From this landscape, Maxent extracts a sample of background locations that it contrasts against the presence locations. Presence is unknown at background locations"* [Merrow et al. (2013)](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1600-0587.2013.07872.x)
+-   *"Maxent uses PB data to obtain a picture of environmental characteristics at presence sites and at background locations (which are a random or regular sample of the landscape, or could be targeted to match known biases in the sampling process)"* [Guillera-Arroitia et al. (2014)](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.12252)
+
+# [EXERCISE]{.story} [SDM using Maxent for the Red admiral butterfly (*Vanessa atalanta*)]{style="float:right;text-align:right;"} {background-color="#5F9747"}
+
+## 1. Conceptualisation
+
+::: columns
+::: {.column width="60%"}
+-   **Taxa:** Red admiral butterfly (*Vanessa atalanta*)
+-   **Objective:** find climatically suitable areas
+-   **Biodiversity data:** GBIF observations
+-   **Predictors:** Climatic predictors
+-   **Location:** Czechia
+:::
+
+::: {.column width="40%"}
+![](img/Vanessa_atalanta.jpg){fig-align="center" width="500"}
+:::
+:::
+
+## 2. Data preparation
+
+### 2.1 Getting species observations (Practical 1)
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(rgbif, tidyverse, rnaturalearth, rnaturalearthdata, sf)
+```
+
+Variables that we will use
+
+```{r}
+#| echo: true
+#| eval: true
+taxa <- "Vanessa atalanta"
+country_code <- "CZ"
+proj_crs <- 4326 # EPSG code for WGS84
+```
+
+------------------------------------------------------------------------
+
+Base map of our area of study
+
+```{r}
+#| echo: false
+#| eval: true
+
+base_map <- rnaturalearth::ne_countries(
+  scale = "medium",
+  type = "countries",
+  country = "Czech Republic",
+  returnclass = "sf"
+)
+
+# Plot the map
+ggplot() +
+  geom_sf(data = base_map, fill = "lightgray", color = "white") +
+  theme_minimal() +
+  labs(title = "Czechia")
+```
+
+------------------------------------------------------------------------
+
+### 2.1 Getting species observations (Practical 1)
+
+Getting the number of occurrence records
+
+```{r}
+#| echo: false
+#| eval: true
+occ_count(
+  country = country_code,
+  scientificName = taxa
+)
+
+```
+
+Download occurrence data using `rgbif`
+
+```{r}
+#| echo: false
+#| eval: true
+vanat_obs <- occ_search(
+  scientificName = taxa, 
+  country = country_code,
+  hasCoordinate=T, 
+  basisOfRecord='HUMAN_OBSERVATION', 
+  limit = 1134) 
+
+# We are just interested in the data frame containing the records
+vanat_obs <- vanat_obs$data
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+We inspect the downloaded occurrences plotting them in a world map using `rnaturalearth`, `sf` and `ggplot2`
+
+```{r}
+pacman::p_load(CoordinateCleaner, ggplot2)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+world_map <- ne_countries(scale = "medium", returnclass = "sf")
+ggplot(world_map) +
+  geom_sf() +
+  geom_point(data = vanat_obs, 
+             aes(x = decimalLongitude, y = decimalLatitude), color = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.2 Checking and cleaning the data
+
+Clean the data using `CoordinateCleaner`
+
+```{r}
+#| echo: false
+#| eval: false
+vanat_gbif_cc <- clean_coordinates(vanat_obs,
+                                   lon="decimalLongitude",
+                                   lat="decimalLatitude",
+                                   tests=c("centroids", "outliers", "duplicates", "institutions"),
+                                   inst_rad = 1000)
+vanat_gbif_clean <- vanat_obs[vanat_gbif_cc$.summary,]
+save(vanat_gbif_clean,file='data/gbif_vanat_cleaned.RData')
+```
+
+```{r}
+#| echo: false
+#| eval: true
+# Load the cleaned coordinates
+load(file="data/gbif_vanat_cleaned.RData")
+```
+
+Plot the data to check if it makes sense after cleaning
+
+```{r}
+#| echo: false
+#| eval: true
+ggplot(base_map) +
+  geom_sf() +
+  geom_point(data = vanat_gbif_clean, 
+             aes(x = decimalLongitude, y = decimalLatitude), color = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.3 Getting climatic data (Practical 3)
+
+Getting WorldClim variables using the package `geodata` for our area of study (Czechia)
+
+```{r}
+pacman::p_load(geodata)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+bioclim_data <- worldclim_country(country = c("Czechia"), var = "bio", path = "data/")
+```
+
+------------------------------------------------------------------------
+
+### 2.4 Spatial thinning
+
+Keeping only one observation per grid cell. We can use `spatSample` from the `terra` package or `thin` from the `spThin` package.
+
+```{r}
+#| echo: false
+#| eval: true
+pacman::p_load(terra)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+vanat_gbif_sf <- st_as_sf(vanat_gbif_clean,
+                          coords = c("decimalLongitude", "decimalLatitude"),
+                          crs = proj_crs)
+vanat_gbif_sp <- terra::vect(vanat_gbif_sf)
+# Keeping one observation per grid cell using spatSample from terra
+vanat_gbif_spthin <- spatSample(vanat_gbif_sp, size = 1, strata = bioclim_data)
+
+## Keeping a dataframe of the thinned dataset
+vanat_gbif_dfthin <- vanat_gbif_clean[vanat_gbif_clean$key %in% vanat_gbif_spthin$key,1:4]
+```
+
+Plotting the thinned data to check if it makes sense
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+plot(bioclim_data[[1]])
+plot(base_map, col = "transparent", add = T )
+plot(vanat_gbif_spthin, add = T, col = "red")
+
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Generating background data
+
+To generate the background data, we sample random points from our area of study using the `sampleRandom` function from the `raster` package.
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+set.seed(1312)
+bioclim_cz_rast <- raster::raster(bioclim_data[[1]])
+
+bg <- raster::sampleRandom(x=bioclim_cz_rast,
+                   size=786,
+                   na.rm=T, #removes the 'Not Applicable' points  
+                   sp=T) # return spatial points 
+bg_df <- as.data.frame(bg)
+
+
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+plot(bioclim_data[[1]])
+plot(base_map, col = "transparent", add = T )
+plot(bg, add = T, col = "black")
+plot(vanat_gbif_spthin, add = T, col = "red")
+```
+
+------------------------------------------------------------------------
+
+### 2.5 Extracting climate data
+
+Extract the climatic data for our presences and background points using `extract` from the `terra` package.
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+
+## Adding climate data
+vanat_obs_clim <- cbind(vanat_gbif_dfthin, 
+                       terra::extract(x = bioclim_data, 
+                                      y = vanat_gbif_dfthin[,c('decimalLongitude','decimalLatitude')], 
+                                      cells=T) )
+
+bg_clim <- cbind(bg_df,
+                 terra::extract(x = bioclim_data, 
+                                y = bg_df[,c("x","y")], 
+                                cells=T) )
+```
+
+------------------------------------------------------------------------
+
+### 2.7 Testing for collinearity in the predictors and select predictors
+
+Identifying variables that have a correlation of over 70%
+
+```{r}
+pacman::p_load(HH)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+# Running the correlation analysis for the climatic variables
+cor_matrix <- cor(vanat_obs_clim[,-c(1:5, 25)], method='spearman')
+# Set a correlation threshold (adjust as needed)
+cor_threshold <- 0.7
+# Perform hierarchical clustering to examine the hierarchical correlation between variables
+dendrogram <- hclust(as.dist(1 - cor_matrix))
+
+# Plot the dendrogram
+plot(dendrogram, main = "Dendrogram with Correlation Threshold")
+
+# Add a horizontal line to mark the correlation threshold
+abline(h = 1 - cor_threshold, col = "red", lty = 2)
+```
+
+------------------------------------------------------------------------
+
+### 2.7 Testing for collinearity in the predictors and select predictors
+
+Selecting the variables in our data
+
+```{r}
+#| echo: true
+#| eval: true
+# Selecting the most relevant and uncorrelated variables
+my_preds <- c( "wc2.1_30s_bio_1", # Annual mean temperature
+               "wc2.1_30s_bio_2", # Mean diurnal range
+               "wc2.1_30s_bio_4", # Temperature seasonality
+               "wc2.1_30s_bio_9", # Mean temperature of driest quarter
+               "wc2.1_30s_bio_17", # Precipitation of driest quarter
+               "wc2.1_30s_bio_12") #Annual precipitation
+
+
+# Filtering the relevant columns of the data
+vanat_data <- vanat_obs_clim %>% 
+  dplyr::select(any_of(my_preds))
+bg_data <- bg_clim %>% 
+  dplyr::select(any_of(my_preds))
+
+```
+
+------------------------------------------------------------------------
+
+### 2.8 Separating the data into training and testing
+
+```{r}
+#| echo: true
+#| eval: true
+set.seed(1312)
+
+# Divide randomly intro 70 and 30
+train_i <- sample(seq_len(nrow(vanat_data)), size=round(0.7*nrow(vanat_data)))
+
+# Subset the training and testing data
+vanat_train <- vanat_data[train_i,]
+vanat_test <- vanat_data[-train_i,]
+```
+
+------------------------------------------------------------------------
+
+### 2.9 Renaming variables, joining presence and background points
+
+Renaming the variables
+
+```{r}
+#| echo: true
+#| eval: true
+p <- vanat_train
+p_test <- vanat_test
+a <- bg_data
+```
+
+Joining presence and background data. Maxent identifies presences as 1 and background points as 0.
+
+```{r}
+#| echo: true
+#| eval: true
+# Vector of presences and background points
+pa <- c(rep(1, nrow(p)), rep(0, nrow(a)))
+
+# Dataframe of the environmental conditions of presences and background points
+pder <- as.data.frame(rbind(p, a))
+```
+
+## 3. Fitting the Maxent
+
+We will fit the Maxent model using the `dismo` package
+
+```{r}
+#| echo: true
+#| eval: true
+pacman::p_load(dismo)
+mod <- maxent(x = pder, p = pa)
+```
+
+------------------------------------------------------------------------
+
+Plotting the relative variable contribution.
+
+Which is the variable that contributes the most?
+
+```{r}
+#| echo: true
+#| eval: true
+#| warning: false
+plot(mod)
+
+```
+
+------------------------------------------------------------------------
+
+Viewing the results of the model
+
+```{r}
+mod@results
+```
+
+------------------------------------------------------------------------
+
+### Predict function
+
+Predicting the relative suitability of the territory for our taxa based on our results
+
+```{r}
+#| echo: true
+#| eval: true
+pred1 <- predict(mod, bioclim_data)  
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+plot(pred1)  
+plot(base_map, col = "transparent", lwd = 1.5, add = T)
+```
+
+------------------------------------------------------------------------
+
+### Model evaluation
+
+We evaluate the models using the `evaluate` function from the `dismo` package for the training and testing data.
+
+```{r}
+#| echo: true
+#| eval: true
+mod_eval_train <- dismo::evaluate(p = p, a = a, model = mod)
+mod_eval_test <- dismo::evaluate(p = p_test, a = a, model = mod)
+# Evaluation of the training model
+print(mod_eval_train)
+# Evaluation of the testing model
+print(mod_eval_test) 
+```
+
+------------------------------------------------------------------------
+
+### Response curves
+
+How each environmental variable affects the Maxent prediction. They show how the logistic prediction changes as each environmental variable is varied, keeping all other environmental variables at their average sample value.
+
+```{r}
+response(mod)
+```
+
+## Resources
+
+-   NIMBioS Ecological Niche Modelling course ([website](http://www.nimbios.org/tutorials/TT_SpatialData) and [githu](https://github.com/shandongfx/workshop_maxent_R/tree/master)[b](https://github.com/shandongfx/workshop_maxent_R/blob/master/code/Appendix1_case_study.md))
+
+-   Other resources mentioned in the previous SDM session
+
+# Any questions? {background-color="#5F9747"}
