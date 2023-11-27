@@ -1,3 +1,9 @@
+---
+output: 
+  html_document: 
+    toc: yes
+    number_sections: yes
+---
 # Student project description
 
 **Petr Keil, Florencia Grattarola & Francois Leroy**
@@ -15,10 +21,17 @@ expand the project.
 
 ## Goal
 
+### A statistical model
+
 The goal is to give students a hands-on experience with a statistical model applied
 at biogeographical context. This can be a species distribution model (SDM), model explaining biodiversity (species richness), or any other response variable.
 
 Students must pick a different response than what we used during classes.
+
+### A simulation model
+
+Alternatively, students can also choose to **implement a simulation model** (e.g. a neutral
+model of biodiversity). Such activity may then indeed not include a response and predictors.
 
 ## Pick a response variable 
 
