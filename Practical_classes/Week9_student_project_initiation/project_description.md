@@ -6,18 +6,18 @@ output:
 ---
 # Student project description
 
-**Petr Keil, Florencia Grattarola & Francois Leroy**
+**Petr Keil et al.**
 
 ## Time frame
 
-- 21 November 2023 - every student leaves with an idea about the project topic (response, predictors, grain, extent)
+- 27 November 2023 - every student leaves with an idea about the project topic (response, predictors, grain, extent)
  
-- 28 November 2023 - work on the project
+- 4 November 2023 - work on the project
 
-- 5 December 2023 - work on the project. If all goals have been achieved, 
+- 11 December 2023 - work on the project. If all goals have been achieved, 
 expand the project.
 
-- 12 December 2023 - every student gives a 10 min presentation about the results.
+- 18 December 2023 - every student gives a 10 min presentation about the results.
 
 ## Goal
 
