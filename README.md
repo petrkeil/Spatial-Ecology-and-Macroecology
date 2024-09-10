@@ -63,7 +63,7 @@ Most practical classes use R. Mild use of either QGIS or ArcGIS can be expected.
 - Oct 28 (**NO CLASS - STATE HOLIDAY**). 
 - Nov 4 (**Gabriele, Carmen**). Species Distribution Models II.
 - Nov 11 (**Petr**). Replacement for the missed lecture.
-- Nov 18 (**Frieda**). Simulation models of biodiversity and evolution - we will play with a cellular automaton (rule 30, Game of Life). The goal is to exercise a bit of algorithmic thinking and do something fun, different from previous stuff, and with a graphic output.
+- Nov 18 (**Frieda**). Simulation models of biodiversity and evolution.
 - Nov 25 (**all**). Mini project I: Choosing a taxon, region, question, and data source. 
 - Dec 2 (**Petr, Gabriele**). Mini project II. Work on the project with us, data preparation.
 - Dec 9 (**Petr, Carmen**). Mini project III. Work on the project with us, analysis.
