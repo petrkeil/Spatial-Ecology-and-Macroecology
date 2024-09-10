@@ -38,29 +38,17 @@ the oral exam** to give us some time to fix issues.
 ## Lectures (Mon 8:45-10:15, lecture hall Z115)
 
 - 30. Sep - **Species geographic distributions - where species live?** Course overview. What is macroecology and spatial ecology. Historical exposition, biogeography, old guys: Humboldt, Wallace, etc. The currencies of macroecology: Probability of occurrence, abundance, endemism, spatial aggregation, rarity. The big questions of macroecology.
-
 - 7. Oct - **Drivers of distributions - why are species where they are?** Environmental drivers of distributions, dispersal limits and barriers, species abiotic and biotic niche, climatic niche, optima, ecological limits, habitat requirements.
-
 - 14. Oct - **NO LECTURE**, Petr and Gabriele are a workshop out of Prague.  
-
 - 21. Oct - **Species range size - what does it mean to be rare?** Range size, area of occupancy, extent of occurrence, role of spatial scale, fractals, aggregation. Patterns of range size, Rapoport's rule, range size vs abundance, range size and abundance distributions.
-
 - 28. Oct - **NO LECTURE**, State holiday. 
-
 - 4. Nov morning - **Applied issues around range and its size - which species should we protect?** Rarity, conservation status, IUCN, endemism, threat. Range collapse, species extinctions, invasions. Spatial structure of populations, metapopulation ecology.
-
 - 4. Nov afternoon - **Simple biodiversity - what is diversity and why does it matter?** Introduction to biodiversity, history, major concepts. Count-based measures - taxonomic, phylogenetic, functional diversity, weighted endemism. Why diversity matters, biodiversity-ecosystem functioning (BEF).
-
 - 11. Nov - **Biodiversity and spatial scale - where and how much should we count species.** Biodiversity scaling: Species-area relationship, endemics-area relationship, alpha vs. beta vs. gamma diversity. Species accumulation curves, rarefaction, MoB. Grain-dependent drivers of biodiversity.
-
 - 18. Nov - **Evolution of biodiversity.** Global biodiversity in geological time, mass extinctions, speciation and evolution - from natural selection to emergence of new species. Types of speciation, diversification, radiation, phylogeny. The current global biodiversity, and its partition among plants, animals, bacteria, primary productents, and among realms. 
-
 - 25. Nov - **Mechanistic and simulation models** The idea of complex nature emerging from simple rules. Cellular automata - Conway's game of life, rule 30, fractals, deterministic chaos. Unified Neutral Theory of Biodiversity (UNTB) - how it sits in the context of competitive exclusion principle, niche theory, and paradox of the plankton. How UNTB works.
-
 - 2. Dec - **Spatial patterns of biodiversity - where are the places with many species?** Biodiversity patterns: Latitudinal and altitudinal gradients, their ubiquity and most common forms, and exceptions from the pattern. Explanations for the patterns: Rohde's hypothesis, metabolic theory, species-energy, endotherms vs ectotherms, habitat heterogeneity. Historical drivers of diversity. 
-
 - 9. Dec - **Species composition, species associations** Community matrices and similarity matrices as the basis of community analysis. Pairwise similarity metrics, an example (Jaccard index), distance decay of similarity (Tobler's law), partitioning similarity to fractions explained by space vs environment, ordinations and clusters, biological regionalization. Interspecific associations, co-occurrences, inferring assembly rules from co-occurrence patterns.
-
 - 16. Dec - **Temporal change - how does nature change in time during anthropocene?** Biodiversity change, species loss, extinction rates, invasions, homogenization, temporal turnover, temporal change of spatial turnover. Spatial scale and biodiversity change, drivers of biodiversity change, anthropocene. Conservation biogeography and applied issues.
 
 
@@ -69,27 +57,16 @@ the oral exam** to give us some time to fix issues.
 Most practical classes use R. Mild use of either QGIS or ArcGIS can be expected.
 
 - 30. Sep (**Flo**). Major biodiversity data sources and data types: GBIF, OBIS, Map of Life, IUCN, BIEN, eBIRD, BBS, important atlas projects. Temporal change databases: BioTime, PREDICTS. Open vs. closed data, data quality issues, download through R, licensing and data sharing.
-
 - 7. Oct (**Flo**). An example of large-scale biodiversity database, learning the basics and visualizing things. Gridding biodiversity data (geographic ranges, biodiversity), exploring patterns at different resolutions, making pretty maps. 
-
 - 14. Oct (**Flo**) - Drivers of distributions and diversity: Environmental data, historical data, human-related predictors, climate, soils, land cover. Future climate projected layers. Plotting and exploring associations and correlations.
-
 - 21. Oct (**Carmen, Gabriele**). Species Distribution Models I.
-
 - 28. Oct (**NO CLASS - STATE HOLIDAY**). 
-
 - 4. Nov (**Gabriele, Carmen**). Species Distribution Models II.
-
 - 11. Nov (**Petr**). Replacement for the missed lecture.
-
 - 18. Nov (**Frieda**). Simulation models of biodiversity and evolution - we will play with a cellular automaton (rule 30, Game of Life). The goal is to exercise a bit of algorithmic thinking and do something fun, different from previous stuff, and with a graphic output.
-
 - 25. Nov (**all**). Mini project I: Choosing a taxon, region, question, and data source. 
-
 - 2. Dec (**Petr, Gabriele**). Mini project II. Work on the project with us, data preparation.
-
 - 9. Dec (**Petr, Carmen**). Mini project III. Work on the project with us, analysis.
-
 - 16. Dec (**all**). Mini project IV: Presentations of results.
 
 
