@@ -206,7 +206,7 @@ Get occurrences records of mammals from Czech Republic.
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
   country = country_code, # CZ, ISO code of Czechia
-  limit = 6000, # Max number of records to download
+  limit = 9000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 
