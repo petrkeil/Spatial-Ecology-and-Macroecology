@@ -7,7 +7,14 @@ author:
     orcid: 0000-0001-9034-4883
   - name: 'Gabriel Ortega'
     orcid: 0000-0002-0516-5694
-format: docx
+format: 
+  html:
+    toc: true
+    toc-location: right
+    smooth-scroll: true
+    html-math-method: katex
+    code-fold: true
+self-contained: true
 editor: source
 ---
 

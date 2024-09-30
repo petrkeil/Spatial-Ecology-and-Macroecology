@@ -27,7 +27,6 @@ format:
     echo: true
     footer: '[https://github.com/petrkeil/Spatial-Ecology-and-Macroecology](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology)'
 editor: source
-bibliography: refs.bib
 ---
 
 ## What are we going to see today?
@@ -44,7 +43,14 @@ bibliography: refs.bib
 
 ## 1. Data types
 
-Data that can place a particular **taxa** in a particular **location** and **time** can take many forms.
+Data that can place a particular **taxa** in a particular **location** and **time** can take many forms, depending on:
+
+::: incremental
+1.  What they record (*currency of the species' distribution*)
+2.  How they are collected (*method*)
+3.  How they are made available for others (*openness*)
+:::
+
 
 ------------------------------------------------------------------------
 
@@ -63,8 +69,8 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 :::
 :::
 
-::: fragment
-| PROS                                              | CONS                                                                   |
+::: {.fragment}
+| **PROS**                                              | **CONS**                                                                   |
 |------------------------------------|------------------------------------|
 | huge amounts of data available, easily aggregated | often without details of effort/method, wide variation in data quality |
 :::
@@ -73,7 +79,7 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 
 ## 1. Data types
 
-**Presence-absence data**
+**Presence-absence (PA) data**
 
 ::: columns
 ::: {.column width="60%"}
@@ -86,8 +92,8 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 :::
 :::
 
-::: fragment
-| PROS                                                   | CONS                                                             |
+::: {.fragment}
+| **PROS**                                                   | **CONS**                                                             |
 |------------------------------------|------------------------------------|
 | absences are informative, area and effort are measured | less abundant (too time consuming), methods are species-specific |
 :::
@@ -109,8 +115,8 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 :::
 :::
 
-::: fragment
-| PRO                                             | CONS                                                         |
+::: {.fragment}
+| **PROS**                                             | **CONS**                                                         |
 |------------------------------------|------------------------------------|
 | standardised protocols, multiple points in time | expensive: geographically restricted, usually temporally too |
 :::
@@ -132,8 +138,8 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 :::
 :::
 
-::: fragment
-| PROS                                                                                      | CONS                                     |
+::: {.fragment}
+| **PROS**                                                                                      | **CONS**                                     |
 |------------------------------------|------------------------------------|
 | rough estimates of the outer boundaries of areas within which species are likely to occur | large spatial and temporal uncertainties |
 :::
@@ -196,7 +202,7 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ## 1. Data types
 
-**Disaggregated** [@konig_scale_2021]
+**Disaggregated**
 
 ::: {layout-ncol="3"}
 -   precision is high, but completeness and representativeness are low.
@@ -210,7 +216,7 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ## 1. Data types
 
-**Aggregated**  [@konig_scale_2021]
+**Aggregated**  
 
 ::: {layout-ncol="3"}
 -   precision is low, but completeness and representativeness are high.
@@ -218,12 +224,6 @@ Finally, data can also be defined as how they are **made available** for others.
 ![](img/range-map.png)
 
 ![](img/checklists.png)
-:::
-
-::: fragment
-::: aside
-While **disaggregated** data can produce reliable results for a limited set of well-covered regions, **aggregated** data types can provide critical information for the extrapolation of biodiversity patterns into less well-sampled regions.
-:::
 :::
 
 # 2. Data sources {background-color="#488fb8"}
@@ -280,14 +280,6 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](https://mol.org/static/img/logo.png){.centre top="200" height="100"}
-
-### [mol.org](https://mol.org)
-
-**Map of Life** endeavors to provide 'best-possible' species range information and species lists for any geographic area. The Map of Life assembles and integrates different sources of data describing species distributions worldwide.
-
-------------------------------------------------------------------------
-
 ![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
@@ -308,6 +300,31 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
+![](https://mol.org/static/img/logo.png){.centre top="200" height="100"}
+
+### [mol.org](https://mol.org)
+
+**Map of Life** endeavors to provide 'best-possible' species range information and species lists for any geographic area. The Map of Life assembles and integrates different sources of data describing species distributions worldwide.
+
+------------------------------------------------------------------------
+
+![](https://ars.els-cdn.com/content/image/X23523409.jpg){.centre top="200" width="100"}
+
+### [10.1016/j.dib.2017.05.007](https://doi.org/10.1016/j.dib.2017.05.007)
+
+**Chorological maps for the main European woody species** is a data paper with a dataset of chorological maps for the main European tree and shrub species, put together by Giovanni Caudullo, Erik Welk, and Jesús San-Miguel-Ayanz.
+
+------------------------------------------------------------------------
+
+![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
+
+### UK [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
+### USA [usgs.gov/centers/eesc/science/north-american-breeding-bird-survey](https://www.usgs.gov/centers/eesc/science/north-american-breeding-bird-survey)
+
+**BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites. It's part of the NBN Atlas.
+
+------------------------------------------------------------------------
+
 ![](https://bien.nceas.ucsb.edu/bien/wp-content/uploads/2021/01/FinalBIENLogoNoText_highres-768x303.png){.centre top="200" width="352"}
 
 ### [bien.nceas.ucsb.edu/bien/](https://bien.nceas.ucsb.edu/bien/)
@@ -315,15 +332,6 @@ While **disaggregated** data can produce reliable results for a limited set of w
 **BIEN** is a network of ecologists, botanists, and computer scientists working together to document global patterns of plant diversity, function and distribution.
 
 `rbien`: <https://github.com/bmaitner/RBIEN>
-
-
-------------------------------------------------------------------------
-
-![](https://ars.els-cdn.com/content/image/X23523409.jpg){.centre top="200" width="352"}
-
-### [10.1016/j.dib.2017.05.007](https://doi.org/10.1016/j.dib.2017.05.007)
-
-**Chorological maps for the main European woody species** is a data paper with a dataset of chorological maps for the main European tree and shrub species, put together by Giovanni Caudullo, Erik Welk, and Jesús San-Miguel-Ayanz.
 
 ------------------------------------------------------------------------
 
@@ -337,15 +345,6 @@ While **disaggregated** data can produce reliable results for a limited set of w
 
 ------------------------------------------------------------------------
 
-![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
-
-### UK [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
-### USA [usgs.gov/centers/eesc/science/north-american-breeding-bird-survey](https://www.usgs.gov/centers/eesc/science/north-american-breeding-bird-survey)
-
-**BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites. It's part of the NBN Atlas.
-
-------------------------------------------------------------------------
-
 ![](http://biotime.st-andrews.ac.uk/images/logo.png){.centre top="200" height="200"}
 
 ### [biotime.st-andrews.ac.uk](https://biotime.st-andrews.ac.uk)
@@ -353,8 +352,6 @@ While **disaggregated** data can produce reliable results for a limited set of w
 BioTime is an open access database global database of assemblage time series for quantifying and understanding biodiversity change.
 
 ![](https://avatars.githubusercontent.com/u/29038235?s=200&v=4){width="80"} **BioTime Hub**: <https://github.com/bioTIMEHub>
-
-------------------------------------------------------------------------
 
 # 3. Open Data {background-color="#488fb8"}
 
@@ -672,7 +669,7 @@ We are ready to do a download. [Whoop!]{.font-big}\
 
 ## 3.1 CZ mammals' GBIF data download
 
-To do this, we will use `occ_search()`.
+To do this, we will use `occ_search()`, **but see `occ_download()`**.
 
 ::: {.fragment}
 ``` r
@@ -748,6 +745,7 @@ Get occurrence records of mammals from Czech Republic.
 ```{r}
 #| echo: true
 #| eval: true
+
 occ_search(taxonKey=taxon_key,
            country='CZ') 
 ```
@@ -763,6 +761,7 @@ To get **all** the records we need to specify a larger limit. Since we have over
 ```{r}
 #| echo: true
 #| eval: true
+ 
 
 occ_search(taxonKey=taxon_key,
            country='CZ',
@@ -814,6 +813,7 @@ How many records do we have?
 ```{r}
 #| echo: true
 #| eval: true
+
 nrow(mammalsCZ)
 ```
 :::
@@ -826,6 +826,7 @@ How many species do we have?
 ```{r}
 #| echo: true
 #| eval: true
+
 mammalsCZ %>%
   filter(taxonRank == "SPECIES") %>%
   distinct(scientificName) %>%
@@ -1077,7 +1078,3 @@ ggplot() +
 :::
 
 # Any doubts? {background-color="#488fb8"}
-
-------------------------------------------------------------------------
-
-### References
