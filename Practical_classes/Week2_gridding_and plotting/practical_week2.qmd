@@ -587,7 +587,7 @@ And we save
 #| eval: true
 mammalsCZ_sf <- mammalsCZ %>% 
   st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
-           crs=4326) # this is the projection that the data is in
+           crs=4326) # this is the projection that the data are in
 ```
 
 . . .
