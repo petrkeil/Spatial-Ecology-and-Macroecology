@@ -1,86 +1,227 @@
 ---
 title: "How to plot biodiversity data, explore patterns at different resolutions, and make pretty map"
-authors: 
-  -Florencia Grattarola
-  -Friederike Woelke
-  -Gabriel Ortega
-
-format: docx
-editor: visual
+author:
+  - name: 'Florencia Grattarola'
+    orcid: 0000-0001-8282-5732
+  - name: 'Friederike Wölke'
+    orcid: 0000-0001-9034-4883
+  - name: 'Gabriel Ortega'
+    orcid: 0000-0002-0516-5694
+format: 
+  html:
+    toc: true
+    toc-location: right
+    smooth-scroll: true
+    html-math-method: katex
+    code-fold: true
+self-contained: true
+editor: source
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Preparations before starting to code
 
 ## Data download
 
-Please download the following files and store them on you `data` folder:  
+Please download the following files and store them on you `data` folder:
 
--   `mammalsCZ.rds`
--   `CZE_adm0.gpkg`  
+-   `trees.gpkg`  
+-   `mammalsCZ.rds`  
+-   `CZE_adm0.gpkg` 
 -   `KvadratyCR_JTSK.gpkg`  
--   `testudines.gpkg`  
 
-## Spatial analyses
-
-Install the package `sf`
+## Libraries 
 
 ```{r}
-#| eval: false
-install.packages('sf') # install
+library(pacman)
 ```
 
-Load the library and check it's working.
+### Spatial analyses
+
+Load `sf` and switch spherical geometry off
 
 ```{r}
-library(sf) # load
-packageVersion('sf')
-```
-
-And switch spherical geometry off
-
-```{r}
+pacman::p_load(sf)
 sf_use_s2(FALSE) # switch spherical geometry off
 ```
 
-## Spatial download
+### Spatial download
 
 For downloading country-specific and world polygons we will use the `rnaturalearth` package
 
 ```{r}
-#| eval: false
-install.packages(c('rnaturalearth', 'rnaturalearthdata')) # the second package is also needed
+pacman::p_load(rnaturalearth, rnaturalearthdata) # the second package is also needed
 ```
 
-To use it, we load the library and check it's working.
+### Visualisation
+
+For all the map plots today we will use the `ggplot` package. It's part of the `tidyverse`. 
+We will also use `patchwork` to combine plots.
 
 ```{r}
-library(rnaturalearth) # load
-packageVersion('rnaturalearth')
-```
-
-## Visualisation
-
-For all the map plots today we will use the `ggplot` package. It's part of the `tidyverse`.
-
-```{r}
-library(tidyverse) # load
+pacman::p_load(patchwork)
+pacman::p_load(tidyverse) # load
 ```
 
 # Project variables
 
 It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
 
+```{r}
+# your variables
+
+```
+
+
 # Exercises
+
+## Mapping species ranges 🐢
+
+1.   Get trees' expert range maps (`POLYGONS`)
+2.   Get a map of Europe
+3.   Create a 1-degree grid (`POLYGONS`)
+4.   Calculate species richness per grid cell (SR)\
+5.   Visualise **SR** patterns in Europe\
+
+### 1. Get trees' expert range maps (`POLYGONS`)
+
+We will get the data from: 
+
+> Caudullo G., Welk E., San-Miguel-Ayanz J., 2017. Chorological maps for the main European woody species. Data in Brief 12, 662-666. DOI: [10.1016/j.dib.2017.05.007](https://doi.org/10.1016/j.dib.2017.05.007)
+
+
+```{r}
+trees <- st_read('Practical_classes/Week2_gridding_and plotting/data/trees.gpkg', quiet=T)
+```
+
+What do the data look like?
+
+```{r}
+trees %>% head(n=10) #%>% knitr::kable()
+```
+
+### 2. Get a map of Europe
+
+We will download a polygon of the European continent at medium scale, crop it by a defined extent, and finally combine all countries into a unique polygon.
+
+```{r}
+europe <- ne_countries(scale = 50, continent = 'Europe', returnclass='sf') %>% 
+  st_crop(., xmin = -30, xmax = 60, ymin = 30, ymax = 73)
+
+europe_union <- st_union(europe) %>% st_make_valid() %>% st_cast() # fixes any problems
+```
+
+Let's see how it looks
+
+```{r}
+ggplot() + 
+  geom_sf(data=europe_union, fill='white')
+```
+
+Before working with this map, we need to **project** the layer. Let's transform the data (both the world and the trees' layers). We can use the code `EPSG:3035`.
+
+```{r}
+#| echo: true
+#| eval: true
+europe_ea <- st_transform(europe_union, crs = 'EPSG:3035') %>% 
+  st_make_valid() %>% st_cast()
+
+trees_ea <- st_transform(trees, crs = 'EPSG:3035') %>% 
+  st_make_valid() %>% st_cast()
+```
+
+Let's double check that everything is alright
+
+```{r}
+st_crs(europe_ea, parameters = TRUE)$epsg
+st_crs(europe_ea, parameters = TRUE)$ud_unit
+st_crs(trees_ea, parameters = TRUE)$epsg
+st_crs(trees_ea, parameters = TRUE)$ud_unit
+```
+
+### 3. Create a global 1-degree grid  (`POLYGONS`)
+
+We will do this using the function `st_make_grid()`. For the `cellsize` argument we will chose 1 degree, which is \~100km (=100,000m)
+
+```{r}
+europe_grid <- st_make_grid(europe_ea, 
+                           cellsize=100000,
+                           square=FALSE) %>%  # this will make hexagons
+  st_intersection(europe_ea) %>% 
+  st_collection_extract('POLYGON') %>% # make sure there are no POINT geometries
+  st_sf(gridID=1:length(.))     
+```
+
+We have the grid, we are ready to calculate metrics per grid cell. Let's see how it looks.
+
+```{r}
+ggplot() + 
+  geom_sf(data= europe_grid, fill='white', size=0.1) 
+```
+
+### 4. Calculate the species richness per grid cell (SR)
+
+Let's first plot 5 random species as an example.
+
+```{r}
+set.seed(1234)
+
+ggplot() + 
+  geom_sf(data= europe, fill='white', size=0.5)  +
+  geom_sf(data= trees_ea %>% slice_sample(n=5),
+          aes(fill=layer_name), alpha=0.5, lwd = 0.1) +
+  scale_fill_brewer(palette = 'Paired')
+```
+
+Now let's use `st_join()` to calculate the number of species per grid-cell (SR).
+
+```{r}
+trees_grid <- st_join(europe_grid, trees_ea) %>%
+  group_by(gridID) %>%
+  summarise(N=sum(!is.na(layer_name)), 
+            SR=n_distinct(layer_name, na.rm = TRUE)) %>% 
+  st_cast()
+```
+
+This **can** take a while ☕️🍪
+
+Here are the results :)
+
+```{r}
+#| echo: true
+#| eval: true
+trees_grid %>% head(n=10) #%>% knitr::kable()
+```
+
+### 5. Visualise **SR** patterns in the world 
+
+And now, we plot!
+
+```{r}
+ggplot() + 
+  geom_sf(data=trees_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
+  geom_sf(data=europe_ea, fill=NA, col='grey70', size=0.2) +
+  theme_bw()
+```
+
+We are done! No it's **your turn** :)
 
 ## Mapping occurrence records 🦌
 
-### 1.  Get occurrence records of mammals in the Czech Republic (`POINTS`)
+### 1. Get occurrence records of mammals in the Czech Republic (`POINTS`)
 
 Get the data from last practical (downloaded from GBIF)
 
 ```{r}
-mammalsCZ <- readRDS('data/mammalsCZ.rds')
-mammalsCZ %>% head(n=10) %>% knitr::kable()
+mammalsCZ <- # ... YOUR CODE HERE ... #
+```
+
+Have a look at the file
+
+```{r}
+mammalsCZ %>% head(n=10) #%>% knitr::kable()
 ```
 
 Let's keep only a few fields
@@ -88,351 +229,143 @@ Let's keep only a few fields
 ```{r}
 mammalsCZ <- mammalsCZ %>% select(species, order, eventDate, 
                                   decimalLongitude, decimalLatitude,
-                                  stateProvince, countryCode, datasetName)
+                                  stateProvince, countryCode)
 ```
 
 We will transform our data (table) into an sf object using `st_as_sf()`
 
 ```{r}
 mammalsCZ %>% 
-  filter(!is.na(decimalLongitude) & 
-           !is.na(decimalLatitude)) %>% # filter records without coordinates
-  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
-           crs=4326) %>% head(n=10) %>% knitr::kable()
-```
-
-```{r}
-mammalsCZ_sf <- mammalsCZ %>% 
-  filter(!is.na(decimalLongitude) & 
-           !is.na(decimalLatitude)) %>% # filter records without coordinates
   st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
            crs=4326)
 ```
 
+```{r}
+mammalsCZ_sf <- mammalsCZ %>% 
+  st_as_sf(coords=c('decimalLongitude', 'decimalLatitude'),
+           crs=4326) # this is the projection that the data are in
+```
+
 Note that `crs=4326` is related to the [EPSG:4326](https://epsg.io/4326) CRS: WGS 84.
 
-### 2.  Create a grid layer of the Czech Republic (`POLYGONS`)
+### 2. Create a grid layer of the Czech Republic (`POLYGONS`)
 
 Load the administrative borders using `st_read`
 
 ```{r}
-CZ_borders <- st_read('data/CZE_adm0.gpkg')
-CZ_borders %>% head(n=10) %>% knitr::kable()
-```
-
-We will *actually* load a Czech standard grid layer of 100 km^2^ area
-
-```{r}
-CZ_grids <- st_read('data/KvadratyCR_JTSK.gpkg')
-CZ_grids %>% head(n=10) %>% knitr::kable()
+CZ_borders <- # ... YOUR CODE HERE ... #
 ```
 
 Check the layer's Coordinate Reference System (CRS)
 
 ```{r}
-st_crs(CZ_borders) == st_crs(CZ_grids)
-
-st_crs(CZ_borders)
-st_crs(CZ_grids)
+st_crs(CZ_borders, parameters = TRUE)$epsg
 ```
 
-### 3.  Calculate sampling effort (N) and species richness per grid cell (SR)
-
-Frist, we will transform the layer's CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`.
+Transform the layers' CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`.
 
 ```{r}
-#| echo: true
-#| eval: true
-mammalsCZ_sf <- st_transform(mammalsCZ_sf,  
-                             crs = st_crs(CZ_grids)) # the same CRS as the CZ_grids layer
+CZ_borders <- # ... YOUR CODE HERE ... #
+```
 
-mammalsCZ_sf %>% head(n=10) %>% knitr::kable()
+Create a grid layer of 100 km^2^ area, with the extent of `CZ_borders`
+
+```{r}
+CZ_grids <- # ... 
+            # YOUR CODE HERE 
+            #... 
+```
+
+Check the layer's Coordinate Reference System (CRS)
+
+```{r}
+st_crs(mammalsCZ_sf, parameters = TRUE)$epsg
+st_crs(CZ_borders, parameters = TRUE)$epsg
+st_crs(CZ_grids, parameters = TRUE)$epsg
+```
+
+Transform the layers' CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) using `st_transform()`.
+
+```{r}
+mammalsCZ_sf <- # ... YOUR CODE HERE ... #
 ```
 
 Let's plot the sf objects
 
 ```{r}
-#| echo: true
-#| eval: true
 ggplot() + 
   geom_sf(data=CZ_borders, fill='white') + # first layer is the borders with white fill
   geom_sf(data=CZ_grids, fill=NA) +  # first layer is the grid cells with no fill
   geom_sf(data=mammalsCZ_sf) # last layer is the points, that are black by default
 ```
 
+
+### 3. Calculate sampling effort (N) and species richness per grid cell (SR)
+
 To calculate number of records and number of species per grid cell, we will use `st_join()`
 
 ```{r}
-#| echo: true
-#| eval: true
 st_join(CZ_grids,       # POLYGONS (grid cells)
         mammalsCZ_sf) %>%   # POINTS
-   head(n=10) %>% knitr::kable()
+   head(n=10) 
 ```
 
 Now, we need to summarise the data per grid-cell. Luckily, `tidyverse` methods also work for `sf` objects :) We will do it with `group_by()` and `summarise()`.\
 
-First, we will group by grid-cells and then we count values per grid.
-So, let's calculate the number of records (`N`) and the number of species per grid-cell (`SR`)
-
-```{r}
-#| echo: true
-#| eval: true
-st_join(CZ_grids, mammalsCZ_sf) %>% 
-  group_by(OBJECTID) %>% # the name of the column that has the index
-  summarise(N=sum(!is.na(species)), # calculates the number of points in the polygon
-            SR=n_distinct(species, na.rm = TRUE)) %>%  # the number of different 'species' in the polygon
-  head(n=10) %>% knitr::kable()
-```
+First, we will group by grid-cells and then we count values per grid. So, let's calculate the number of records (`N`) and the number of species per grid-cell (`SR`)
 
 Let's store the output into a new object `CZ_mammals_grids`.
 
 ```{r}
-#| echo: true
-#| eval: true
-mammalsCZ_grids <- st_join(CZ_grids, mammalsCZ_sf) %>% 
-  group_by(OBJECTID) %>% 
-  summarise(N=sum(!is.na(species)), 
-            SR=n_distinct(species, na.rm = TRUE))
+mammalsCZ_grids <- # ... 
+                   # YOUR CODE HERE 
+                   #... 
 ```
 
-### 4.  Visualise **N** and **SR** patterns in Czech Republic
+### 4. Visualise **N** and **SR** patterns in Czech Republic
 
-Finally, let's plot this. We will do it using `geom_sf()`, a `ggplot` function to visualise sf objects.  
+Finally, let's plot this. We will do it using `geom_sf()`, a `ggplot` function to visualise sf objects.
+We need to indicate which column from the object should the grids be filled with.
+Let's get a nicer color scale. Bear in mind that [we see colors differently](https://davidmathlogic.com/colorblind/). Thus, it's important to consider colorblind safe palettes.
+
 
 ```{r}
-#| echo: true
-#| eval: true
+
 ggplot() + 
-  geom_sf(data=mammalsCZ_grids) +
-  coord_sf(crs=4326)
+            # ... 
+            # YOUR CODE HERE 
+            #... 
+
 ```
 
-Where are the nice colours? We need to indicate which column from the object should the grids be filled with.
+The hotspots of species richness are in cities? How can these be the richest areas for mammals? Let's have a look at the sampling effort (`N`: number of records per grid cell) and compare both layers.
 
 ```{r}
-#| echo: true
-#| eval: true
+
 ggplot() + 
-  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
-  coord_sf(crs=4326)
+            # ... 
+            # YOUR CODE HERE 
+            #... 
+
 ```
-
-Let's get a nicer color scale. Bear in mind that [we see colors differently](https://davidmathlogic.com/colorblind/). Thus, it's important to consider colorblind safe palettes.  
-```{r}
-#| echo: true
-#| eval: true
-ggplot() + 
-  geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
-  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) + # fill of the grids
-  geom_sf(data=CZ_borders, fill=NA) +
-  coord_sf(crs=4326) +
-  theme_bw()
-```
-
-Now, here's a better plot :)
-
-The hotspots of species richness are in cities. How can these be the richest areas for mammals?
-Let's have a look at the sampling effort (`N`: number of records per grid cell) and compare both layers.  
-
-```{r}
-#| echo: true
-#| eval: true
-ggplot() + 
-  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
-  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1) +
-  geom_sf(data=CZ_borders, fill=NA) +
-  coord_sf(crs=4326) +
-  theme_bw()
-```
-
 
 What can you say about the hotspots of species richness we found?
 
 ```{r}
-#| echo: false
-#| eval: true
-#| layout-ncol: 2
-#| fig-cap: 
-#|   - "Species richness"
-#|   - "Number of records"
 
 SR <- ggplot() + 
   geom_sf(data=mammalsCZ_grids, aes(fill=SR)) +
-  scale_fill_fermenter(palette ='YlOrBr', n.breaks=9, direction = 1) +
+  scale_fill_fermenter(palette ='YlOrBr', n.breaks=8, direction = 1) +
   geom_sf(data=CZ_borders, fill=NA) +
-  coord_sf(crs=4326) +
   theme_bw()
 
 N <- ggplot() + 
   geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
-  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1)+
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=8, direction = 1)+
   geom_sf(data=CZ_borders, fill=NA) +
-  coord_sf(crs=4326) +
   theme_bw()
 
-SR 
-N
-```
-
-We are done! No it's **your turn** :)
-
-## Mapping species ranges 🐢
-
-### 1.   Get testudines' IUCN expert range maps (`POLYGONS`)
-
-Read the data (downloaded from IUCN [Spatial Data Download's](https://www.iucnredlist.org/resources/spatial-data-download) page). Take a look at the zip file for more info on metadata, and terms and conditions of use. 
-
-```{r}
-testudines <- st_read('data/testudines.gpkg')
+SR | N
 ```
 
 
-What do the data look like?
-
-```{r}
-testudines %>% head(n=10) %>% knitr::kable()
-```
-
-### 2.   Get a world map
-
-We will download a polygon of the world at medium scale and we will combine all countries into a unique polygon.
-
-
-```{r}
-world <- ne_countries(scale = 50, returnclass='sf')
-world <- st_union(world) %>% st_make_valid() %>% st_cast() # fixes any problems
-```
-
-Let's see how it looks
-
-```{r}
-ggplot() + 
-  geom_sf(data=world, fill='white')
-```
-
-Before working with this map, we need to **project** the layer: from lat/lon to equal area projection.
-Earth is not flat :) **Projections** help us represent the two-dimensional curved surface of the globe into 2D space. There are many ways to do this. Find here a cool (Projection Wizard)[https://projectionwizard.org].
-
-Equal-area maps preserve area measure, generally distorting shapes in order to do that
-
-```{r}
-#| echo: false
-#| eval: true
-#| layout-ncol: 3
-#| fig-cap: 
-#|   - "World Geodetic System (EPSG:4326)"
-#|   - "Mollweide (ESRI:54009)"
-#|   - "WGS 84 / Equal Earth Greenwich (EPSG:8857)"
-
-ggplot() + 
-    geom_sf(data=world, fill='white') + 
-    coord_sf(crs = 4326)
-
-ggplot() + 
-    geom_sf(data=world, fill='white') + 
-    coord_sf(crs = 'ESRI:54009')
-
-ggplot() + 
-    geom_sf(data=world, fill='white') + 
-    coord_sf(crs = 'EPSG:8857')
-```
-
-We will choose **Equal Earth** (EPSG:8857).
-Let's transform the data (both the world and the testudines' layers)
-
-```{r}
-world_ea <- st_transform(world, crs = 'EPSG:8857') %>% 
-  st_make_valid() %>% st_cast()
-
-testudines_ea <- st_transform(testudines, crs = 'EPSG:8857') %>% 
-  st_make_valid() %>% st_cast()
-```
-
-Let's double check that everything is alright
-
-```{r}
-st_crs(world_ea, parameters = TRUE)$epsg
-st_crs(world_ea, parameters = TRUE)$ud_unit
-st_crs(testudines_ea, parameters = TRUE)$epsg
-st_crs(testudines_ea, parameters = TRUE)$ud_unit
-```
-
-### 3.   Create a global 1-degree grid  (`POLYGONS`)
-
-We will do this using the function `st_make_grid()`. For the `cellsize` argument we will chose 1 degree, which is \~100km (=100,000m)
-
-
-```{r}
-world_grid <- st_make_grid(world_ea, 
-                           cellsize=100000,
-                           square=FALSE) %>%  # this will make hexagons
-  st_intersection(world_ea) %>% 
-  st_sf(gridID=1:length(.))     
-```
-
-We have the grid, we are ready to calculate metrics per grid cell. Let's see how it looks.
-
-```{r}
-#| echo: false
-#| eval: true
-ggplot() + 
-  geom_sf(data= world_grid, fill='white', size=0.1) 
-```
-
-### 4.   Calculate the species richness per grid cell (SR)
-
-To do this, let's keep only the *testudines* that are extant (resident) species
-
-```{r}
-#| echo: true
-#| eval: true
-testudines_extant <- testudines_ea %>% 
-  filter(LEGEND=='Extant (resident)') %>% 
-  group_by(ID_NO) %>% 
-  summarise(BINOMIAL=unique(BINOMIAL),
-            PRESENCE=sum(PRESENCE)) %>% 
-  ungroup() %>% st_cast()
-```
-
-This **can** take a while ☕️
-
-Let's plot 10 species as an example
-
-```{r}
-ggplot() + 
-  geom_sf(data= world_grid, fill='white', size=0.5)  +
-  geom_sf(data= testudines_extant %>% head(n=10), aes(fill=BINOMIAL), alpha=0.5, lwd = 0)
-```
-
-
-Now let's use `st_join()` to calculate the number of species per grid-cell (SR).
-
-```{r}
-testudines_grid <- st_join(world_grid, testudines_extant) %>%
-  group_by(gridID) %>%
-  summarise(N=sum(!is.na(BINOMIAL)), 
-            SR=n_distinct(BINOMIAL, na.rm = TRUE))
-```
-
-This **will** take a while ☕️🍪  
-
-Here are the results :)
-
-```{r}
-#| echo: true
-#| eval: true
-testudines_grid %>% head(n=10) %>% knitr::kable()
-```
-
-### 5.   Visualise **SR** patterns in the world\
-
-And now, we plot!
-
-```{r}
-ggplot() + 
-  geom_sf(data=testudines_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
-  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
-  geom_sf(data=world_ea, fill=NA, col='grey70', size=0.2) +
-  theme_bw()
-```
