@@ -1,12 +1,21 @@
 ---
-title: "Downloading, cleaning and mapping data from GBIF"
-authors: 
-  -Florencia Grattarola
-  -Friederike Woelke
-  -Gabriel Ortega
-
-format: docx
-editor: visual
+title: 'Downloading, cleaning and mapping data from GBIF'
+author:
+  - name: 'Florencia Grattarola'
+    orcid: 0000-0001-8282-5732
+  - name: 'Friederike Wölke'
+    orcid: 0000-0001-9034-4883
+  - name: 'Gabriel Ortega'
+    orcid: 0000-0002-0516-5694
+format: 
+  html:
+    toc: true
+    toc-location: right
+    smooth-scroll: true
+    html-math-method: katex
+    code-fold: true
+self-contained: true
+editor: source
 ---
 
 # Mammal's of the Czech Republic
@@ -15,70 +24,64 @@ We will use the mammals of Czech Republic as an example dataset. We will access 
 
 ## Some preparation before starting to code
 
--   Create a new project for all your practical sessions (with a Scripts and Data folder inside).
+-   Create a new project for all your practical sessions (with `code` and `data` folders inside).
 -   Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).
 -   Keep your code short and easily readable in plain English.
 
-# Install and load libraries
+## 1 Install and load libraries
 
-We will use the long way to install and load packages. I'll recommend you to investigate the short way using the function `p_load()` from the package **`pacman`**
+We will always load packages into R using the package **`pacman`**. It's is a handy package to install, load, and unload libraries. If you attempt to load a library that is not installed, `pacman` will try to install it automatically.
 
-## Install the package `tidyverse`
+```{r}
+#| eval: false
+install.packages('pacman')
+```
+
+# 1 Install and/or load `tidyverse`
 
 Tidyverse is a set of libraries for easier manipulation and transformation of data. We will be using many functions from this package, like `filter()`, `mutate()`, and later `read_csv()`.
 
-```{r eval=FALSE}
-install.packages("tidyverse") # install
+```{r}
+pacman::p_load(tidyverse) # Data wrangling
 ```
+
+## 1.1 Install and/or load `rgbif`
+
+We will use **`rgbif`** to download data from GBIF directly into our R session. `rgbif` has plenty of functions that allow us to interact with GBIF.
 
 ```{r}
-library(tidyverse) # load
+pacman::p_load(rgbif) # the GBIF R package
 ```
 
-## Install the package `rgbif`
+## 1.2 Install and/or load `taxize`
 
-We will use **`rgbif`** to download data from GBIF directly into our R session. Rgbif is plenty of functions that allow us to interact with GBIF.
-
-```{r eval=FALSE}
-install.packages("rgbif")
-```
-
-To use it, we load the library and check it's working.
+We will need to get a taxon ID (`taxonKey`) for the *Mammalia* class from the GBIF backbone. For that we will use another package called **`taxize`**.
 
 ```{r}
-library(rgbif)
-packageVersion("rgbif")
+pacman::p_load(taxize)
 ```
 
-We will need the GBIF backbone taxon ID (`taxonKey`) for the *Mammalia* class. For that we will use another package called **`taxize`**.
+## 1.3 Install and/or load `sf`
 
-```{r eval=FALSE}
-install.packages("taxize")
-```
-
-Same as with **rgbif,** load **taxize** and check it's working.
+We will use **`sf`** to work with spatial data.
 
 ```{r}
-library(taxize)
-packageVersion("taxize")
+pacman::p_load(sf)
 ```
 
-```{r eval=FALSE}
-install.packages("sf")
-```
+## 1.4 Install and/or load `rnaturalearth`
 
-Same as with **rgbif,** load **sf** and check it's working.
+We will use **`rnaturalearth`** to interact with [Natural Earth](https://www.naturalearthdata.com/) to get mapping data into R (e.g., countries' polygons).
 
 ```{r}
-library(sf)
-packageVersion("sf")
+pacman::p_load(rnaturalearth)
 ```
 
-# Project variables
+# 2 Project variables
 
 It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
 
-## Create your project variables
+## 2.1 Create a taxon ID for the *Mammalia* class
 
 Define here the things you already know you will use later on the script. For instance, we know that we will work with **mammals** from **Czechia** and the data we will get from GBIF are in **WGS84** latitude and longitude.
 
@@ -91,11 +94,13 @@ proj_crs <- 4326 # EPSG code for WGS84
 Let's get the taxon ID for the *Mammalia* class
 
 ```{r}
-taxon_key <- get_gbifid_(taxa) %>%
+taxon_key <- taxize::get_gbifid_(taxa) %>%
   bind_rows() %>% # Transform the result of get_gbifid into a dataframe
   filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
   pull(usagekey) # Pull the contents of the column "usagekey"
 ```
+
+## 2.2 Download a basemap of Czech Republic
 
 It is often useful to have a base map of the study area (in this case the whole Czechia).
 
@@ -108,7 +113,7 @@ base_map <- rnaturalearth::ne_countries(
 )
 ```
 
-# Data download
+# 3 GBIF data download
 
 And now we can use the function `occ_count()` to find out the **number of occurrence records** for Czechia.
 
@@ -193,7 +198,7 @@ occ_search(
 
 ------------------------------------------------------------------------
 
-## Data download through R
+## 3.1 CZ mammals' GBIF data download
 
 Get occurrences records of mammals from Czech Republic.
 
@@ -201,14 +206,14 @@ Get occurrences records of mammals from Czech Republic.
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
   country = country_code, # CZ, ISO code of Czechia
-  limit = 6000, # Max number of records to download
+  limit = 9000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 
 mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data object inside. Here we pull the data out of the list.
 ```
 
-# Data exploration
+# 4 Data exploration
 
 Examine the dataset's variables and their respective data types: Are they numeric, character, or boolean in nature? That will tell you what you can do with every column in the dataset.
 
@@ -233,7 +238,7 @@ mammalsCZ %>%
 
 `distinct()` is used to see unique values
 
-# Data quality
+# 5 Data quality
 
 Data are not 'good' or 'bad', the quality will depend on our goal. Some things we can check:
 
@@ -245,7 +250,7 @@ Data are not 'good' or 'bad', the quality will depend on our goal. Some things w
 
 CoordinateCleaner offers advanced data filtering and cleaning capabilities by automatically identifying and flagging common spatial and temporal errors.
 
-## Basic data filtering
+## 5.1 Basic data filtering
 
 As an example of data cleaning procedures, we will check the following fields in our dataset:
 
@@ -339,9 +344,9 @@ How many records do we have now?
 nrow(mammalsCZ)
 ```
 
-# Basic maps
+# 6 Basic maps
 
-## How are the records distributed?
+How are the records distributed?
 
 ```{r}
 library(sf)
