@@ -92,7 +92,7 @@ We will get the data from:
 
 
 ```{r}
-trees <- st_read('Practical_classes/Week2_gridding_and plotting/data/trees.gpkg', quiet=T)
+trees <- st_read('data/trees.gpkg', quiet=T)
 ```
 
 What do the data look like?
@@ -268,7 +268,7 @@ Transform the layers' CRS to [S-JTSK / Krovak East North](https://epsg.io/5514) 
 CZ_borders <- # ... YOUR CODE HERE ... #
 ```
 
-Create a grid layer of 100 km^2^ area, with the extent of `CZ_borders`
+Create a grid layer of 100 km^2^ area (10x10), with the extent of `CZ_borders`
 
 ```{r}
 CZ_grids <- # ... 

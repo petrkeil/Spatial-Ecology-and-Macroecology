@@ -108,13 +108,15 @@ packageVersion('rnaturalearth')
 ## Visualisation
 
 For all the map plots today we will use the `ggplot` package. It's part of the `tidyverse`.
+We will also use `patchwork` to combine plots.  
 
 . . .
 
 ```{r}
 #| echo: true
 #| eval: true
-pacman::p_load(tidyverse) # load
+pacman::p_load(patchwork)
+pacman::p_load(tidyverse)
 ```
 
 
@@ -158,7 +160,7 @@ We will get the data from:
 
 
 :::{.fragment}
-[We will **only** use the polygon data. See [`read_tree_data_to_gpkg.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/3713ec0823ba08d540f3aeea5f8d1a0acb56c71b/Practical_classes/Week2_gridding_and plotting/read_tree_data_to_gpkg.R) to know how these data were processed.]{.font-aside}
+[We will **only** use the polygon data. See [`read_tree_data_to_gpkg.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/22c68d275b0fc0bc1a65de450e609c2386e0fe5c/Practical_classes/Week2_gridding_and%20plotting/read_tree_data_to_gpkg.R) to know how these data were processed.]{.font-aside}
 :::
 
 
