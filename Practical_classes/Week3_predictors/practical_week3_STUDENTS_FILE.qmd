@@ -347,7 +347,7 @@ We could do:
 
 ```
 r <- rast(res = 10000,
-          ext = extention, # or even `ext(vect(peru))`
+          ext = extent, # or even `ext(vect(peru))`
           crs = "epsg:4326") 
 ```
 

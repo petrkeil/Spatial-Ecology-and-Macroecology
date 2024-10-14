@@ -433,13 +433,8 @@ Now get the precipitation data from Worldclim.
 #| eval: true
 #| code-block-border-left: true
 
-prec <- worldclim_country(
-  var = "prec",
-  country = "PER"
-)
-
+prec <- worldclim_country(var = "prec", country = "PER")
 prec <- crop(prec, extent)
-
 prec
 ```
 
@@ -457,9 +452,7 @@ We will use the function `elevation_30s()` from `geodata`. These data come from 
 #| code-block-border-left: true
 
 elev <- elevation_30s(country = "PER")
-
 elev <- crop(elev, extent)
-
 elev
 ```
 
@@ -503,7 +496,7 @@ To download **MODIS** data through the NASA *http* server, we need to create a p
 
 . . . 
 
-<br>We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v006/), and download data for **Peru** from the year **2020**.
+<br>We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v061/), and download data for **Peru** from the year **2020**.
 
 ---
 
@@ -634,9 +627,7 @@ Let's read the layer and process it.
 #| code-block-border-left: true
 
 land <- rast("data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
-
 land <- crop(land , extent)
-
 land
 ```
 
@@ -657,9 +648,7 @@ Again using the package `geodata`.
 #| eval: true
 
 footp <- footprint(year = 2009)
-
 footp <- crop(footp, extent)
-
 footp
 ```
 
@@ -719,7 +708,7 @@ We could do:
 
 ```
 r <- rast(res = 10000,
-          ext = extention, # or even `ext(vect(peru))`
+          ext = extent, # or even `ext(vect(peru))`
           crs = "epsg:4326") 
 ```
 
@@ -817,8 +806,6 @@ tmap_mode(mode = "view")
 
 ## Peru: drivers of amphibians richness 🐸
 
-4.    Visualise predictors
-
 Annual mean temperature (WorldClim BIO1)
 
 ```{r}
@@ -835,8 +822,6 @@ tm_shape(mean(tavg)) +
 ---
 
 ## Peru: drivers of amphibians richness 🐸
-
-4.    Visualise predictors
 
 Precipitation seasonality (WorldClim BIO15)
 
@@ -855,8 +840,6 @@ tm_shape(mean(prec)) +
 ---
 
 ## Peru: drivers of amphibians richness 🐸
-
-4.    Visualise predictors
 
 Elevation (WorldClim)
 
@@ -937,8 +920,6 @@ Please bear in mind that your landcover layer might not have the same classes/le
 
 ## Peru: drivers of amphibians richness 🐸
 
-4.    Visualise predictors
-
 Land-cover (MODIS Terra MCD12Q1)
 
 ```{r}
@@ -956,8 +937,6 @@ tm_shape(land) +
 ---
 
 ## Peru: drivers of amphibians richness 🐸
-
-4.    Visualise predictors
 
 Human footprint index (SEDAC)
 
