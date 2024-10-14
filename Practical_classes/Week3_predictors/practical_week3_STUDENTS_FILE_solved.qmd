@@ -485,10 +485,11 @@ Then we can add values to the levels.
 #| eval: true
 
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17),
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
   label = c(
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
+    "Deciduous Needleleaf Forests",
     "Deciduous Broadleaf Forests",
     "Mixed Forests",
     "Closed Shrublands",
@@ -500,6 +501,7 @@ levels(land[[1]]) <- data.frame(
     "Croplands",
     "Urban and Built-up Lands",
     "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
     "Barren",
     "Water Bodies"
   )
