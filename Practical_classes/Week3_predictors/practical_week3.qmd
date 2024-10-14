@@ -1218,6 +1218,6 @@ This time, you will use the following drivers:
 
 . . . 
 
-See the solutions at [practical_week3_STUDENTS_FILE_solved.qmd]().
+See the solutions at [practical_week3_STUDENTS_FILE_solved.qmd](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/dde48b7d5261939729993967e37be9a2dede508d/Practical_classes/Week3_predictors/practical_week3_STUDENTS_FILE_solved.qmd).
 
 # Any doubts? {background-color="#488fb8"}
