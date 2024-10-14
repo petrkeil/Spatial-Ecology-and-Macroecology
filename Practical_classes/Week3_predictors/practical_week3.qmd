@@ -1001,8 +1001,8 @@ Let's see all the values together.
 #| eval: true
 
 predictors <- tibble(
-  "tavg" = values(tavg$PER_wc2.1_30s_tavg_1) %>% as.vector(),
-  "prec" = values(prec$PER_wc2.1_30s_prec_1) %>% as.vector(),
+  "tavg" = values(mean(tavg)) %>% as.vector(),
+  "prec" = values(mean(prec)) %>% as.vector(),
   "elev" = values(elev) %>% as.vector(),
   "land" = values(land) %>% as.vector(),
   "footp" = values(footp) %>% as.vector()
