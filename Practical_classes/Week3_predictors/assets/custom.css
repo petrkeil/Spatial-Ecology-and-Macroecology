@@ -16,6 +16,10 @@
   display: block;
 }--*/
 
+.info.legend.leaflet-control i {
+  float: left;
+}
+
 .box {
   margin-top: 10px;
   margin-right: 10px;
