@@ -183,20 +183,25 @@ tavg <- crop(tavg, extent)
 tavg
 ```
 
-Now get the precipitation data from Worldclim.
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+tavg
+```
+
+Now get the `bio` data from Worldclim, and filter `bio12`.
 
 ```{r}
 #| echo: true
 #| eval: true
 #| code-block-border-left: true
 
-prec <- worldclim_country(
-  var = "prec",
-  country = "PER"
-)
+bio <- worldclim_country(var = "bio", country = "PER")
+prec <- bio$wc2.1_30s_bio_12
 
 prec <- crop(prec, extent)
-
 prec
 ```
 
@@ -701,13 +706,9 @@ This might be useful: <http://bboxfinder.com/>
 #| echo: true
 #| eval: true
 
-france <- ne_countries(scale=50,
-                       country = "France", 
-                       returnclass = "sf") 
-
-bbox_france <- st_bbox(c(xmin = -7, xmax = 13, 
-                         ymax = 42, ymin = 52), 
-                       crs = st_crs(4326))
+france <- ne_countries(country = "France", scale=50, returnclass = "sf") 
+bbox_france <- st_bbox(c(xmin = -6.855469, xmax = 12.128906, 
+          ymax = 41.409776, ymin = 51.344339), crs = st_crs(4326))
 
 france <-st_crop(france, bbox_france)
 
@@ -732,7 +733,7 @@ proj_france <- 'PROJCS["ProjWiz_Custom_Lambert_Azimuthal",
 ### 2.    Get 5 different drivers (`raster`) 
 
 -   Temperature seasonality (**WorldClim BIO4**)
--   Annual precipitation (**WorldClim BIO12**)
+-   Precipitation seasonality (**WorldClim BIO15**)
 -   Elevation (**SRTM**)
 -   Water bodies (**ESA WorldCover**)
 -   Human footprint index (**SEDAC**)
@@ -748,10 +749,12 @@ extent <- round(st_bbox(france),0) + c(-1,-1,1,1)
 
 geodata_path("Practical_classes/Week3_predictors/data/")
 
-tavg <- worldclim_country(var = "tavg",country = "FRA")
-tavg <- crop(tavg, extent)
+bio <- worldclim_country(var = "bio", country = "FRA")
 
-prec <- worldclim_country(var = "prec",country = "FRA")
+temp <- bio$wc2.1_30s_bio_4
+temp <- crop(temp, extent)
+
+prec <- bio$wc2.1_30s_bio_15
 prec <- crop(prec, extent)
 
 elev <- elevation_30s(country = "FRA")
@@ -777,7 +780,7 @@ r <- rast(res = 10000, # Target cell size
           crs = proj_france) %>% # Useful planar projection
   project(., "epsg:4326") # Projection of our rasters
 
-tavg <- resample(tavg, r, method = "bilinear") # for continuous data!
+temp <- resample(temp, r, method = "bilinear") # for continuous data!
 prec <- resample(prec, r, method = "bilinear")
 elev <- resample(elev, r, method = "bilinear")
 footp <- resample(footp, r, method = "near") # for categorical data!
@@ -785,7 +788,7 @@ land <- resample(land, r, method = "near")
 
 compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
 
-tavg <- mask(tavg, vect(france))
+temp <- mask(temp, vect(france))
 prec <- mask(prec, vect(france))
 elev <- mask(elev, vect(france))
 footp <- mask(footp, vect(france))
@@ -800,7 +803,7 @@ land <- mask(land, vect(france))
 
 tmap_mode(mode = "view")
 
-tm_shape(mean(tavg)) +
+tm_shape(mean(temp)) +
   tm_raster(palette = "OrRd",
             midpoint = NA, 
             style = "cont", n = 10)
@@ -815,13 +818,12 @@ tm_shape(elev) +
   tm_raster(palette = "BrBG", 
             midpoint = NA, 
             style = "cont", n = 10) +
-  tm_view(bbox = extent) +
-  tm_layout(legend.position = 'left')
+  tm_view(bbox = extent)
 
 land <- as.factor(land$MCD12Q1.061_LC_Type1_doy2020001_aid0001_France)
 
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17),
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
   label = c(
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
@@ -837,10 +839,11 @@ levels(land[[1]]) <- data.frame(
     "Croplands",
     "Urban and Built-up Lands",
     "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
     "Barren",
     "Water Bodies"
   )
-)
+) 
 
 tm_shape(land) +
   tm_raster(palette = "Set1", 
@@ -865,7 +868,7 @@ Please download the following file and store it on you `data` folder:
 #| eval: true
 
 predictors <- tibble(
-  "tavg" = values(mean(tavg)) %>% as.vector(),
+  "tavg" = values(mean(temp)) %>% as.vector(),
   "prec" = values(mean(prec)) %>% as.vector(),
   "elev" = values(elev) %>% as.vector(),
   "land" = values(land) %>% as.vector(),

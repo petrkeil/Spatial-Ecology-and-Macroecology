@@ -304,7 +304,7 @@ We will use it later.
 
 ::: incremental
 -   Annual mean temperature (**WorldClim BIO1**)
--   Precipitation seasonality (**WorldClim BIO15**)
+-   Annual precipitation (**WorldClim BIO12**)
 -   Elevation (**SRTM**)
 -   Land-cover (**MODIS Terra MCD12Q1**)
 -   Human footprint index (**SEDAC**)
@@ -384,7 +384,7 @@ geodata_path("data/")
 Let's first download the **WorldClim** data (version 2.1 climate data for 1970-2000):
 
 -   Annual mean temperature (`bio1`)  
--   Annual precipitation (`bio15`)  
+-   Annual precipitation (`bio12`)  
 
 . . .
 
@@ -433,7 +433,28 @@ Now get the precipitation data from Worldclim.
 #| eval: true
 #| code-block-border-left: true
 
-prec <- worldclim_country(var = "prec", country = "PER")
+bio <- worldclim_country(var = "bio", country = "PER")
+```
+
+. . .
+
+And filter `bio12`.
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+prec <- bio$wc2.1_30s_bio_12
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
 prec <- crop(prec, extent)
 prec
 ```
@@ -707,7 +728,7 @@ First we need to create a new raster to use as a **template**.
 We could do:
 
 ```
-r <- rast(res = 10000,
+r <- rast(res = 50000,
           ext = extent, # or even `ext(vect(peru))`
           crs = "epsg:4326") 
 ```
@@ -730,7 +751,7 @@ First we need to create a new raster to use as a **template**.
 #| echo: true
 #| eval: true
 
-r <- rast(res = 10000, # Target cell size
+r <- rast(res = 50000, # Target cell size
           ext(vect(st_transform(peru, proj_peru))), # Extent of the raster
           crs = proj_peru) %>% # Useful planar projection
   project(., "epsg:4326") # Projection of our rasters
@@ -891,10 +912,11 @@ Then we can add values to the levels.
 #| eval: true
 
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17),
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
   label = c(
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
+    "Deciduous Needleleaf Forests",
     "Deciduous Broadleaf Forests",
     "Mixed Forests",
     "Closed Shrublands",
@@ -906,6 +928,7 @@ levels(land[[1]]) <- data.frame(
     "Croplands",
     "Urban and Built-up Lands",
     "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
     "Barren",
     "Water Bodies"
   )
@@ -914,7 +937,7 @@ levels(land[[1]]) <- data.frame(
 
 . . . 
 
-Please bear in mind that your landcover layer might not have the same classes/levels as mine. Check here the classification values: [MCD12_User_Guide_V6](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) (see page 7 Classification Legends).
+You might not have the same classes/levels at different areas. Check here the classification values: [MCD12_User_Guide_V6](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) (see page 7 Classification Legends). 
 
 ---
 
@@ -1192,5 +1215,9 @@ This time, you will use the following drivers:
 -   Elevation (**SRTM**)
 -   Land-cover (**MODIS Terra MCD12Q1**)
 -   Human footprint index (**SEDAC**)
+
+. . . 
+
+See the solutions at [practical_week3_STUDENTS_FILE_solved.qmd]().
 
 # Any doubts? {background-color="#488fb8"}

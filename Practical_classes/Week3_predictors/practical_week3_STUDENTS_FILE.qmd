@@ -150,7 +150,7 @@ We will also set the path were we are going to save data.
 #| eval: true
 #| code-block-border-left: true
 
-geodata_path("Practical_classes/Week3_predictors/data/")
+geodata_path("data/")
 ```
 
 This is required to use the package `geodata`. From now on, every time you try to get a dataset with `geodata` functions, the package will check if the data already exists in your data folder and load it from there.
@@ -183,20 +183,17 @@ tavg <- crop(tavg, extent)
 tavg
 ```
 
-Now get the precipitation data from Worldclim.
+Now get the `bio` data from Worldclim, and filter `bio12`.
 
 ```{r}
 #| echo: true
 #| eval: true
 #| code-block-border-left: true
 
-prec <- worldclim_country(
-  var = "prec",
-  country = "PER"
-)
+bio <- worldclim_country(var = "bio", country = "PER")
+prec <- bio$wc2.1_30s_bio_12
 
 prec <- crop(prec, extent)
-
 prec
 ```
 
@@ -289,7 +286,7 @@ Let's read the layer and process it.
 #| eval: true
 #| code-block-border-left: true
 
-land <- rast("Practical_classes/Week3_predictors/data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
+land <- rast("data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
 
 land <- crop(land , extent)
 
@@ -346,7 +343,7 @@ First we need to create a new raster to use as a **template**.
 We could do:
 
 ```
-r <- rast(res = 10000,
+r <- rast(res = 50000,
           ext = extent, # or even `ext(vect(peru))`
           crs = "epsg:4326") 
 ```
@@ -359,7 +356,7 @@ I reported it <https://github.com/rspatial/terra/issues/1618>
 #| echo: true
 #| eval: true
 
-r <- rast(res = 10000, # Target cell size
+r <- rast(res = 50000, # Target cell size
           ext(vect(st_transform(peru, proj_peru))), # Extent of the raster
           crs = proj_peru) %>% # Useful planar projection
   project(., "epsg:4326") # Projection of our rasters
@@ -439,8 +436,6 @@ tm_shape(mean(prec)) +
   tm_view(bbox = extent)
 ```
 
----
-
 #### Elevation (WorldClim)
 
 ```{r}
@@ -480,10 +475,11 @@ Then we can add values to the levels.
 #| eval: true
 
 levels(land[[1]]) <- data.frame(
-  ID = c(1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17),
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
   label = c(
     "Evergreen Needleleaf Forest",
     "Evergreen Broadleaf Forests",
+    "Deciduous Needleleaf Forests",
     "Deciduous Broadleaf Forests",
     "Mixed Forests",
     "Closed Shrublands",
@@ -495,14 +491,15 @@ levels(land[[1]]) <- data.frame(
     "Croplands",
     "Urban and Built-up Lands",
     "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
     "Barren",
     "Water Bodies"
   )
 )
 ```
 
-Please bear in mind that your landcover layer might not have the same classes/levels as mine. Check here the classification values: [MCD12_User_Guide_V6](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) (see page 7 Classification Legends).
-
+You might not have the same classes/levels at different areas. Check here the classification values: [MCD12_User_Guide_V6](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) (see page 7 Classification Legends).
+ 
 
 ```{r}
 #| echo: false
@@ -545,8 +542,8 @@ Let's see all the values together.
 #| eval: true
 
 predictors <- tibble(
-  "tavg" = values(mean(tavg)) %>% as.vector(),
-  "prec" = values(mean(prec)) %>% as.vector(),
+  "tavg" = values(tavg$PER_wc2.1_30s_tavg_1) %>% as.vector(),
+  "prec" = values(prec$PER_wc2.1_30s_prec_1) %>% as.vector(),
   "elev" = values(elev) %>% as.vector(),
   "land" = values(land) %>% as.vector(),
   "footp" = values(footp) %>% as.vector()
@@ -694,6 +691,8 @@ We are done! No it's **your turn** :)
 
 
 ### 1.    Get a map of France
+
+This might be useful: <http://bboxfinder.com/>
 
 ```{r}
 #| echo: true
