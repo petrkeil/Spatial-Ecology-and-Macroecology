@@ -150,7 +150,7 @@ We will also set the path were we are going to save data.
 #| eval: true
 #| code-block-border-left: true
 
-geodata_path("data/")
+geodata_path("Practical_classes/Week3_predictors/data/")
 ```
 
 This is required to use the package `geodata`. From now on, every time you try to get a dataset with `geodata` functions, the package will check if the data already exists in your data folder and load it from there.
@@ -289,7 +289,7 @@ Let's read the layer and process it.
 #| eval: true
 #| code-block-border-left: true
 
-land <- rast("data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
+land <- rast("Practical_classes/Week3_predictors/data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
 
 land <- crop(land , extent)
 
@@ -545,8 +545,8 @@ Let's see all the values together.
 #| eval: true
 
 predictors <- tibble(
-  "tavg" = values(tavg$PER_wc2.1_30s_tavg_1) %>% as.vector(),
-  "prec" = values(prec$PER_wc2.1_30s_prec_1) %>% as.vector(),
+  "tavg" = values(mean(tavg)) %>% as.vector(),
+  "prec" = values(mean(prec)) %>% as.vector(),
   "elev" = values(elev) %>% as.vector(),
   "land" = values(land) %>% as.vector(),
   "footp" = values(footp) %>% as.vector()

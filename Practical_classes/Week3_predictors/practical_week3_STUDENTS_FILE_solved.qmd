@@ -701,9 +701,13 @@ This might be useful: <http://bboxfinder.com/>
 #| echo: true
 #| eval: true
 
-france <- ne_countries(country = "France", returnclass = "sf") 
-bbox_france <- st_bbox(c(xmin = -6.855469, xmax = 12.128906, 
-          ymax = 41.409776, ymin = 51.344339), crs = st_crs(4326))
+france <- ne_countries(scale=50,
+                       country = "France", 
+                       returnclass = "sf") 
+
+bbox_france <- st_bbox(c(xmin = -7, xmax = 13, 
+                         ymax = 42, ymin = 52), 
+                       crs = st_crs(4326))
 
 france <-st_crop(france, bbox_france)
 
