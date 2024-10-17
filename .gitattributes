@@ -1,3 +1,4 @@
 Practical_classes/Week5_modeling_patterns_biodiv/data/ filter=lfs diff=lfs merge=lfs -text
 Practical_classes/Week6_biodiversity_change/data/ filter=lfs diff=lfs merge=lfs -text
 Practical_classes/Week7_beta_diversity/data/ filter=lfs diff=lfs merge=lfs -text
+Practical_classes/Week8_evolution_of_biodiversity/1_Diversification/data/mammals_occu.rds filter=lfs diff=lfs merge=lfs -text
