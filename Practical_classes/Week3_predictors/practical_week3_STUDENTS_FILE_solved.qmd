@@ -1,0 +1,896 @@
+---
+title: "Drivers of species distribution"
+author:
+  - name: 'Florencia Grattarola'
+    orcid: 0000-0001-8282-5732
+  - name: 'Friederike Wölke'
+    orcid: 0000-0001-9034-4883
+  - name: 'Gabriel Ortega'
+    orcid: 0000-0002-0516-5694
+format: 
+  html:
+    toc: true
+    toc-location: right
+    smooth-scroll: true
+    html-math-method: katex
+    code-fold: true
+self-contained: true
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+## Peru: drivers of amphibians richness 🐸
+
+1.    Get a map of Peru
+2.    Get 5 different drivers (`raster`) 
+3.    Process all the layers to the same resolution and the extent of Peru
+4.    Visualise predictors 
+5.    Calculate the correlation between the different predictors (and compare with biodiversity) 
+
+
+### Data download
+
+Please download the following file and store it on you `data` folder:  
+
+-   `amphibians_grid.rds` 
+
+### Libraries 
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+library(pacman)
+pacman::p_load(sf,  # Manage spatial data as simple features dataframes
+               rnaturalearth, # useful base maps
+               tidyverse) # install the package if you haven't already
+
+sf_use_s2(FALSE) # switch spherical geometry off
+
+pacman::p_load(terra, # Work with rasters and vectorial spatial data
+               tmap, # Cool maps
+               GGally, # Cool correlation maps
+               geodata, # Get data from multiple sources
+               MODIStsp) # Get data from MODIS
+```
+
+### 1.    Get a map of Peru
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+peru <- ne_countries(
+  country = "Peru",
+  returnclass = "sf" # We want an object of class sf
+) 
+```
+
+Let’s see how it looks.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+ggplot() + 
+  geom_sf(data=peru, fill='white') +
+  coord_sf()
+```
+
+
+To get a planar projection of the area (visit <https://projectionwizard.org/>).
+
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+proj_peru <- 'PROJCS["ProjWiz_Custom_Transverse_Cylindrical_Equal_Area",
+ GEOGCS["GCS_WGS_1984",
+  DATUM["D_WGS_1984",
+   SPHEROID["WGS_1984",6378137.0,298.257223563]],
+  PRIMEM["Greenwich",0.0],
+  UNIT["Degree",0.0174532925199433]],
+ PROJECTION["Transverse_Cylindrical_Equal_Area"],
+ PARAMETER["False_Easting",0.0],
+ PARAMETER["False_Northing",0.0],
+ PARAMETER["Central_Meridian",-74.7949219],
+ PARAMETER["Scale_Factor",1.0],
+ PARAMETER["Latitude_Of_Origin",0.0],
+ UNIT["Meter",1.0]]'
+```
+
+
+### 2.    Get 5 different drivers (`raster`) 
+
+-   Annual mean temperature (**WorldClim BIO1**)
+-   Precipitation seasonality (**WorldClim BIO15**)
+-   Elevation (**SRTM**)
+-   Land-cover (**MODIS Terra MCD12Q1**)
+-   Human footprint index (**SEDAC**)
+
+When working with rasters, there are three basic procedures we can recommend you:
+
+1.  **Crop**: Cut the rasters to the geographic `extent` you need. This is a square cut.
+2.  **Reproject**: Make sure that all your rasters are on the same `projection`. But be aware that by reprojecting, you are introducing an additional source of error.
+3.  **Mask**: Set to `NA` all the cells outside your polygon(s) of interest.
+
+
+We will create a variable with the spatial extent of Peru to use it to crop the raster data.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+round(st_bbox(peru),0) # Check the extent of the country (round values)
+round(st_bbox(peru),0) + c(-1,-1,1,1) #This way we add space around the country
+```
+
+Now let's create an object with the extent.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+extent <- round(st_bbox(peru),0) + c(-1,-1,1,1) # Bounding box plus 1 degree
+```
+
+
+We will also set the path were we are going to save data. 
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+geodata_path("data/")
+```
+
+This is required to use the package `geodata`. From now on, every time you try to get a dataset with `geodata` functions, the package will check if the data already exists in your data folder and load it from there.
+
+
+#### Drivers: climate
+
+Let's first download the **WorldClim** data (version 2.1 climate data for 1970-2000):
+
+-   Annual mean temperature (`bio1`)  
+-   Annual precipitation (`bio15`)  
+
+You can download these data from <https://www.worldclim.org/data/worldclim21.html> <br> or use the package `geodata`.
+We will use the function `worldclim_country()` from `geodata`.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+tavg <- worldclim_country(var = "tavg",country = "PER") # PER is the three letters ISO code for PERU
+tavg <- crop(tavg, extent)
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+tavg
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+tavg
+```
+
+Now get the `bio` data from Worldclim, and filter `bio12`.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+bio <- worldclim_country(var = "bio", country = "PER")
+prec <- bio$wc2.1_30s_bio_12
+
+prec <- crop(prec, extent)
+prec
+```
+
+#### Drivers: elevation 
+
+We will use the function `elevation_30s()` from `geodata`. These data come from the Shuttle Radar Topographic Mission and are aggregated to 1km resolution.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+elev <- elevation_30s(country = "PER")
+
+elev <- crop(elev, extent)
+
+elev
+```
+
+#### Drivers: land-cover 
+
+Now, let's get the landcover data. For this we will use the package `MODIStsp`.
+
+::: {.callout-important}
+## `MODIStsp` has not been maintained
+The package may not be working properly.
+:::
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+MODIStsp_get_prodnames()
+```
+
+
+To download **MODIS** data through the NASA *http* server, we need to create a profile at <https://urs.earthdata.nasa.gov/home> to get a user and password.
+
+Today, I'll present you an example and provide you with the data already processed, but you can do this at home.
+
+We will use the [Land Cover Type Yearly L3 Global 500m](https://lpdaac.usgs.gov/products/mcd12q1v006/), and download data for **Peru** from the year **2020**.
+
+
+With `MODIStsp_get_prodlayers()` you can see all the layers of the product:
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+MODIStsp_get_prodlayers("MCD12Q1", prodver = "061")$bandnames
+```
+
+There are five different land cover classification schemes, we will be using the primary land cover scheme (**LC1**) which identifies 17 classes defined by the [IGBP](http://www.igbp.net/) (International Geosphere-Biosphere Programme), including 11 natural vegetation classes, 3 human-altered classes, and 3 non-vegetated classes.
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-block-border-left: true
+
+MODIStsp(
+  gui = FALSE,
+  out_folder = "data/",
+  out_folder_mod = "data/",
+  selprod = "LandCover_Type_Yearly_500m (MCD12Q1)",
+  prod_version = "061",
+  bandsel = "LC1",
+  sensor = "Terra",
+  user = your_user, # your username for NASA http server
+  password = your_pass, # your password for NASA http server
+  start_date = "2020.01.01",
+  end_date = "2020.12.31",
+  verbose = TRUE,
+  bbox = extent, # bbox covering Peru
+  spatmeth = "bbox",
+  out_format = "GTiff",
+  compress = "LZW",
+  out_projsel = "User Defined",
+  output_proj = 4326,
+  delete_hdf = TRUE,
+  parallel = TRUE
+)
+```
+
+Let's read the layer and process it.
+
+```{r}
+#| echo: true
+#| eval: true
+#| code-block-border-left: true
+
+land <- rast("data/MCD12Q1.061_LC_Type1_doy2020001_aid0001.tif")
+
+land <- crop(land , extent)
+
+land
+```
+
+#### Drivers: anthropogenic
+
+Again using the package `geodata`.
+
+```{r}
+#| echo: true
+#| eval: true
+
+footp <- footprint(year = 2009)
+
+footp <- crop(footp, extent)
+
+footp
+```
+
+### 3.    Process all the layers to the same resolution and the extent of Peru
+
+Rasters should have the same spatial extent and resolution...
+If they don't match... what should we do?
+
+```{r}
+#| echo: true
+#| eval: true
+
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+```
+
+```{r}
+#| echo: true
+#| eval: true
+
+st_bbox(tavg)
+st_bbox(prec) 
+st_bbox(elev) 
+st_bbox(footp)
+st_bbox(land)
+
+#Compare with the country extent
+st_bbox(peru)
+```
+
+We will use the package `terra` to process the rasters.\
+First we need to create a new raster to use as a **template**.
+
+::: {.callout-tip collapse="true"}
+## Bug in `terra`
+
+We could do:
+
+```
+r <- rast(res = 10000,
+          ext = extention, # or even `ext(vect(peru))`
+          crs = "epsg:4326") 
+```
+
+But there's a bug :O\
+I reported it <https://github.com/rspatial/terra/issues/1618>
+:::
+
+```{r}
+#| echo: true
+#| eval: true
+
+r <- rast(res = 10000, # Target cell size
+          ext(vect(st_transform(peru, proj_peru))), # Extent of the raster
+          crs = proj_peru) %>% # Useful planar projection
+  project(., "epsg:4326") # Projection of our rasters
+
+r
+```
+
+We will `resample()` all of the rasters to our target resolution.
+
+```{r}
+#| echo: true
+#| eval: true
+
+tavg <- resample(tavg, r, method = "bilinear") # for continuous data!
+prec <- resample(prec, r, method = "bilinear")
+elev <- resample(elev, r, method = "bilinear")
+footp <- resample(footp, r, method = "near") # for categorical data!
+land <- resample(land, r, method = "near") 
+```
+
+And we can compare the rasters after resampling.
+
+```{r}
+#| echo: true
+#| eval: true
+
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+```
+
+And finally we will use `mask()` to intersect the layer with Peru.
+
+```{r}
+#| echo: true
+#| eval: true
+
+tavg <- mask(tavg, vect(peru))
+prec <- mask(prec, vect(peru))
+elev <- mask(elev, vect(peru))
+footp <- mask(footp, vect(peru))
+land <- mask(land, vect(peru))
+```
+
+### 4.    Visualise predictors
+
+We will use the package `tmap`.
+
+```{r}
+#| echo: true
+#| eval: true
+
+tmap_mode(mode = "view")
+```
+
+#### Annual mean temperature (WorldClim BIO1)
+
+```{r}
+#| echo: false
+#| eval: true
+
+tm_shape(mean(tavg)) +
+  tm_raster(palette = "OrRd",
+            midpoint = NA, 
+            style = "cont", n = 10)
+```
+
+
+#### Precipitation seasonality (WorldClim BIO15)
+
+```{r}
+#| echo: false
+#| eval: true
+
+tm_shape(mean(prec)) +
+  tm_raster(palette = "RdBu", 
+            midpoint = NA, 
+            style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+---
+
+#### Elevation (WorldClim)
+
+```{r}
+#| echo: false
+#| eval: true
+
+tm_shape(elev) +
+  tm_raster(palette = "BrBG", 
+            midpoint = NA, 
+            style = "cont", n = 10) +
+  tm_view(bbox = extent) +
+  tm_layout(legend.position = 'left')
+```
+
+#### Land-cover (MODIS Terra MCD12Q1)
+
+We need to make sure values are factors.
+
+```{r}
+#| echo: true
+#| eval: true
+
+names(land)
+```
+
+```{r}
+#| echo: true
+#| eval: true
+
+land <- as.factor(land$MCD12Q1.061_LC_Type1_doy2020001_aid0001)
+```
+
+Then we can add values to the levels. 
+
+```{r}
+#| echo: true
+#| eval: true
+
+levels(land[[1]]) <- data.frame(
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
+  label = c(
+    "Evergreen Needleleaf Forest",
+    "Evergreen Broadleaf Forests",
+    "Deciduous Needleleaf Forests",
+    "Deciduous Broadleaf Forests",
+    "Mixed Forests",
+    "Closed Shrublands",
+    "Open Shrublands",
+    "Woody Savannas",
+    "Savannas",
+    "Grassslands",
+    "Permanent Wetlands",
+    "Croplands",
+    "Urban and Built-up Lands",
+    "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
+    "Barren",
+    "Water Bodies"
+  )
+)
+```
+
+Please bear in mind that your landcover layer might not have the same classes/levels as mine. Check here the classification values: [MCD12_User_Guide_V6](https://lpdaac.usgs.gov/documents/101/MCD12_User_Guide_V6.pdf) (see page 7 Classification Legends).
+
+
+```{r}
+#| echo: false
+#| eval: true
+
+tm_shape(land) +
+  tm_raster(palette = "Set1", 
+            style = "cat") +
+  tm_view(bbox = extent) +
+  tm_layout(legend.position = 'left')
+```
+
+#### Human footprint index (SEDAC)
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 1
+
+tm_shape(footp) +
+  tm_raster(palette = "viridis", style = "cont") +
+  tm_view(bbox = extent)
+```
+
+### 5.    Calculate the correlation between the different predictors (and compare with biodiversity) 
+
+Let's get values per grid-cell.
+
+```{r}
+#| echo: true
+#| eval: true
+
+names(tavg)
+```
+
+Let's see all the values together.
+
+```{r}
+#| echo: true
+#| eval: true
+
+predictors <- tibble(
+  "tavg" = values(tavg$PER_wc2.1_30s_tavg_1) %>% as.vector(),
+  "prec" = values(prec$PER_wc2.1_30s_prec_1) %>% as.vector(),
+  "elev" = values(elev) %>% as.vector(),
+  "land" = values(land) %>% as.vector(),
+  "footp" = values(footp) %>% as.vector()
+) %>% 
+  mutate(
+    across(everything(), ~replace_na(.x, NA))
+  )
+```
+
+```{r}
+#| echo: true
+#| eval: true
+
+summary(predictors)
+```
+
+Let's see how these values correlate.
+
+```{r}
+#| echo: true
+#| eval: true
+#| warning: false
+
+GGally::ggpairs(predictors, cex = 0.1)
+```
+
+What can this plot tell you?
+
+### EXTRA: Can we see any pattern with the hotspots of amphibians species richness?
+
+Let's read the data, plot it and see the patterns
+
+```{r}
+#| echo: true
+#| eval: true
+
+amphibians_grid <- readRDS("data/amphibians_grid.rds") %>%
+  st_transform(., 4326)
+```
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 1
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+```
+
+Species richness vs mean annual temperature
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(mean(tavg)) +
+  tm_raster(palette = "OrRd", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+Species richness vs precipitation seasonality
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(mean(prec)) +
+  tm_raster(palette = "RdBu", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+
+```
+
+
+Species richness vs elevation
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(elev) +
+  tm_raster(palette = "BrBG", midpoint = NA, style = "cont", n = 10) +
+  tm_view(bbox = extent)
+```
+
+
+Species richness vs land-use
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(land) +
+  tm_raster(palette = "Set1", style = "cat") +
+  tm_view(bbox = extent)
+```
+
+Species richness vs human footprint
+
+```{r}
+#| echo: false
+#| eval: true
+#| layout-ncol: 2
+
+tm_shape(amphibians_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+tm_shape(footp) +
+  tm_raster(palette = "viridis", style = "cont") +
+  tm_view(bbox = extent)
+```
+
+We are done! No it's **your turn** :)
+
+## France: drivers of trees richness
+
+1.    Get a map of France
+2.    Get 5 different drivers (`raster`) 
+3.    Process all the layers to the same resolution and the extent of France
+4.    Visualise predictors 
+5.    Calculate the correlation between the different predictors (and compare with biodiversity) 
+
+
+
+### 1.    Get a map of France
+
+This might be useful: <http://bboxfinder.com/>
+
+```{r}
+#| echo: true
+#| eval: true
+
+france <- ne_countries(country = "France", scale=50, returnclass = "sf") 
+bbox_france <- st_bbox(c(xmin = -6.855469, xmax = 12.128906, 
+          ymax = 41.409776, ymin = 51.344339), crs = st_crs(4326))
+
+france <-st_crop(france, bbox_france)
+
+ggplot() + 
+  geom_sf(data=france, fill='white') +
+  coord_sf()
+
+proj_france <- 'PROJCS["ProjWiz_Custom_Lambert_Azimuthal",
+ GEOGCS["GCS_WGS_1984",
+  DATUM["D_WGS_1984",
+   SPHEROID["WGS_1984",6378137.0,298.257223563]],
+  PRIMEM["Greenwich",0.0],
+  UNIT["Degree",0.0174532925199433]],
+ PROJECTION["Lambert_Azimuthal_Equal_Area"],
+ PARAMETER["False_Easting",0.0],
+ PARAMETER["False_Northing",0.0],
+ PARAMETER["Central_Meridian",1.8896484],
+ PARAMETER["Latitude_Of_Origin",46.7708584],
+ UNIT["Meter",1.0]]'
+```
+
+### 2.    Get 5 different drivers (`raster`) 
+
+-   Temperature seasonality (**WorldClim BIO4**)
+-   Precipitation seasonality (**WorldClim BIO15**)
+-   Elevation (**SRTM**)
+-   Water bodies (**ESA WorldCover**)
+-   Human footprint index (**SEDAC**)
+
+Extra:
+-   Land-cover (**MODIS Terra MCD12Q1**) -> see demo online
+
+```{r}
+#| echo: true
+#| eval: true
+
+extent <- round(st_bbox(france),0) + c(-1,-1,1,1)
+
+geodata_path("Practical_classes/Week3_predictors/data/")
+
+bio <- worldclim_country(var = "bio", country = "FRA")
+
+temp <- bio$wc2.1_30s_bio_4
+temp <- crop(temp, extent)
+
+prec <- bio$wc2.1_30s_bio_15
+prec <- crop(prec, extent)
+
+elev <- elevation_30s(country = "FRA")
+elev <- crop(elev, extent)
+
+land <- rast("Practical_classes/Week3_predictors/data/MCD12Q1.061_LC_Type1_doy2020001_aid0001_France.tif")
+land <- crop(land , extent)
+
+footp <- footprint(year = 2009)
+footp <- crop(footp, extent)
+```
+
+### 3.    Process all the layers to the same resolution and the extent of France
+
+```{r}
+#| echo: true
+#| eval: true
+
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+
+r <- rast(res = 10000, # Target cell size
+          ext(vect(st_transform(france, proj_france))), # Extent of the raster
+          crs = proj_france) %>% # Useful planar projection
+  project(., "epsg:4326") # Projection of our rasters
+
+temp <- resample(temp, r, method = "bilinear") # for continuous data!
+prec <- resample(prec, r, method = "bilinear")
+elev <- resample(elev, r, method = "bilinear")
+footp <- resample(footp, r, method = "near") # for categorical data!
+land <- resample(land, r, method = "near") 
+
+compareGeom(tavg, prec, elev, footp, land, stopOnError = F, messages = T, res = T)
+
+temp <- mask(temp, vect(france))
+prec <- mask(prec, vect(france))
+elev <- mask(elev, vect(france))
+footp <- mask(footp, vect(france))
+land <- mask(land, vect(france))
+```
+
+### 4.    Visualise predictors 
+
+```{r}
+#| echo: true
+#| eval: true
+
+tmap_mode(mode = "view")
+
+tm_shape(mean(temp)) +
+  tm_raster(palette = "OrRd",
+            midpoint = NA, 
+            style = "cont", n = 10)
+
+tm_shape(mean(prec)) +
+  tm_raster(palette = "RdBu", 
+            midpoint = NA, 
+            style = "cont", n = 10) +
+  tm_view(bbox = extent)
+
+tm_shape(elev) +
+  tm_raster(palette = "BrBG", 
+            midpoint = NA, 
+            style = "cont", n = 10) +
+  tm_view(bbox = extent)
+
+land <- as.factor(land$MCD12Q1.061_LC_Type1_doy2020001_aid0001_France)
+
+levels(land[[1]]) <- data.frame(
+  ID = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17),
+  label = c(
+    "Evergreen Needleleaf Forest",
+    "Evergreen Broadleaf Forests",
+    "Deciduous Needleleaf Forests",
+    "Deciduous Broadleaf Forests",
+    "Mixed Forests",
+    "Closed Shrublands",
+    "Open Shrublands",
+    "Woody Savannas",
+    "Savannas",
+    "Grassslands",
+    "Permanent Wetlands",
+    "Croplands",
+    "Urban and Built-up Lands",
+    "Cropland/Natural Vegetation Mosaics",
+    "Permanent Snow and Ice",
+    "Barren",
+    "Water Bodies"
+  )
+) 
+
+tm_shape(land) +
+  tm_raster(palette = "Set1", 
+            style = "cat") +
+  tm_view(bbox = extent) +
+  tm_layout(legend.position = 'left')
+
+
+tm_shape(footp) +
+  tm_raster(palette = "viridis", style = "cont") +
+  tm_view(bbox = extent)
+```
+
+### 5.    Calculate the correlation between the different predictors (and compare with biodiversity) 
+
+Please download the following file and store it on you `data` folder:  
+
+-   `trees_grid.rds` 
+
+```{r}
+#| echo: true
+#| eval: true
+
+predictors <- tibble(
+  "tavg" = values(mean(temp)) %>% as.vector(),
+  "prec" = values(mean(prec)) %>% as.vector(),
+  "elev" = values(elev) %>% as.vector(),
+  "land" = values(land) %>% as.vector(),
+  "footp" = values(footp) %>% as.vector()
+) %>% 
+  mutate(
+    across(everything(), ~replace_na(.x, NA))
+  )
+
+
+summary(predictors)
+
+GGally::ggpairs(predictors, cex = 0.1)
+
+trees_grid <- readRDS("Practical_classes/Week3_predictors/data/trees_grid.rds") %>% st_transform(., 4326) %>% st_intersection(france)
+
+trees_grid <- trees_grid %>% st_intersection(france)
+
+tm_shape(trees_grid) +
+  tm_fill("SR", palette = "YlOrBr") +
+  tm_view(bbox = extent)
+
+```

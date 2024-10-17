@@ -1,5 +1,5 @@
 #title-slide .title {
-  color: #6AA84F;
+  color: #488fb8;
 }
 
 #title-slide .author {
@@ -16,10 +16,14 @@
   display: block;
 }--*/
 
+.info.legend.leaflet-control i {
+  float: left;
+}
+
 .box {
   margin-top: 10px;
   margin-right: 10px;
-  border: 5px solid #5F9747;
+  border: 5px solid #6297b5;
   padding: 10px;
   font-size: 26px;
   background-color: #E6E6E6;
@@ -42,7 +46,7 @@
 .info-box {
   margin-top: 10px;
   margin-right: 10px;
-  border-left: 10px solid #5F9747;
+  border-left: 10px solid #6297b5;
   padding-left: 20px;
   padding-right: 10px;
   padding-top: 10px;

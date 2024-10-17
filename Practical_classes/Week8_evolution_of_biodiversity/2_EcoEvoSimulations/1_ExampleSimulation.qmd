@@ -1,0 +1,540 @@
+---
+title: "Untitled"
+format:
+  html:
+    theme: united
+    toc: true
+    code-overflow: wrap
+    embed-resources: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Gen3sis: Simulating macro-evolutionary and biogeographic dynamics across space and time
+
+It provides a framework to model how species evolve, interact with their
+environment, disperse, and diversify across landscapes. gen3sis is
+especially useful for studying species diversification, speciation,
+extinction, and migration under varying environmental and geological
+conditions.
+
+## Key Features
+
+-   *Species Evolution and Diversification*: Simulates speciation events
+    based on user-defined rules.
+-   *Dispersal*: Models how species disperse across landscapes,
+    incorporating environmental and geographical barriers.
+-   *Environmental Changes*: Accounts for changes in the environment
+    over time, allowing for the study of how species respond to climate
+    changes and other disturbances.
+-   *Custom Scenarios*: Users can set up custom biogeographic,
+    environmental, and evolutionary scenarios to test hypotheses.
+
+```{r}
+# check the package version, we are on 1.5.11
+packageVersion("gen3sis")
+```
+
+```{r}
+library(here)
+library(gen3sis)
+library(terra)
+```
+
+# Simplified workflow
+
+To get started, the engine requires the following information:
+
+1\. The configuration of the eco-evolutionary processes (i.e.,
+parameters for dispersal, speciation, mutation and ecology)
+
+2\. The time-series of the landscape in which these processes happen
+(including plate tectonics, mountain building, sea level changes, etc.)
+
+-   *Example resources*:
+
+    -   CHELSA or Bio-oracle future climate projections;
+
+    -   CHELSA climate change since the last glacial maximum to the
+        present
+
+    -   Tristan Salles et al's landscape reconstructions:
+        <https://www.science.org/doi/10.1126/science.add2541>
+
+    -   Make your own landscape (IT'S FUN)!! (tutorial:
+        <https://alexskeels.github.io/CBAGen3sis/Day2_Prac5_landscapes.html>)
+
+# Sample data
+
+We will use the example data that comes with the gen3sis package. You
+don't have to adjust the code below. If the installation of gen3sis
+worked, the code below should work as well.
+
+```{r}
+# here()
+
+data_path <- file.path(here("SouthAmerica"))
+# list.files(data_path, recursive = T)
+path_config <- file.path(data_path, "config/config_southamerica.R")
+path_landscape <- file.path(data_path, "landscape")
+
+load(".RData")
+
+```
+
+## Configurations
+
+The config is the code for the ecological and evolutionary rules and
+other parameters of Gen3sis, such as the random seed, instructions on
+saving output.
+
+A config file is a a stand-alone R script which is modified by you. You
+can modify a config in two ways. The first way and most practical, is to
+open up a config.R file from your file explorer. For example you can
+navigate to the folder open the file. The second way includes loading
+the file into R as config for gen3sis and adjust it in R. To keep our
+simulations reproducible and all changes we make to the config, we will
+modify the file from within R.
+
+```{r}
+config_raw <- create_input_config(config_file = "SouthAmerica/config/config_southamerica.R")
+```
+
+## Landscape
+
+The landscape is made up of 2 classes of files: 1) The landscape object
+with latitude, longitude and environmental variables 2) The distance
+matrices that set the dispersal options for species in the landscape.
+For this, the user has to define a cost-function for dispersal over
+'terrestrial' patches or 'water' patches. For terrestrial species, the
+cost function should be higher on water patches than on terrestrial
+patches. For water-species, the cost function for terrestrial patches
+should be infinite (water-species do not disperse over land). The
+distances are calandscapeulated during the creation of the world:
+function:
+create_input_landscape(...,calandscapeulate_full_distance_matrices =
+TRUE)
+
+```{r}
+## Environmental landscape
+landscape <- readRDS(file.path(path_landscape, "landscapes.rds"))
+gen3sis::plot_landscape_overview(landscape)
+
+# Inspect the object
+class(landscape)
+
+# which environmental variables do we have?
+names(landscape)
+
+# Which time periods do we have?
+names(landscape$temp)
+
+# How does it look?
+landscape$temp[1:3, 1:9]
+
+```
+
+```{r}
+# Define color palettes
+temp_colors <- colorRampPalette(c("blue", "red"))  # Blue to red for temperature
+arid_colors <- colorRampPalette(c("red", "yellow")) # Red to yellow for aridity
+
+par(mfrow = c(3,3))
+# Plotting the areas
+plot(terra::rast(landscape$area[ ,c("x", "y", "66")]), main = "Area 66 Million years ago")
+plot(terra::rast(landscape$area[ ,c("x", "y", "30")]), main = "Area 30 Million years ago") 
+plot(terra::rast(landscape$area[ ,c("x", "y", "1")]), main = "Area 1 Million years ago")
+
+# Plotting temperature with custom colors
+plot(terra::rast(landscape$temp[ ,c("x", "y", "66")]), main = "Temperature 66 Million years ago", col = temp_colors(100))
+plot(terra::rast(landscape$temp[ ,c("x", "y", "30")]), main = "Temperature 30 Million years ago", col = temp_colors(100))
+plot(terra::rast(landscape$temp[ ,c("x", "y", "1")]), main = "Temperature 1 Million years ago", col = temp_colors(100))
+
+# Plotting aridity with custom colors
+plot(terra::rast(landscape$arid[ ,c("x", "y", "66")]), main = "Aridity 66 Million years ago", col = arid_colors(100))
+plot(terra::rast(landscape$arid[ ,c("x", "y", "30")]), main = "Aridity 30 Million years ago", col = arid_colors(100))
+plot(terra::rast(landscape$arid[ ,c("x", "y", "1")]), main = "Aridity 1 Million years ago", col = arid_colors(100))
+```
+
+```{r}
+par(mfrow=c(1,2))
+# plot the change in mean tempereature through time
+mean_temperatures <- colMeans(landscape$temp[, 3:ncol(landscape$temp)], na.rm=T)
+plot(seq(from=1, to = 66, by=1),mean_temperatures ,  xlab="time (Ma)", ylab="mean temperature", type='l')
+
+# plot the change in mean elevation through time
+mean_aridity <- colMeans(landscape$arid[, 3:ncol(landscape$arid)], na.rm=T)
+plot(seq(from=1, to = 66, by=1), mean_aridity, xlab="time (Ma)", ylab="mean aridity", type='l')
+```
+
+# Original simulation
+
+```{r}
+#| eval: false
+sim0 <- run_simulation(
+    config = file.path(data_path, "config/config_southamerica.R"),
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim0"), 
+    call_observer = "all",
+    verbose = 1)
+```
+
+
+```{r}
+plot_summary(sim0)
+
+```
+
+### Plot SR for 3 time steps
+
+```{r}
+
+timesteps <- c(40, 20, 0)
+
+oldpar <- par(no.readonly = TRUE) #save original parameters
+
+par(mfrow = c(2, 3))
+
+
+for (i in timesteps) {
+    landscape_i <- readRDS(
+      file.path(
+        data_path, 
+        paste0("output/sim0/config_southamerica/landscapes/landscape_t_",
+        i, ".rds")))
+    species_i <- readRDS(
+      file.path(
+        data_path, 
+        paste0("output/sim0/config_southamerica/species/species_t_",
+        i, ".rds")))
+    
+    plot_richness(species_i, landscape_i)
+}
+
+
+par(oldpar) # reset to original parameters
+
+```
+
+# Your turn: Modify!
+
+Let's change some of the parameters and compare the species richness between different configurations.
+
+## Modify abundance
+
+Caution: Some parameters will make the model run for a very long time. If your model has not finished after 5-10 minutes (max!), it's time to stop.
+
+```{r}
+#| eval: false
+# Make a copy of the original config-file 
+config1 <- config_raw
+
+
+
+# The original function:
+config1$gen3sis$ecology$apply_ecology
+
+
+
+# Let's modify it ===========================
+
+config1$gen3sis$ecology$apply_ecology <- function(abundance, traits, landscape, config) {
+  
+## Change here: 
+  
+  abundance_scale = 5 # change here
+  abundance_threshold = 1 # and/or change here
+  
+  
+  #abundance threshold
+  survive <- abundance>=abundance_threshold
+  abundance[!survive] <- 0
+  abundance <- (( 1-abs( traits[, "temp"] - landscape[, "temp"]))*abundance_scale)*as.numeric(survive)
+  
+  
+  #abundance threshold
+  abundance[abundance<abundance_threshold] <- 0
+  k <- ((landscape[,"area"]*(landscape[,"arid"]+0.1)*(landscape[,"temp"]+0.1))*abundance_scale^2)
+  total_ab <- sum(abundance)
+  subtract <- total_ab-k
+  
+  if (subtract > 0) {
+    # print(paste("should:", k, "is:", total_ab, "DIFF:", round(subtract,0) ))
+    while (total_ab>k){
+      alive <- abundance>0
+      loose <- sample(1:length(abundance[alive]),1)
+      abundance[alive][loose] <- abundance[alive][loose]-1
+      total_ab <- sum(abundance)
+    }
+    #set negative abundances to zero
+    abundance[!alive] <- 0
+  }
+  
+  return(abundance)
+}
+
+
+# Run the simulation with the new configuration ======================
+
+sim1 <- run_simulation(
+    config = config1,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim1"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+# Check the difference to the original simulation ================
+plot_summary(sim0) # original
+plot_summary(sim1) # changed
+
+```
+
+## Changing the ancestor
+
+```{r}
+#| eval: false
+config_2 <- config_raw
+
+# The original function:
+config_2$gen3sis$initialization$create_ancestor_species 
+
+# Let's modify it. E.g., only 1 ancestor species (instead of 10)
+
+
+config_2$gen3sis$initialization$create_ancestor_species <- function(landscape, config) {
+  range <- c(-95, -24, -68, 13)
+  co <- landscape$coordinates
+  selection <- co[, "x"] >= range[1] &
+    co[, "x"] <= range[2] &
+    co[, "y"] >= range[3] &
+    co[, "y"] <= range[4]
+
+  new_species <- list()
+
+
+## Change number of ancestral species in the top of the loop: e.g.: for (i in 1:20) for 20 ancestral species
+  for(i in 1:1){
+    initial_cells <- rownames(co)[selection]
+    initial_cells <- sample(initial_cells, 1)
+    new_species[[i]] <- create_species(initial_cells, config)
+    #set local adaptation to max optimal temp equals local temp
+    new_species[[i]]$traits[ , "temp"] <- landscape$environment[initial_cells,"temp"]
+    new_species[[i]]$traits[ , "dispersal"] <- 1 
+    #plot_species_presence(landscape, species=new_species[[i]])
+  }
+  
+  return(new_species)
+}
+
+
+
+
+# Run the simulation with the new configuration
+sim2 <- run_simulation(
+    config = config_2,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim2"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+# Get the summary
+plot_summary(sim0)
+plot_summary(sim2)
+```
+
+
+## Decreased Dispersal distance
+
+**The Weibull distribution - test it:**
+
+```{r}
+
+# scale parameter = this is where the distribution is centered around
+# shape parameter = indicates how sharp the curve is going to be
+
+hist(rweibull(1000, shape = 1.5, scale = 133)) # Original distribution of dispersal values
+
+# Play around with some values. What do you observe?
+
+## Examples:
+# changed shape parameter:
+hist(rweibull(1000, shape = 0.5, scale = 133))
+hist(rweibull(1000, shape = 1, scale = 133))
+hist(rweibull(1000, shape = 1.5, scale = 133))
+# changed scale paramer:
+hist(rweibull(1000, shape = 2, scale = 70))
+
+```
+
+**Task**: Change the arguments of the Weibull distribution to achieve a
+[lower dispersal distance]{.underline} for the model. What happens?
+
+*Caution: Increasing the dispersal distance increases computing time a
+lot! scale = 200 took me 25 minutes to simulate. For time reasons, we
+should stick to decreasing it during the practical course.*
+
+```{r}
+#| eval: false
+#| label: Sim2-decreased-dispersal
+
+# create a copy of the config file that we can change
+config3 <- config_raw
+
+# Original function =========
+config3$gen3sis$dispersal$get_dispersal_values 
+
+
+
+# change the function =========
+config3$gen3sis$dispersal$get_dispersal_values <- function(n, species, landscape, config) {
+  values <- rweibull(n, shape = 2, scale = 100)
+
+  return(values)
+}
+
+
+# Run the simulation with the new configuration =========
+sim3 <- run_simulation(
+    config = config3,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim3"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+## What is different?
+plot_summary(sim0)
+plot_summary(sim3)
+```
+
+## Increased speciation time
+
+**Task**: Change the divergence time to a [longer]{.underline} time
+interval. What happens?
+
+*Caution: Changing the divergence time to shorter time intervals
+increases computing time a lot! divergence_threshold = 1 took me 22
+minutes to simulate. For time reasons, we should stick to increasing it
+during the practical course.*
+
+```{r}
+#| eval: false
+# create a copy of the config file that we can change
+config4 <- config_raw
+
+
+config4$gen3sis$speciation$divergence_threshold
+
+# change the function in the config file-object (in R only)
+config4$gen3sis$speciation$divergence_threshold <- 5
+
+
+# Run the simulation with the new configuration
+sim4 <- run_simulation(
+    config = config4,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim4"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+plot_summary(sim0)
+plot_summary(sim4)
+```
+
+## Increased evolutionary rate
+
+```{r}
+#| eval: false
+
+config5 <- config_raw
+
+config5$gen3sis$mutation$apply_evolution
+
+config5$gen3sis$mutation$apply_evolution <- function(species, cluster_indices, landscape, config) {
+  
+  trait_evolutionary_power <- 0.07
+  traits <- species[["traits"]]
+  cells <- rownames(traits)
+  #homogenize trait based on abundance
+  for(cluster_index in unique(cluster_indices)){
+    cells_cluster <- cells[which(cluster_indices == cluster_index)]
+    mean_abd <- mean(species$abundance[cells_cluster])
+    weight_abd <- species$abundance[cells_cluster]/mean_abd
+    traits[cells_cluster, "temp"] <- mean(traits[cells_cluster, "temp"]*weight_abd)
+  }
+  #mutations
+  mutation_deltas <-rnorm(length(traits[, "temp"]), mean=0, sd=trait_evolutionary_power)
+  traits[, "temp"] <- traits[, "temp"] + mutation_deltas
+  
+  return(traits)
+}
+
+# Run the simulation with the new configuration
+sim5 <- run_simulation(
+    config = config5,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim5"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+plot_summary(sim0)
+plot_summary(sim5)
+```
+
+## Decreased evolutionary rate
+
+```{r}
+#| eval: false
+config6 <- config_raw
+config6$gen3sis$ecology$apply_evolution <- function(species, cluster_indices, landscape, config) {
+  
+  trait_evolutionary_power <- 0.0001
+  traits <- species[["traits"]]
+  cells <- rownames(traits)
+  #homogenize trait based on abundance
+  for(cluster_index in unique(cluster_indices)){
+    cells_cluster <- cells[which(cluster_indices == cluster_index)]
+    mean_abd <- mean(species$abundance[cells_cluster])
+    weight_abd <- species$abundance[cells_cluster]/mean_abd
+    traits[cells_cluster, "temp"] <- mean(traits[cells_cluster, "temp"]*weight_abd)
+  }
+  #mutations
+  mutation_deltas <-rnorm(length(traits[, "temp"]), mean=0, sd=trait_evolutionary_power)
+  traits[, "temp"] <- traits[, "temp"] + mutation_deltas
+  
+  return(traits)
+}
+
+# Run the simulation with the new configuration
+sim6 <- run_simulation(
+    config = config6,
+    landscape = file.path(data_path, "landscape"), 
+    output_directory = file.path(data_path, "output/sim6"), 
+    call_observer = 1,
+    verbose = 1)
+```
+
+
+```{r}
+plot_summary(sim0)
+plot_summary(sim6)
+```
+
+```{r}
+save.image(here(".RData"))
+```

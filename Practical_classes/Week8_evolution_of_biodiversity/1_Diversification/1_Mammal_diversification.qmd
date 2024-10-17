@@ -1,0 +1,624 @@
+---
+title: "Evolution of Biodiversity & Diversification"
+format:
+  html:
+    theme: united
+    toc: true
+    code-overflow: wrap
+    embed-resources: true
+---
+
+# Prepare R 
+
+```{r}
+#| label: install-packages
+#| warning: false
+#| error: false
+#| message: false
+#| echo: false
+
+## All packages we will need (I know it's a lot! sorry!)
+package_list <-
+  c(
+    # Data handling
+    "here",
+    "dplyr",
+    "ggplot2",
+    
+    # Phylo packages
+    "ape",
+    "geiger",
+    "phytools",
+    "picante",
+    #"phangorn", # for mcc computation (not needed)
+    "phylobase",
+    "adephylo",
+    
+    # Spatial packages
+    "terra",
+    "sf",
+    "tmap",
+    "viridis",
+    "gen3sis",
+    "RColorBrewer"
+    )
+
+
+## Install packages
+installed_packages <- package_list %in% rownames(installed.packages())
+
+# Install packages not yet installed:
+if (any(installed_packages == FALSE)) {
+  install.packages(package_list[!installed_packages])
+}
+
+# Packages loading
+invisible(lapply(package_list, library, character.only = TRUE))
+
+## Test if everything worked :-) 
+if (
+  isTRUE(
+    all(
+      package_list %in%
+        as.data.frame(
+          utils::installed.packages()
+        )[, 1]
+    )
+  )
+) {
+  cat("Everything is good to go")
+} else {
+  warning("All required packages are not installed")
+  warning(
+    paste(
+      "Please install the following packages:",
+      paste(
+        setdiff(
+          package_list,
+          as.data.frame(
+            utils::installed.packages()
+          )[, 1]
+        ),
+        collapse = ", "
+      )
+    )
+  )
+}
+
+```
+
+# Case study: Mammals in Botanical Countries
+
+## Setting up path variables
+
+```{r, libraries}
+#| label: set-path-vars
+
+# Clean working space
+rm(list = ls())
+
+# Paths to our data
+out_path <- here("data")
+tree_path <- here("data_raw", "Phylogenies", "Complete_phylogeny.nex")
+occurrence_path <- here("data", "mammals_occu.rds")
+tax_path <- here("data_raw", "Traits", "Trait_data.csv")
+shp_path <- here("data_raw","shp")
+
+```
+
+## The Data
+Source: https://github.com/MegaPast2Future/PHYLACINE_1.2/
+
+### A) Phylogenetic tree for mammals
+
+Phylogenetic trees are very uncertain and should be regarded as 'hypothesis of relationship' rather than facts. They are created using bayesian methods and the output of such analyses is a posterior distribution of the result. Therefore, they are very rarely provided as a single tree and rather as a set of 1000 phylogenetic trees that were sampled randomly from said posterior distribution. These trees vary in placement of clades within the tree and branching times. This makes phylogenetic analyses require a lot of computational power, since one line of code can easily take a week to run for a set of 1000 phylogenetic trees with sufficient size.
+
+We will therefore find the maximum clade credibility (MCC) tree, which tries to find the tree with the highest confidence in the placement of clades from the set of 1000 trees.
+
+Please skip this code chunk right below and read in the file for the MCC tree instead (next chunk).
+
+```{r, phylogeny, eval = FALSE}
+#| eval: false
+#| label: create-phylogeny
+
+### DO NOT RUN ###
+
+tree <- read.nexus(tree_path)
+
+# The Maximum Clade Credibility tree: 
+# (this takes about 1h to calculate. I did it for you! Skip to the next code block)
+mcc_tree <- mcc(tree, tree = TRUE, rooted = TRUE)
+
+# Inspect the object:
+mcc_tree
+saveRDS(mcc_tree, here(out_path, "MCCtree.rds"))
+
+#########
+
+rm(mcc_tree, tree, tree_path)
+
+```
+
+```{r}
+#| label: read-phylogeny
+### RUN THIS INSTEAD ###
+
+tree <- readRDS(file.path(out_path, "MCCtree.rds")) %>% 
+  # this will make the tree look more organized but doesn't change its structure:
+  ladderize() 
+
+```
+
+#### Phylogeny plot
+```{r}
+#| label: plot-phylogeny
+plotTree(
+  tree,   
+  ftype = "off", 
+  ylim=c(-0.2,1)*Ntip(tree)) # increase the plot window to the bottom to plot the geo axis
+# add the axis
+phytools::geo.legend()
+```
+
+#### Lineages through time plot 
+```{r}
+#| label: lineages_through_time_plot
+
+# Lineages-through-time plot
+K_P_massextinction <- 217-66
+
+ltt1 <- ltt(tree, log.lineages = FALSE, plot = FALSE)
+
+plot(ltt1);abline(v = K_P_massextinction)
+
+rm(ltt1)
+```
+
+### B) Occurrence data for mammals (country-scale)
+
+I prepared mammal occurrences for you beforehand, because it takes some time for almost 6000 species. I have provided the code how I prepared this data in the project folder. The range maps were taken from the PHYLACINE database and can be freely downloaded from their repository to reproduce the occurrence data I provided here.
+
+For the sake of time, we will be using the data that I have prepared instead of re-doing the preprocessing.
+
+```{r, occurrence-data}
+#| label: read-occurrence-data
+
+occur <- readRDS(occurrence_path)
+
+
+# Inspect the data
+class(occur) # sf object
+head(occur) # presence of species in polygons (botanical countries/LEVEL_3_CO)
+```
+
+
+```{r}
+#| label: fix-occu-data
+
+# Fix some geometry issues (:
+occur <- st_read(shp_path) %>%
+  left_join(occur %>% st_drop_geometry()) %>% 
+  st_make_valid()
+```
+
+## 1. Phylogenetic calculations
+
+
+
+```{r}
+#| label: species-names-vectors
+
+## Species vectors for matching 
+
+sp_in_tree <- tree$tip.label
+sp_in_data <- unique(occur$species)
+
+```
+
+### Calculate phylogenetic metrics (on the whole tree)
+Once we have reconstructed the geographic pattern of species diversity, we can reconstruct the pattern of diversification. We will focus on present-day diversification. **Present-day diversification (DR)** captures the diversification rates near the tips of the phylogeny (\~ last 2 myrs). DR can be be calculated as the inverse of **species distinctiveness (ED)**, which is a measure of species isolation on the phylogeny. Species positioned at the end of long branches are viewed as distinctive (high values of ED). It can be shown mathematically that these species are also associated with slow diversification (low values of DR). Fast diversification, conversely, typifies species with low ED. The inverse relationships between ED and DR (**DR = 1 / ED**) is rather intuitive, when you consider that rapid radiations produce many species on the phylogeny separated by short branches.
+
+
+Here we compare these patterns to **deep-time diversification rates (root distance, RD)**: This one is a bit more inclusive towards diversification phases over the whole evolutionary time of the phylogeny. It counts the number of nodes (ancestors) between the species at the tip and the root. Higher numbers indicate higher diversification rates (over the whole clade since it's origin at the root).
+
+```{r}
+#| label: do-phylo-calculations
+
+# Species evolutionary distinctiveness (ED)
+ed <- evol.distinct(tree) %>%
+  filter(Species %in% sp_in_data)
+
+# Present-day diversification rates (DR)
+dr <- 1 / ed$w
+names(dr) <- ed$Species
+
+
+
+
+# Diversification rates of whole clades (RD) 
+# (root tip distance = number of nodes between root and tip)
+rd0 <- distRoot(tree, 
+               tips = "all",
+               method = c("nNodes")) 
+
+rd <- rd0[names(rd0) %in% sp_in_data]
+
+
+```
+
+### Match tree and data
+
+```{r}
+#| label: drop-tips-from-tree
+
+# Drop species from the tree for which we do not have data
+tree <- keep.tip(tree, intersect(sp_in_tree, sp_in_data)) %>% 
+  # Ladderize the tree again
+  ladderize()
+
+```
+
+### Plot Diversification rates on the tree
+
+The phylogeny can help to demonstrate what exactly DR measures, given that short branches are generally associated with high DR, while the opposite holds for long branches. Let's visualize it.
+
+```{r}
+#| label: plot-rates-on-tree
+
+plotTree.wBars(tree, 
+               dr, 
+               type="fan",
+               lwd = 0.2)
+
+
+plotTree.wBars(tree, 
+               rd, 
+               type="fan",
+               method = "plotTree",
+               lwd = 0.2)
+
+```
+
+### Species richness 
+
+```{r}
+#| label: create-plotting-data-SR
+
+richness <- occur %>% 
+  # st_make_valid() %>%
+  group_by(LEVEL_3_CO) %>% 
+  # Calculate species richness per country:
+  mutate(SR = sum(presence)) %>% 
+  dplyr::select(LEVEL_3_CO, SR) %>%
+  unique()
+
+```
+
+### Diversification Metrics
+
+
+```{r}
+#| label: create-plotting-data-DR-RD
+
+  
+# Present-day diversification rates (DR)
+dr_df <- as.data.frame(dr)
+dr_df$species <- row.names(dr_df)
+dr_df2 <- left_join(occur, dr_df) 
+
+diversification <- dr_df2 %>% 
+  filter(!is.na(dr)) %>%
+  dplyr::select(LEVEL_3_CO, dr) %>%
+  group_by(LEVEL_3_CO) %>% 
+  dplyr::mutate(mean_DR = mean(dr, na.rm=T)) %>%
+  dplyr::select(-dr) %>%
+  unique() %>%
+  ungroup() %>%
+  mutate(scaled_DR =((mean_DR - min(mean_DR)) / (max(mean_DR) - min(mean_DR)))) 
+
+
+
+# Clade diversification (Root distance, RD)
+rd_df <- as.data.frame(rd) 
+rd_df$species <- row.names(rd_df)
+rd_df2 <- left_join(occur, rd_df)
+
+root_dist <- rd_df2 %>% 
+  filter(!is.na(rd)) %>%
+  dplyr::select(LEVEL_3_CO, rd) %>%
+  group_by(LEVEL_3_CO) %>% 
+  dplyr::mutate(mean_RD = mean(rd, na.rm=T)) %>%
+  dplyr::select(-rd) %>%
+  unique() %>%
+  ungroup() %>%
+  mutate(scaled_RD =((mean_RD - min(mean_RD)) / (max(mean_RD) - min(mean_RD))))
+
+```
+
+## Species richness vs. Diversification
+
+```{r}
+#| label: plot-maps
+
+my_palette <- viridis(12, option = "D")  
+
+#Plot:
+tm_shape(richness) +
+  tm_polygons("SR", palette = my_palette) + 
+  tm_layout(main.title = "Mammals - Species Richness")
+#Plot:
+tm_shape(diversification) +
+  tm_polygons("scaled_DR", palette = my_palette) + 
+  tm_layout(main.title = "Mammals - Present-day Diversification")
+
+tm_shape(root_dist) +
+  tm_polygons("scaled_RD", palette = my_palette) + 
+  tm_layout(main.title = "Mammals - Clade Diversification")
+```
+
+# Subclades: Your turn! 
+
+Let's load the taxonomic information from PHYLACINE so that you can subset the data based on your interest. This is just something I do to prepare your data for your task :)
+
+```{r}
+#| label: create-data-subsets
+### DO NOT RUN ####
+
+
+## Here I split the phylogeny into smaller clades (orders). 
+## If you want to investigate a  family or even the species within a genus, you can use this code to filter your tree based on your interest :) 
+
+
+
+
+
+tax <- read.csv(tax_path)[1:3]  %>% 
+  filter(Binomial.1.2 %in% sp_in_tree)
+
+orders <- unique(tax$Order.1.2) # Which one do you want to investigate? 
+family <- unique(tax$Family.1.2)
+genus <- unique(tax$Genus.1.2)
+
+
+
+## make clade lists
+fmrca = geiger:::.mrca  
+
+## Orders: 
+clades <- list()
+for (i in orders) {
+  print(i)
+  
+  # Subset tax based on the current order
+  x <- subset(tax, Order.1.2 == i)
+  
+  # Find common labels between x$Binomial.1.2 and tree$tip.label
+  valid_labels <- intersect(x$Binomial.1.2, tree$tip.label)
+  
+  # Proceed only if there are valid labels
+  if (length(valid_labels) > 1) {  # MRCA requires at least 2 labels
+    y <- extract.clade(tree, getMRCA(tree, valid_labels))
+    clades[[i]] <- y
+  } else {
+    next  # Skip if no valid labels or only one label
+  }
+}
+
+
+class(clades) <- "multiPhylo"
+
+plot(clades)
+```
+
+In the following code chunk, I have split the phylogeny by taxonomic orders. We have 18 different orders of mammals in this tree. The goal is that you chose any one of these 18 clades and investigate the geographic patterns of species richness & diversification rates.
+
+I'll run one example for Carnivores (because the clade is rather small and can be nicely visualized)
+
+## Chose your clade:
+
+```{r}
+#| label: Task-Subclades
+## Adjust here!!
+my_clade <- clades$Carnivora
+
+
+# Plot your clade
+plotTree(ladderize(my_clade), 
+         fsize = 0.4, 
+         ftype = "i", 
+         lwd = 0.2, 
+         type = "fan")
+
+# extract species names
+carni_sp <- my_clade$tip.label
+
+# extract occurrence data
+carni_occ <- occur %>% 
+  filter(species %in% carni_sp) %>%
+  group_by(LEVEL_3_CO) %>%
+  mutate(SR_carni = n_distinct(species)) %>% 
+  unique()
+
+carni_occ2 <- occur %>% 
+  dplyr::select(LEVEL_3_CO) %>% 
+  left_join(carni_occ %>% st_drop_geometry()) %>% 
+  dplyr::select(LEVEL_3_CO, SR_carni) %>% 
+  unique()
+
+# Carnivores richness map =============
+plot(carni_occ2["SR_carni"], main = "Species Richness - Carnivores")
+ltt(my_clade, log.lineages = FALSE)
+```
+
+### Diversification rates
+
+```{r}
+# From above: diversification rates =====
+dr_df <- as.data.frame(dr)
+dr_df$species <- row.names(dr_df)
+dr_df2 <- left_join(occur, dr_df) 
+##
+
+div_carni <- dr_df2 %>% 
+  # Filter here:
+  filter(!is.na(dr) & species %in% carni_sp) %>%
+  
+  dplyr::select(LEVEL_3_CO, dr) %>%
+  group_by(LEVEL_3_CO) %>% 
+  dplyr::mutate(mean_DR = mean(dr, na.rm=T)) %>%
+  dplyr::select(-dr) %>%
+  unique() %>%
+  ungroup() %>%
+  mutate(scaled_DR =((mean_DR - min(mean_DR)) / (max(mean_DR) - min(mean_DR)))) %>%
+  unique()
+
+# We removed some countries by filtering before (those where SR mammals = 0 in this dataset)
+div_carni2 <- occur %>% 
+  dplyr::select(LEVEL_3_CO) %>% 
+  left_join(div_carni %>% st_drop_geometry()) %>% 
+  dplyr::select(LEVEL_3_CO, mean_DR, scaled_DR) %>% 
+  unique()
+
+
+
+### Root distance ======
+
+rd_df <- as.data.frame(rd) 
+rd_df$species <- row.names(rd_df)
+rd_df2 <- left_join(occur, rd_df)
+
+root_dist <- rd_df2 %>% 
+  # Filter here:
+  filter(!is.na(rd) & species %in% carni_sp) %>%
+  
+  dplyr::select(LEVEL_3_CO, rd) %>%
+  group_by(LEVEL_3_CO) %>% 
+  dplyr::mutate(mean_RD = mean(rd, na.rm=T)) %>%
+  dplyr::select(-rd) %>%
+  unique() %>%
+  ungroup() %>%
+  mutate(scaled_RD =((mean_RD - min(mean_RD)) / (max(mean_RD) - min(mean_RD))))
+
+# We removed some countries by filtering before (those where SR mammals = 0 in this dataset)
+root_dist_carni2 <- occur %>% 
+  dplyr::select(LEVEL_3_CO) %>% 
+  left_join(root_dist %>% st_drop_geometry()) %>% 
+  dplyr::select(LEVEL_3_CO, mean_RD, scaled_RD) %>% 
+  unique()
+
+
+# Carnivores diversification map1 =============
+plot(div_carni2["scaled_DR"], main = "Present-day diversification - Carnivores")
+# Carnivores diversification map2 =============
+plot(root_dist_carni2["scaled_RD"], main = "Clade diversification - Carnivores")
+
+```
+
+## Richness vs. Diversification
+
+```{r}
+#Plot:
+tm_shape(div_carni2) +
+  tm_polygons("mean_DR", palette = my_palette, colorNA = "grey") + 
+  tm_layout(main.title = "Carnivores - Present Day Diversification") +
+  tm_layout(legend.outside = TRUE)
+
+tm_shape(root_dist_carni2) +
+  tm_polygons("mean_RD", palette = my_palette, colorNA = "grey") + 
+  tm_layout(main.title = "Carnivores - Clade Diversification") +
+  tm_layout(legend.outside = TRUE)
+
+tm_shape(carni_occ2) +
+  tm_polygons("SR_carni", palette = my_palette, colorNA = "grey") + 
+  tm_layout(main.title = "Carnivores - Species Richness") +
+  tm_layout(legend.outside = TRUE)
+
+# Relationship between richness and diversification
+plot(div_carni2$mean_DR, carni_occ2$SR_carni, "p")
+```
+
+
+# EXTRA
+## Plotting tools: annotation
+
+```{r}
+#| label: tools-annotation
+
+# create a color vector for plottin the labels on the tree:
+# Orders: (for visualization on the full tree)
+palette_28 <- brewer.pal(12, "Set3")  # Set3 has 12 colors by default
+colors28 <- colorRampPalette(palette_28)(28)
+
+
+
+# First, plot the tree without tip labels
+plotTree(tree, type = "fan", ftype = "off")
+
+# Initialize an empty list to store clades
+clades <- list()
+
+# Iterate over all orders
+for (i in seq_along(orders)) {  # Correct the loop to iterate over orders properly
+  
+  # Get the current order label
+  label <- orders[i]
+  
+  # Subset tax based on the current order
+  x <- subset(tax, Order.1.2 == label)
+  
+  # Find common labels between x$Binomial.1.2 and tree$tip.label
+  valid_labels <- intersect(x$Binomial.1.2, tree$tip.label)
+  
+  # Check if there are valid labels, and based on their number, adjust label properties
+  
+  if (length(valid_labels) > 20) {  
+    
+    # For clades with more than 15 valid labels
+    # Extract the clade and save it to the list
+    
+    y <- extract.clade(tree, getMRCA(tree, valid_labels))
+    clades[[label]] <- y  # Use label as the key for storing clades
+    
+    # Annotate the clade in the plot with curved labels
+    arc.cladelabels(
+      tree = tree, 
+      text = label,  # Text to display
+      node = findMRCA(tree, valid_labels),  # Node number to label
+      orientation = "curved",  # Curve the label for fan plot
+      col = colors28[i],  # Color of the label
+      ln.offset = 1.05,  # Adjust label position to avoid overlap with the tree
+      lab.offset = 1.10,
+      cex = 0.5,  # Font size
+      lwd = 3    # Line width for the label arc
+    )
+    
+  } else if (length(valid_labels) <= 20 & length(valid_labels) > 1) { 
+    
+    # For clades with 2-15 valid labels
+    # Annotate the clade in the plot with horizontal labels
+    
+    arc.cladelabels(
+      tree = tree, 
+      text = label,  # Text to display
+      node = findMRCA(tree, valid_labels),  # Node number to label
+      orientation = "horizontal",  # Horizontal for smaller clades
+      col = colors28[i],  # Color of the label
+      ln.offset = 1.05,  # Adjust line position to avoid overlap with the tree
+      lab.offset = 1.15, # Adjust label position to avoid overlap with others 
+      cex = 0.5,  # Font size
+      lwd = 3    # Line width for the label arc
+    ) 
+  }
+}
+
+# Convert the clades list to a "multiPhylo" object
+class(clades) <- "multiPhylo"
+
+
+```
+
+```{r}
+#| eval: false
+save.image(here(".RData"))
+```
+
