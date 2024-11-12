@@ -1,5 +1,6 @@
 ---
-title: "Evolution of Biodiversity & Diversification"
+title: "Practical 8: Evolution of Biodiversity & Diversification"
+author: "Friederike Wölke, wolke@fzp.czu.cz, Room D330"
 format:
   html:
     theme: united
@@ -8,82 +9,26 @@ format:
     embed-resources: true
 ---
 
-# Prepare R 
+This document outlines steps for **analyzing mammalian biodiversity using phylogenetic trees and diversification** **metrics**. It's part 1 of [todays' practical on evolution of biodiversity](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/tree/main/Practical_classes/Week8_evolution_of_biodiversity) in [**spatial ecology and macroecology 2024.**](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology)
+
+I have prepared a config.R file that has all the packages that we are going to need for today. Since it's a lot (on my machine at home it took less than 5 minutes, but you never know with the computers at Uni) we will run it in parallel while you already have a look at the prepared code/outputs in the .html file.
+
+**At the bottom of this file you will find an activity where you chose your favorite mammal clade, run a diversification analysis, and plot the results on the world map.**
+
+Please ensure that all packages are installed with the following code chunk to being able to do this activity.
+
+::: {.callout-tip icon="false"}
+## ⭐ A note on frustration:
+
+If it doesn't work and you don't want to make it work: it's fine. The topic of evolution is a bit out of scope for the course anyway. If you can't make it work but want to make it work, please let me know and we will find a solution.
+:::
+
+## Prepare R
 
 ```{r}
-#| label: install-packages
-#| warning: false
-#| error: false
-#| message: false
-#| echo: false
+#| label: configurations
 
-## All packages we will need (I know it's a lot! sorry!)
-package_list <-
-  c(
-    # Data handling
-    "here",
-    "dplyr",
-    "ggplot2",
-    
-    # Phylo packages
-    "ape",
-    "geiger",
-    "phytools",
-    "picante",
-    #"phangorn", # for mcc computation (not needed)
-    "phylobase",
-    "adephylo",
-    
-    # Spatial packages
-    "terra",
-    "sf",
-    "tmap",
-    "viridis",
-    "gen3sis",
-    "RColorBrewer"
-    )
-
-
-## Install packages
-installed_packages <- package_list %in% rownames(installed.packages())
-
-# Install packages not yet installed:
-if (any(installed_packages == FALSE)) {
-  install.packages(package_list[!installed_packages])
-}
-
-# Packages loading
-invisible(lapply(package_list, library, character.only = TRUE))
-
-## Test if everything worked :-) 
-if (
-  isTRUE(
-    all(
-      package_list %in%
-        as.data.frame(
-          utils::installed.packages()
-        )[, 1]
-    )
-  )
-) {
-  cat("Everything is good to go")
-} else {
-  warning("All required packages are not installed")
-  warning(
-    paste(
-      "Please install the following packages:",
-      paste(
-        setdiff(
-          package_list,
-          as.data.frame(
-            utils::installed.packages()
-          )[, 1]
-        ),
-        collapse = ", "
-      )
-    )
-  )
-}
+source("config.R")
 
 ```
 
@@ -91,37 +36,64 @@ if (
 
 ## Setting up path variables
 
+Here we are saving the paths to our files as character strings to have a cleaner (and more adaptable) script downstream. It's recommended to set up variables in the beginning of a script to keep things clean and easy to change.
+
+**What we need:**
+
+1.  The phylogenetic tree (in nexus format)
+2.  Mammal occurrence data (prepared using the script 'preprocess_mammals_ranges.R'
+3.  Taxonomic information for subsetting and annotation
+4.  The shapefile in botanical countries-scale (tdwg3).
+
+**Thanks to the [PHYLACINE](https://github.com/MegaPast2Future/PHYLACINE_1.2/) database, we have it all together already :-)**
+
+Familiarize yourself with the `here-package`. It's the new reproducible and collaborative way to do R stuff on different machines. It always sets the working directory to be where the script is/or the Rproj. if you have one.
+
 ```{r, libraries}
 #| label: set-path-vars
 
 # Clean working space
 rm(list = ls())
 
-# Paths to our data
-out_path <- here("data")
-tree_path <- here("data_raw", "Phylogenies", "Complete_phylogeny.nex")
-occurrence_path <- here("data", "mammals_occu.rds")
-tax_path <- here("data_raw", "Traits", "Trait_data.csv")
-shp_path <- here("data_raw","shp")
+# Paths to our data:
+
+out_path <- here("data") # where we will save stuff
+
+tree_path <- here("data_raw", "Phylogenies", "Complete_phylogeny.nex") # file path to the phylogeny (in nexus format)
+
+occurrence_path <- here("data", "mammals_occu.rds") # file path to the occurrence data that I prepared with the 'preprocess_mammals_ranges.R' script.
+
+tax_path <- here("data_raw", "Traits", "Trait_data.csv") # Taxonomic information from the trait database
+
+shp_path <- here("data_raw","shp") # shapefile in botanical countries-scale
+
+
+# Let's set the theme for ggplots
+theme_set(theme_bw())
 
 ```
 
 ## The Data
-Source: https://github.com/MegaPast2Future/PHYLACINE_1.2/
 
-### A) Phylogenetic tree for mammals
+[Source:]{.underline} <https://github.com/MegaPast2Future/PHYLACINE_1.2/>
 
-Phylogenetic trees are very uncertain and should be regarded as 'hypothesis of relationship' rather than facts. They are created using bayesian methods and the output of such analyses is a posterior distribution of the result. Therefore, they are very rarely provided as a single tree and rather as a set of 1000 phylogenetic trees that were sampled randomly from said posterior distribution. These trees vary in placement of clades within the tree and branching times. This makes phylogenetic analyses require a lot of computational power, since one line of code can easily take a week to run for a set of 1000 phylogenetic trees with sufficient size.
+### 1) Phylogenetic tree for mammals
 
-We will therefore find the maximum clade credibility (MCC) tree, which tries to find the tree with the highest confidence in the placement of clades from the set of 1000 trees.
+::: {.callout-tip icon="false"}
+## ⭐ A note on Phylogenetic Trees
 
-Please skip this code chunk right below and read in the file for the MCC tree instead (next chunk).
+Phylogenetic trees are very uncertain and should be regarded as *'hypothesis of relationship'* rather than facts. They are created using bayesian methods and the output of such analyses is a posterior distribution of the result. Therefore, they are very rarely provided as a single tree and rather as a set of 1000 phylogenetic trees that were sampled randomly from said posterior distribution. These trees vary in placement of clades within the tree and branching times. This makes phylogenetic analyses require a lot of computational power, since one line of code can easily take a week to run for a set of 1000 phylogenetic trees with sufficient size.
+
+We will therefore find the *maximum clade credibility* (MCC) tree, which tries to find the tree with the highest confidence in the placement of clades from the set of 1000 trees.
+
+[***Please skip this code chunk right below and read in the file for the MCC tree instead (next chunk).***]{.underline}
+:::
 
 ```{r, phylogeny, eval = FALSE}
 #| eval: false
-#| label: create-phylogeny
+#| label: create-mcc-phylogeny
 
-### DO NOT RUN ###
+### PLEASE DO NOT RUN ###
 
 tree <- read.nexus(tree_path)
 
@@ -133,7 +105,7 @@ mcc_tree <- mcc(tree, tree = TRUE, rooted = TRUE)
 mcc_tree
 saveRDS(mcc_tree, here(out_path, "MCCtree.rds"))
 
-#########
+#### END #####
 
 rm(mcc_tree, tree, tree_path)
 
@@ -141,6 +113,7 @@ rm(mcc_tree, tree, tree_path)
 
 ```{r}
 #| label: read-phylogeny
+
 ### RUN THIS INSTEAD ###
 
 tree <- readRDS(file.path(out_path, "MCCtree.rds")) %>% 
@@ -149,32 +122,69 @@ tree <- readRDS(file.path(out_path, "MCCtree.rds")) %>%
 
 ```
 
-#### Phylogeny plot
+#### 🖼️Phylogeny plot
+
+::: callout-note
+## 🗨️Discussion 1
+
+What can we say about diversification in Mammals?
+
+-   when? (in which period?)
+
+-   how strong?
+
+-   any trends?
+:::
+
 ```{r}
 #| label: plot-phylogeny
+par(mfrow = c(1,1))
 plotTree(
   tree,   
   ftype = "off", 
   ylim=c(-0.2,1)*Ntip(tree)) # increase the plot window to the bottom to plot the geo axis
 # add the axis
 phytools::geo.legend()
+
 ```
 
-#### Lineages through time plot 
+#### 🖼️Lineages through time plot
+
+Let's visualize the diversification of lineages (i.e, species) through time, and indicate when the *K-Pg Mass Extinction* happened 66 million years ago. Let's have a look at the temporal dynamics of diversification.
+
+::: callout-note
+## 🗨️Discussion 2
+
+-   Identify the direction of the x-axis: Is it from past to present or from present to past?
+
+-   How old is the mammal clade? When did it evolve?
+
+-   When did mammals diversification get started?
+
+-   Compare the two visualizations: why does it make sense to use the log-transformation?
+:::
+
 ```{r}
 #| label: lineages_through_time_plot
 
+par(mar = c(5, 4, 4, 2) + 0.1) # set up the plot window
+
+
 # Lineages-through-time plot
+
 K_P_massextinction <- 217-66
 
 ltt1 <- ltt(tree, log.lineages = FALSE, plot = FALSE)
 
-plot(ltt1);abline(v = K_P_massextinction)
+par(mfrow=c(1,2))
+plot(ltt1, log.lineages = FALSE, main = "# Lineages");abline(v = K_P_massextinction, col = "red")
+plot(ltt1, log.lineages = TRUE, main = "log # Lineages");abline(v = K_P_massextinction, col = "red")
+par(mfrow=c(1,1))
 
-rm(ltt1)
+rm(ltt1) # let's remove it because it's bigg and we don't need it anymore
 ```
 
-### B) Occurrence data for mammals (country-scale)
+### 2) Occurrence data for mammals (country-scale)
 
 I prepared mammal occurrences for you beforehand, because it takes some time for almost 6000 species. I have provided the code how I prepared this data in the project folder. The range maps were taken from the PHYLACINE database and can be freely downloaded from their repository to reproduce the occurrence data I provided here.
 
@@ -183,27 +193,47 @@ For the sake of time, we will be using the data that I have prepared instead of 
 ```{r, occurrence-data}
 #| label: read-occurrence-data
 
-occur <- readRDS(occurrence_path)
-
+occur <- read.csv(here("data", "occ_data.csv")) 
 
 # Inspect the data
 class(occur) # sf object
 head(occur) # presence of species in polygons (botanical countries/LEVEL_3_CO)
 ```
 
+#### 🖼️TDWG3 world plot
+
+::: callout-note
+## 🗨️ Discussion 3
+
+-   What can you see in the map? Describe the scale at which we will assess diversification.
+:::
 
 ```{r}
-#| label: fix-occu-data
+#| label: viz-occu-data
 
 # Fix some geometry issues (:
 occur <- st_read(shp_path) %>%
-  left_join(occur %>% st_drop_geometry()) %>% 
-  st_make_valid()
+  left_join(occur) 
+
+# Visualize the map and its resolution
+occur %>% 
+  select(LEVEL_3_CO) %>% 
+  unique() %>%
+  ggplot()+
+  geom_sf(aes(fill = LEVEL_3_CO), show.legend = FALSE)
 ```
 
-## 1. Phylogenetic calculations
+Cool! Now we are prepped with our data and can calculate some **phylogenetic indices** to investigate global patterns for.
 
+## Phylogenetic calculations
 
+We start by setting up some vectors again.
+
+::: {.callout-tip icon="false"}
+## ⭐ A note on phylogenetic comparative methods
+
+Most importantly, to run any phylogenetic analysis, the **species in the tree have to match the species in the data**. Not only that it has to be exactly the same species list, it's also needed for many analyses that the species lists are in the same order. Since the tree always has an internal structure that dictates the order of tip labels, it is advised to **reorder the data by tips in the tree.**
+:::
 
 ```{r}
 #| label: species-names-vectors
@@ -216,15 +246,19 @@ sp_in_data <- unique(occur$species)
 ```
 
 ### Calculate phylogenetic metrics (on the whole tree)
-Once we have reconstructed the geographic pattern of species diversity, we can reconstruct the pattern of diversification. We will focus on present-day diversification. **Present-day diversification (DR)** captures the diversification rates near the tips of the phylogeny (\~ last 2 myrs). DR can be be calculated as the inverse of **species distinctiveness (ED)**, which is a measure of species isolation on the phylogeny. Species positioned at the end of long branches are viewed as distinctive (high values of ED). It can be shown mathematically that these species are also associated with slow diversification (low values of DR). Fast diversification, conversely, typifies species with low ED. The inverse relationships between ED and DR (**DR = 1 / ED**) is rather intuitive, when you consider that rapid radiations produce many species on the phylogeny separated by short branches.
 
+Once we have reconstructed the geographic pattern of species diversity, we can reconstruct the pattern of diversification. We will do it twice, once for present-day diversification rates (DR) and for whole-clade or deep-time diversification rates (RD).
 
-Here we compare these patterns to **deep-time diversification rates (root distance, RD)**: This one is a bit more inclusive towards diversification phases over the whole evolutionary time of the phylogeny. It counts the number of nodes (ancestors) between the species at the tip and the root. Higher numbers indicate higher diversification rates (over the whole clade since it's origin at the root).
+**Present-day diversification (DR)** captures the diversification rates near the tips of the phylogeny (\~ last 2 myrs). DR can be be calculated as the inverse of **species distinctiveness (ED)**, which is a measure of species isolation on the phylogeny. Species positioned at the end of long branches are viewed as distinctive (high values of ED). It can be shown mathematically that these species are also associated with slow diversification (low values of DR). Fast diversification, conversely, typifies species with low ED. The inverse relationships between ED and DR (**DR = 1 / ED**) is rather intuitive, when you consider that rapid radiations produce many species on the phylogeny separated by short branches.
+
+Here we compare these patterns to **deep-time diversification rates (root distance, RD)**: This one is a bit more inclusive towards diversification phases over the whole evolutionary time of the phylogeny. It counts the number of nodes (ancestors) between the species at the tip and the root. Higher numbers indicate higher diversification rates (over the whole clade, since its origin at the root).
 
 ```{r}
 #| label: do-phylo-calculations
 
-# Species evolutionary distinctiveness (ED)
+
+# Species evolutionary distinctiveness (ED) ## took 13 seconds
+## there is a function for it from the picante-package.
 ed <- evol.distinct(tree) %>%
   filter(Species %in% sp_in_data)
 
@@ -233,37 +267,41 @@ dr <- 1 / ed$w
 names(dr) <- ed$Species
 
 
-
-
-# Diversification rates of whole clades (RD) 
-# (root tip distance = number of nodes between root and tip)
+# Diversification rates of whole clades (RD) ## took 57 seconds
+## there is a function for it from the adephylo-package.
 rd0 <- distRoot(tree, 
                tips = "all",
                method = c("nNodes")) 
 
-rd <- rd0[names(rd0) %in% sp_in_data]
 
+# Now we filter for species for which we actually have data. 
+rd <- rd0[names(rd0) %in% sp_in_data]
 
 ```
 
 ### Match tree and data
 
+Now let's do the filtering and only keep tips that are found in both (tree and data).
+
 ```{r}
 #| label: drop-tips-from-tree
 
 # Drop species from the tree for which we do not have data
-tree <- keep.tip(tree, intersect(sp_in_tree, sp_in_data)) %>% 
+tree <- keep.tip(tree, 
+                 intersect(sp_in_tree, sp_in_data)
+                 ) %>% 
   # Ladderize the tree again
   ladderize()
 
 ```
 
-### Plot Diversification rates on the tree
+#### 🖼️ Plot Diversification rates on the tree
 
 The phylogeny can help to demonstrate what exactly DR measures, given that short branches are generally associated with high DR, while the opposite holds for long branches. Let's visualize it.
 
 ```{r}
 #| label: plot-rates-on-tree
+par(mfrow=c(1,2))
 
 plotTree.wBars(tree, 
                dr, 
@@ -279,16 +317,19 @@ plotTree.wBars(tree,
 
 ```
 
-### Species richness 
+### Species richness
+
+We will sum up all species in each botanical country to get the species richness.
 
 ```{r}
 #| label: create-plotting-data-SR
+# NOTE: if some countries are missing in the map, try uncommenting 'st_make_valid()'
 
 richness <- occur %>% 
-  # st_make_valid() %>%
   group_by(LEVEL_3_CO) %>% 
-  # Calculate species richness per country:
-  mutate(SR = sum(presence)) %>% 
+  mutate(
+    SR = sum(presence) # Calculate species richness per country:
+    ) %>% 
   dplyr::select(LEVEL_3_CO, SR) %>%
   unique()
 
@@ -296,6 +337,7 @@ richness <- occur %>%
 
 ### Diversification Metrics
 
+We will calculate mean diversification rates for each botanical country. Since the differences between different lineages can be large, we will scale the rates to be between 0 and 1.
 
 ```{r}
 #| label: create-plotting-data-DR-RD
@@ -304,89 +346,117 @@ richness <- occur %>%
 # Present-day diversification rates (DR)
 dr_df <- as.data.frame(dr)
 dr_df$species <- row.names(dr_df)
-dr_df2 <- left_join(occur, dr_df) 
+dr_df2 <- left_join(occur, dr_df)  # merge with occurrence data
 
-diversification <- dr_df2 %>% 
+diversification <- dr_df2 %>%
   filter(!is.na(dr)) %>%
   dplyr::select(LEVEL_3_CO, dr) %>%
-  group_by(LEVEL_3_CO) %>% 
-  dplyr::mutate(mean_DR = mean(dr, na.rm=T)) %>%
+  group_by(LEVEL_3_CO) %>%
+  dplyr::mutate(
+    mean_DR = mean(dr, na.rm = T)
+    ) %>%
   dplyr::select(-dr) %>%
   unique() %>%
   ungroup() %>%
-  mutate(scaled_DR =((mean_DR - min(mean_DR)) / (max(mean_DR) - min(mean_DR)))) 
+  mutate(
+    scaled_DR = ((mean_DR - min(mean_DR)) / (max(mean_DR) - min(mean_DR)))
+    )
 
 
 
 # Clade diversification (Root distance, RD)
-rd_df <- as.data.frame(rd) 
+rd_df <- as.data.frame(rd)
 rd_df$species <- row.names(rd_df)
-rd_df2 <- left_join(occur, rd_df)
+rd_df2 <- left_join(occur, rd_df) # merge with occurrence data
 
-root_dist <- rd_df2 %>% 
+root_dist <- rd_df2 %>%
   filter(!is.na(rd)) %>%
   dplyr::select(LEVEL_3_CO, rd) %>%
-  group_by(LEVEL_3_CO) %>% 
-  dplyr::mutate(mean_RD = mean(rd, na.rm=T)) %>%
+  group_by(LEVEL_3_CO) %>%
+  dplyr::mutate(
+    mean_RD = mean(rd, na.rm = T)
+    ) %>%
   dplyr::select(-rd) %>%
   unique() %>%
   ungroup() %>%
-  mutate(scaled_RD =((mean_RD - min(mean_RD)) / (max(mean_RD) - min(mean_RD))))
+  mutate(
+    scaled_RD = ((mean_RD - min(mean_RD)) / (max(mean_RD) - min(mean_RD)))
+    )
 
 ```
 
-## Species richness vs. Diversification
+::: callout-note
+## 🗨️ Discussion 4
+
+-   Compare the maps: are there geographical trends/patterns?
+
+-   Think of extinctions (in space): what do you think how did they influence this result?
+
+-   Think of plate tectonics: what do you think is the reason for this pattern?
+:::
+
+#### 🖼️ Species richness *versus* Diversification
 
 ```{r}
 #| label: plot-maps
+tmap_options(check.and.fix = TRUE) # add this and ignore the warnings :-)
 
 my_palette <- viridis(12, option = "D")  
 
-#Plot:
-tm_shape(richness) +
+# Species Richness today:
+map1 <- tm_shape(richness) +
   tm_polygons("SR", palette = my_palette) + 
-  tm_layout(main.title = "Mammals - Species Richness")
-#Plot:
-tm_shape(diversification) +
-  tm_polygons("scaled_DR", palette = my_palette) + 
-  tm_layout(main.title = "Mammals - Present-day Diversification")
+  tm_layout(main.title = "Mammals - Species Richness",
+            legend.position = c("right", "bottom"))
 
-tm_shape(root_dist) +
+# Recent diversifications:
+map2 <- tm_shape(diversification) +
+  tm_polygons("scaled_DR", palette = my_palette) + 
+  tm_layout(main.title = "Mammals - Present-day Diversification",
+            legend.position = c("right", "bottom"))
+
+# Overall clade diversifications:
+map3 <- tm_shape(root_dist) +
   tm_polygons("scaled_RD", palette = my_palette) + 
-  tm_layout(main.title = "Mammals - Clade Diversification")
+  tm_layout(main.title = "Mammals - Clade Diversification",
+            legend.position = c("right", "bottom"))
+
+tmap_arrange(map1, map2, map3, nrow = 3)
 ```
 
-# Subclades: Your turn! 
+# ❇️Activity: Subclades - Your turn!
 
-Let's load the taxonomic information from PHYLACINE so that you can subset the data based on your interest. This is just something I do to prepare your data for your task :)
+Let's load the taxonomic information from PHYLACINE and subset the data based on our interest.
+
+This is just something I do to prepare the data for your task :)
 
 ```{r}
 #| label: create-data-subsets
-### DO NOT RUN ####
+
+## Here I split the phylogeny into smaller clades (orders).
+## If you want to investigate a  family or even the species within a genus, you can use this code template to filter your tree based on your interest :)
 
 
-## Here I split the phylogeny into smaller clades (orders). 
-## If you want to investigate a  family or even the species within a genus, you can use this code to filter your tree based on your interest :) 
-
-
-
-
-
+# Read the taxonomic information from Phylacine:
 tax <- read.csv(tax_path)[1:3]  %>% 
   filter(Binomial.1.2 %in% sp_in_tree)
 
-orders <- unique(tax$Order.1.2) # Which one do you want to investigate? 
+
+# Which one do you want to investigate? 
+orders <- unique(tax$Order.1.2)
 family <- unique(tax$Family.1.2)
 genus <- unique(tax$Genus.1.2)
 
-
-
-## make clade lists
+# Define the Most Recent Common Ancestor (MRCA) function
 fmrca = geiger:::.mrca  
 
-## Orders: 
+# make clade lists
 clades <- list()
-for (i in orders) {
+
+## Orders: 
+## OR Change the loop-vector to 'family' or 'genus' (whatever you prefer)
+
+for (i in orders) { 
   print(i)
   
   # Subset tax based on the current order
@@ -407,21 +477,36 @@ for (i in orders) {
 
 class(clades) <- "multiPhylo"
 
-plot(clades)
 ```
 
-In the following code chunk, I have split the phylogeny by taxonomic orders. We have 18 different orders of mammals in this tree. The goal is that you chose any one of these 18 clades and investigate the geographic patterns of species richness & diversification rates.
+#### 🖼️ Orders Phylogeny plots
 
-I'll run one example for Carnivores (because the clade is rather small and can be nicely visualized)
+```{r}
 
-## Chose your clade:
+# Set up a 5x5 plotting layout
+par(mfrow = c(5, 5))  # Adjust margins as needed
+
+# Loop over each tree in the 'clades' list and plot it
+for (i in 1:length(clades)) {
+  plotTree(clades[[i]], ftype="off", mar = c(2, 2, 2, 2))  
+  title(main = paste(names(clades)[i]))
+}
+```
+
+In the following code chunk, I have split the phylogeny by taxonomic orders. We have 25 different orders of mammals in this tree. **The goal is that you chose any one of these clades and investigate the geographic patterns of species richness & diversification rates.**
+
+I'll run one example for Carnivores (because the clade is rather small but big enough and can be nicely visualized)
+
+## Step 1: Chose your clade:
 
 ```{r}
 #| label: Task-Subclades
-## Adjust here!!
+
+
+## Adjust your clade of choice here!!
 my_clade <- clades$Carnivora
 
-
+par(mfrow = c(1,1))
 # Plot your clade
 plotTree(ladderize(my_clade), 
          fsize = 0.4, 
@@ -432,25 +517,32 @@ plotTree(ladderize(my_clade),
 # extract species names
 carni_sp <- my_clade$tip.label
 
-# extract occurrence data
+# extract occurrence data & calculate SR:
 carni_occ <- occur %>% 
+  st_drop_geometry() %>% 
   filter(species %in% carni_sp) %>%
   group_by(LEVEL_3_CO) %>%
-  mutate(SR_carni = n_distinct(species)) %>% 
-  unique()
+  mutate(
+    SR_carni = n_distinct(species)
+    ) %>% 
+  distinct(SR_carni, LEVEL_3_CO)
 
+# Spatial object:
 carni_occ2 <- occur %>% 
   dplyr::select(LEVEL_3_CO) %>% 
-  left_join(carni_occ %>% st_drop_geometry()) %>% 
+  # Merge with Species Richness
+  left_join(carni_occ) %>% 
   dplyr::select(LEVEL_3_CO, SR_carni) %>% 
   unique()
 
 # Carnivores richness map =============
+par(mar = c(5, 4, 4, 2) + 0.1) # set up the plot window
 plot(carni_occ2["SR_carni"], main = "Species Richness - Carnivores")
-ltt(my_clade, log.lineages = FALSE)
+ltt(my_clade, log.lineages = TRUE)
+
 ```
 
-### Diversification rates
+## Step 2: Calculate Diversification rates
 
 ```{r}
 # From above: diversification rates =====
@@ -509,12 +601,13 @@ root_dist_carni2 <- occur %>%
 
 # Carnivores diversification map1 =============
 plot(div_carni2["scaled_DR"], main = "Present-day diversification - Carnivores")
+
 # Carnivores diversification map2 =============
 plot(root_dist_carni2["scaled_RD"], main = "Clade diversification - Carnivores")
 
 ```
 
-## Richness vs. Diversification
+## Step3: Plot Richness vs. Diversification
 
 ```{r}
 #Plot:
@@ -537,8 +630,8 @@ tm_shape(carni_occ2) +
 plot(div_carni2$mean_DR, carni_occ2$SR_carni, "p")
 ```
 
+# 🧚‍♂️🪄EXTRA
 
-# EXTRA
 ## Plotting tools: annotation
 
 ```{r}
@@ -621,4 +714,3 @@ class(clades) <- "multiPhylo"
 #| eval: false
 save.image(here(".RData"))
 ```
-
