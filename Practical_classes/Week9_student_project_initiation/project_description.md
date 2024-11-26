@@ -1,39 +1,38 @@
 ---
+title: "Student project description"
+author: "Petr Keil, Gabriele Midolo, Carmen Soria, Frieda Wölke"
 output: 
   html_document: 
     toc: yes
     number_sections: yes
 ---
-# Student project description
 
-**Petr Keil et al.**
+# Time frame
 
-## Time frame
-
-- 27 November 2023 - every student leaves with an idea about the project topic (response, predictors, grain, extent)
+- 25 November 2024 - every student leaves with an idea about the project topic (species, taxonomic group, response, predictors, grain, extent)
  
-- 4 November 2023 - work on the project
+- 2 December 2024 - work on the project
 
-- 11 December 2023 - work on the project. If all goals have been achieved, 
+- 9 December 2024 - work on the project. If all goals have been achieved, 
 expand the project.
 
-- 18 December 2023 - every student gives a 10 min presentation about the results.
+- 16 December 2024 - every student gives a 10 min presentation about the results.
 
-## Goal
+# Goal
 
-### A statistical model
+## A statistical model
 
 The goal is to give students a hands-on experience with a statistical model applied
 at biogeographical context. This can be a species distribution model (SDM), model explaining biodiversity (species richness), or any other response variable.
 
 Students must pick a different response than what we used during classes.
 
-### A simulation model
+## A simulation model
 
 Alternatively, students can also choose to **implement a simulation model** (e.g. a neutral
 model of biodiversity). Such activity may then indeed not include a response and predictors.
 
-## Pick a response variable 
+# Pick a response variable 
 
 This can be:
 - point occurrences of a species (e.g. from GBIF or other database)
@@ -42,7 +41,7 @@ This can be:
 - any other variable of interest, after discussion with us (e.g. language diversity,
 deforestation, spectral variables, ...)
 
-## Pick predictors
+# Pick predictors
 
 These are **hypothesized** variables that affect the response variable. 
 
@@ -50,28 +49,28 @@ You should pick at least **3 different data sources** for the predictors (e.g. W
 
 You should have some **reason** for why you're picking a specific predictor.
 
-## Pick extent and grain (resolution)
+# Pick extent and grain (resolution)
 
 **Extent** is the overall boundary within which you will operate. E.g. Czech Republic, Europe, World
 
 **Grain** is the pixel size, if you work with rasters. E.g. 1x1 km in WorldClim. But it can also be country grain, 10x10 km grain, ...
 
-## Do the analysis
+# Do the analysis
 
 Link the response to predictors. You can use any technique that you like, e.g. 
 linear models, generalized linear models (logistic regression), random forest,
 MaxEnt, ...
 
-### Interpret the model
+## Interpret the model
 
 What can you learn from the fitted model? Can you say something about habitat
 preferences/niche? Can you interpret model coefficients?
 
-### Use it to for spatial predictions
+## Use it to for spatial predictions
 
 Use the model to map your response into areas for which you have no data.
 
-## Present the results
+# Present the results
 
 Prepare a 10 min presentation describing all the steps above. 
 
