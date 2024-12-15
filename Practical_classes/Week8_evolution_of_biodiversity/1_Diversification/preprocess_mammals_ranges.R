@@ -108,7 +108,11 @@ bot_v3 <- bot_v2 %>% st_as_sf()
 
 mammals_occu <- left_join(bot_v3, df_values2)
 
-saveRDS(mammals_occu, here(out_path, "mammals_occu.rds"))
+mammals_occu %>% 
+  st_drop_geometry() %>% 
+  write.csv(here("data", "occ_data.csv"))
+
+# saveRDS(mammals_occu, here(out_path, "mammals_occu.rds"))
 
 # =====================
 
