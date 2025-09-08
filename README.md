@@ -60,8 +60,8 @@ Most practical classes use R. Mild use of either QGIS or ArcGIS can be expected.
 - Oct 13 (**Elisa, Adam**) - Drivers of distributions and diversity: Environmental data, historical data, human-related predictors, climate, soils, land cover. Future climate projected layers. Plotting and exploring associations and correlations.
 - Oct 20 (**Mel, Gabriele**). Species Distribution Models I.
 - Oct 27 (**Gabriele, Carmen**). Species Distribution Models II.
-- Nov 3  (**Petr, Flo**). Biodiversity change.
-- Nov 10 (**Petr, Flo**). Simulation models of biodiversity.
+- Nov 3  (**Petr **). Simulation models of biodiversity.
+- Nov 10 (**Petr, Flo**). Biodiversity change.
 - Nov 17 - **State holiday - no practical class**
 - Nov 24 (**all**). Mini project I: Choosing a taxon, region, question, and data source. 
 - Nov 1 (**all**). Mini project II. Work on the project with us, data preparation.
