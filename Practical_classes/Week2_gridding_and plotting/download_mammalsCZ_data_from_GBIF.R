@@ -1,5 +1,5 @@
 # gbif data download
-# occ_download() is the best way to get GBIF mediated occurrences
+# occ_download() is the best way to download data from GBIF
 
 library(rgbif)
 library(taxize)
@@ -55,7 +55,7 @@ occ_download(
 #   GBIF Occurrence Download https://doi.org/10.15468/dl.a9fytb Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2024-10-06
 
 # check the query status
-occ_download_wait('0044820-240906103802322')
+occ_download_wait(" *** USE THE NUMBER OF YOUR DOWNLOAD ***")
 
 # <<gbif download metadata>>
 # Status: SUCCEEDED
@@ -68,7 +68,7 @@ occ_download_wait('0044820-240906103802322')
 # Total records: 7317
 
 # download the data
-data <- occ_download_get('0044820-240906103802322') %>%
+data <- occ_download_get(" *** USE THE NUMBER OF YOUR DOWNLOAD ***") %>%
   occ_download_import()
 
 # clean the data
