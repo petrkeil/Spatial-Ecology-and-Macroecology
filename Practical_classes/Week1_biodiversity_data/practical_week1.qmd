@@ -1,7 +1,7 @@
 ---
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 1'
-date: 2024-09-30
+date: 2025-09-29
 author:
   - name: 'Florencia Grattarola'
     id: fg
@@ -27,6 +27,8 @@ format:
     echo: true
     footer: '[https://github.com/petrkeil/Spatial-Ecology-and-Macroecology](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology)'
 editor: source
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## What are we going to see today?
@@ -43,7 +45,7 @@ editor: source
 
 ## 1. Data types
 
-Data that can place a particular **taxa** in a particular **location** and **time** can take many forms, depending on:
+Data that can place a particular **taxon** in a particular **location** and **time** can take many forms, depending on:
 
 ::: incremental
 1.  What they record (*currency of the species' distribution*)
@@ -83,7 +85,7 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 
 ::: columns
 ::: {.column width="60%"}
--   For example: data from inventories, checklists, atlas, acoustic sensors, DNA sampling or camera-trap surveys
+-   For example: data from checklists, inventories, atlases, acoustic sensors, DNA sampling, or camera-trap surveys
 -   Characteristics: multiple species, spatio-temporally specific, report searches that did not find the species (absences)
 :::
 
@@ -95,7 +97,7 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 ::: {.fragment}
 | **PROS**                                                   | **CONS**                                                             |
 |------------------------------------|------------------------------------|
-| absences are informative, area and effort are measured | less abundant (too time consuming), methods are species-specific |
+| absences are informative, area and effort are measured | less abundant (too time-consuming), methods are species-specific |
 :::
 
 ------------------------------------------------------------------------
@@ -118,7 +120,7 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 ::: {.fragment}
 | **PROS**                                             | **CONS**                                                         |
 |------------------------------------|------------------------------------|
-| standardised protocols, multiple points in time | expensive: geographically restricted, usually temporally too |
+| standardised protocols, multiple points in time | expensive, geographically restricted, usually temporally too |
 :::
 
 ------------------------------------------------------------------------
@@ -148,7 +150,7 @@ Data that can place a particular **taxa** in a particular **location** and **tim
 
 ## 1. Data types
 
-Data can also be defined as **how** they were collected.
+Data can also be defined by **how** they were collected.
 
 ------------------------------------------------------------------------
 
@@ -196,7 +198,7 @@ Data can also be defined as **how** they were collected.
 
 ## 1. Data types
 
-Finally, data can also be defined as how they are **made available** for others.
+Finally, data can also be defined by how they are **made available** for others.
 
 ------------------------------------------------------------------------
 
@@ -280,6 +282,14 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ------------------------------------------------------------------------
 
+![](https://observation.org/static/img/logo/logo-observation-org.svg){.centre top="200" height="100"}
+
+### [observation.org](https://observation.org)
+
+**Observation.org**  is a global biodiversity platform for citizen science and monitoring, established in 2004. It mainly used in Europe.
+
+------------------------------------------------------------------------
+
 ![](img/IUCN_Red_List.png){.centre top="200" height="200"}
 
 ### [iucnredlist.org](https://www.iucnredlist.org)
@@ -290,25 +300,16 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ------------------------------------------------------------------------
 
-![](img/IUCN_Red_List.png){.centre top="200" height="200"}
-
-### [iucnredlist.org](https://www.iucnredlist.org)
-
-**IUCN**'s (International Union for Conservation of Nature) Red List of Threatened Species has evolved to become the world's most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
-
-![](https://avatars.githubusercontent.com/u/29559340?s=200&v=4){height="100"} `redlistr`: <https://github.com/red-list-ecosystem/redlistr>
-
-------------------------------------------------------------------------
-
 ![](https://mol.org/static/img/logo.png){.centre top="200" height="100"}
 
 ### [mol.org](https://mol.org)
 
-**Map of Life** endeavors to provide 'best-possible' species range information and species lists for any geographic area. The Map of Life assembles and integrates different sources of data describing species distributions worldwide.
+**Map of Life** assembles and integrates different sources of data describing species distributions worldwide. It is developed by the Center for Biodiversity and Global Change at Yale University.
 
 ------------------------------------------------------------------------
 
-![](https://ars.els-cdn.com/content/image/X23523409.jpg){.centre top="200" width="100"}
+![](https://ars.els-cdn.com/content/image/1-s2.0-S2352340917301981-gr1.jpg){.centre top="200" width="100"}
+<!-- ![](https://ars.els-cdn.com/content/image/X23523409.jpg){.centre top="200" width="100"} -->
 
 ### [10.1016/j.dib.2017.05.007](https://doi.org/10.1016/j.dib.2017.05.007)
 
@@ -316,11 +317,11 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ------------------------------------------------------------------------
 
-![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="200" height="200"}
+![](https://www.bto.org/sites/all/themes/egret/img/logo/bbs-logo-square.png){.centre top="300" height="300"}
 
 ### UK [bto.org/our-science/projects/breeding-bird-survey](https://www.bto.org/our-science/projects/breeding-bird-survey)
 ### USA [usgs.gov/centers/eesc/science/north-american-breeding-bird-survey](https://www.usgs.gov/centers/eesc/science/north-american-breeding-bird-survey)
-
+<br>
 **BBS** (Breeding Bird Survey) involves thousands of volunteer birdwatchers carrying out standardised annual bird counts on randomly-located 1-km sites. It's part of the NBN Atlas.
 
 ------------------------------------------------------------------------
@@ -349,7 +350,7 @@ Finally, data can also be defined as how they are **made available** for others.
 
 ### [biotime.st-andrews.ac.uk](https://biotime.st-andrews.ac.uk)
 
-BioTime is an open access database global database of assemblage time series for quantifying and understanding biodiversity change.
+BioTime is an open access global database of assemblage time series for quantifying and understanding biodiversity change.
 
 ![](https://avatars.githubusercontent.com/u/29038235?s=200&v=4){width="80"} **BioTime Hub**: <https://github.com/bioTIMEHub>
 
@@ -369,32 +370,6 @@ BioTime is an open access database global database of assemblage time series for
 The data on the internet can be public but they are not necessarily open. They can be standard, available in open formats (e.g., csv), and yet, if they don't have a licence, by default they are closed (all rights reserved).
 :::
 
-------------------------------------------------------------------------
-
-## 3. Open Data: Data standards
-
-**Darwin Core** is the internationally agreed data standard to facilitate the sharing of information about biological diversity.
-
-### [dwc.tdwg.org](https://dwc.tdwg.org/terms/)
-
-
-::: columns
-
-::: {.column width="40%"}
-![](img/tdwg-logo-home.png){.centre top="200" height="200"}
-:::
-
-::: {.column width="60%"}
-::: {.fragment}
-`countryCode`: The standard code for the country in which the Location occurs. Recommended best practice is to use an ISO 3166-1-alpha-2 country code.\ 
-:::
-
-::: {.fragment}
-`recordedBy`: A list (concatenated and separated) of names of people, groups, or organizations responsible for recording the original Occurrence.
-:::
-:::
-
-:::
 ------------------------------------------------------------------------
 
 ## 3. Open Data: Licensing
@@ -423,6 +398,33 @@ Open data are licensed under open licenses. Some examples:
 
 ------------------------------------------------------------------------
 
+## 3. Open Data: Data standards
+
+**Darwin Core** is the internationally agreed data standard to facilitate the sharing of information about biological diversity.
+
+### [dwc.tdwg.org](https://dwc.tdwg.org/terms/)
+
+
+::: columns
+
+::: {.column width="40%"}
+![](img/tdwg-logo-home.png){.centre top="200" height="200"}
+:::
+
+::: {.column width="60%"}
+::: {.fragment}
+`countryCode`: The standard code for the country in which the Location occurs. Recommended best practice is to use an ISO 3166-1-alpha-2 country code.\ 
+:::
+
+::: {.fragment}
+`recordedBy`: A list (concatenated and separated) of names of people, groups, or organizations responsible for recording the original Occurrence.
+:::
+:::
+
+:::
+
+------------------------------------------------------------------------
+
 ## 3. Open Data: Data sharing
 
 Data that are **standardized** and have an **open licence** can be shared :)
@@ -433,7 +435,7 @@ Data that are **standardized** and have an **open licence** can be shared :)
 
 ## Imagine you want to start a project:
 
-Chose a taxon, chose **one** data source and try to get distribution data.
+Choose **one taxon** and **one data source**, and try to get distribution data.
 
 Then answer the following 3 questions:
 
@@ -446,28 +448,30 @@ Then answer the following 3 questions:
 
 ::: aside
 Should take around **5 minutes** :)\
-Afterwards we will discuss some of your examples. Please be prepared to share your experience.
+Afterwards, we will discuss some of your examples. Please be prepared to share your experience.
 :::
 
 # [EXERCISE 2]{.story} [Mammal's of the Czech Republic]{style="float:right;text-align:right;"} {background-color="#488fb8"}
 
-We will use the mammals of Czech Republic as an example dataset. We will access data through [**GBIF**](https://gbif.org) using tools available in R. 
+We will use the mammals of the Czech Republic as an example dataset.
+We will access the data through [**GBIF**](https://gbif.org) using R. 
 
 ## Some preparation before starting to code
 
 ::: incremental
--   Create a new project for all your practical sessions (with `code` and `data` folders inside).
--   Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).
--   Keep your code short and easily readable in plain English.
+-    Create a new project – you will use it for all your practical sessions (with `code` and `data` folders inside).
 :::
 
 ::: {.fragment}
 [File]{.font-big} \> [New project]{.font-big} \> [New directory]{.font-big} or [Existing directory]{.font-big}
 :::
 
+<br>
+
 ::: incremental
--   Download the code for today's practical from: [practical_week1_exercise2_STUDENTS_FILE.qmd](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/3713ec0823ba08d540f3aeea5f8d1a0acb56c71b/Practical_classes/Week1_biodiversity_data/practical_week1_exercise2_STUDENTS_FILE.qmd)
+-   Download the [Quarto](https://quarto.org) Markdown document for today's practical from: [practical_week1_exercise2_STUDENTS_FILE.qmd](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/3713ec0823ba08d540f3aeea5f8d1a0acb56c71b/Practical_classes/Week1_biodiversity_data/practical_week1_exercise2_STUDENTS_FILE.qmd)
 :::
+
 
 ------------------------------------------------------------------------
 
@@ -483,6 +487,9 @@ install.packages('pacman')
 ```
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 library(pacman) # load
 packageVersion('pacman')
 ```
@@ -501,6 +508,9 @@ If you attempt to load a library that is not installed, `pacman` will try to ins
 We will use **`tidyverse`** for the manipulation and transformation of data.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(tidyverse) # Data wrangling
 packageVersion('tidyverse')
 ```
@@ -515,9 +525,12 @@ We will be using many functions from this library of package, like `filter()`, `
 
 ## 1 Install and load libraries
 
-We will use **`rgbif`** to download data from GBIF directly into R.
+We will use **`rgbif`** to download data from GBIF directly into our R session.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(rgbif) # the GBIF R package
 packageVersion('rgbif')
 ```
@@ -526,9 +539,12 @@ packageVersion('rgbif')
 
 ## 1 Install and load libraries
 
-We will need to get a taxon ID (`taxonKey`) for the *Mammalia* class from the GBIF backbone. For that we will use another package called **`taxize`**.
+We will need to get a taxon ID (`taxonKey`) for the *Mammalia* class from the GBIF backbone. For that, we will use another package called **`taxize`**.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(taxize)
 packageVersion('taxize')
 ```
@@ -540,6 +556,9 @@ packageVersion('taxize')
 We will use **`sf`** to work with spatial data.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(sf)
 packageVersion('sf')
 ```
@@ -548,9 +567,12 @@ packageVersion('sf')
 
 ## 1 Install and load libraries
 
-We will use **`rnaturalearth`** to interact with [Natural Earth](https://www.naturalearthdata.com/) to get mapping data into R (e.g., countries' polygons).
+We will use **`rnaturalearth`** to interact with [Natural Earth](https://www.naturalearthdata.com/) and get mapping data (e.g., countries' polygons) into R.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(rnaturalearth)
 packageVersion('rnaturalearth')
 ```
@@ -559,15 +581,22 @@ packageVersion('rnaturalearth')
 
 ## 2 Project variables
 
-Create some variables that will be used later.
+Create some variables that will be used later.  
 
 ```{r}
 #| echo: true
 #| eval: true
-taxa <- "Mammalia"
-country_code <- "CZ" # Two letters ISO code for Czechia
+
+taxon <- "Mammalia"
+country_code <- "CZ" # Two letters ISO code for the Czech Republic
 proj_crs <- 4326 # EPSG code for WGS84
 ```
+
+<br>
+
+::: {.fragment}
+Define the things you already know you will use later in the script. For instance, we know that we will work with **mammals** from the **Czech Republic** and that the data we will get from GBIF are in **WGS84** latitude and longitude.
+:::
 
 ## 2 Project variables
 
@@ -576,9 +605,10 @@ Get a taxon ID for the *Mammalia* class.
 ```{r}
 #| echo: true
 #| eval: true
-taxon_key <- get_gbifid_(taxa) %>%
+
+taxon_key <- get_gbifid_(taxon) %>%
   bind_rows() %>% # Transform the result of get_gbifid into a dataframe
-  filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
+  filter(matchtype == "HIGHERRANK" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
   pull(usagekey) # Pull the contents of the column "usagekey"
 
 taxon_key
@@ -596,7 +626,7 @@ Basemap of CZ to use later for plotting or checking the dataset.
 base_map <- rnaturalearth::ne_countries(
   scale = 110,
   type = 'countries',
-  country = 'czechia',
+  country = 'Czechia',
   returnclass = 'sf'
 )
 ```
@@ -638,38 +668,38 @@ How many occurrence records are in GBIF for the entire **Czech Republic**?
 ```{r}
 #| echo: true
 #| eval: true
-occ_count(country=country_code) # country code for Czech Republic (https://countrycode.org/)
+
+occ_count(country = country_code) # country code for the Czech Republic
 ```
 :::
 
 <br> 
 
 ::: {.fragment}
-And how many records for the **mammals** of Czech Republic?
+And how many of those records are **mammals**?
 :::
 
 ::: {.fragment}
 ```{r}
 #| echo: true
 #| eval: true
-occ_count(
-  country = country_code,
-  taxonKey = taxon_key
-)
+
+occ_count(country = country_code,
+          taxonKey = taxon_key)
 ```
 :::
 
 <br> 
 
 ::: {.fragment}
-We are ready to do a download. [Whoop!]{.font-big}\
+After this initial exploration, we are ready to download data. [Whoop!]{.font-big}\
 :::
 
 ------------------------------------------------------------------------
 
 ## 3.1 CZ mammals' GBIF data download
 
-To do this, we will use `occ_search()`, **but see `occ_download()`**.
+To do this, we will use `occ_search()`. This function has many options that correspond with fields in the GBIF database (DarwinCore terms). 
 
 ::: {.fragment}
 ``` r
@@ -740,47 +770,57 @@ occ_search(
 
 ## 3.1 CZ mammals' GBIF data download
 
+This is **not** the best way to download data from GBIF. The best way would be to use the function `occ_download()`, but you will need a user account for this.   
+
+<br> 
+
+For our next practical, please create an account in [GBIF.org](https://www.gbif.org) and follow the script [download_mammalsCZ_data_from_GBIF.R](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/main/Practical_classes/Week2_gridding_and%20plotting/download_mammalsCZ_data_from_GBIF.R) in the **Week2_gridding_and plotting** of the **Practical_classes** folder to get these data. 
+
+------------------------------------------------------------------------
+
+## 3.1 CZ mammals' GBIF data download
+
 Get occurrence records of mammals from Czech Republic.
 
 ```{r}
 #| echo: true
 #| eval: true
 
-occ_search(taxonKey=taxon_key,
-           country='CZ') 
+occ_search(taxonKey = taxon_key,
+           country = country_code) 
 ```
 
-[By default it will only return the first 500 records]{.font-aside}
+[By default, it will only return the first 500 records]{.font-aside}
 
 ------------------------------------------------------------------------
 
 ## 3.1 CZ mammals' GBIF data download
 
-To get **all** the records we need to specify a larger limit. Since we have over 8,000 records, we'll choose 9,000 as the limit.
+To get **all** the records, we need to specify a larger limit. Since we have over 15,000 records, we should choose more than 16,000 as the limit. **However**, this will get super slow, so you could pick 5000.
 
 ```{r}
 #| echo: true
-#| eval: true
+#| eval: false
  
-
-occ_search(taxonKey=taxon_key,
-           country='CZ',
-            limit=9000) 
+occ_search(taxonKey = taxon_key,
+           country = country_code,
+            limit = 16000) 
 ```
 
 ------------------------------------------------------------------------
 
 ## 3.1 CZ mammals' GBIF data download
 
-Finally, we store the result in the object `mammalsCZ`.
+Finally, we store the result in the object `mammalsCZ`. We include the option to remove common geospatial issues (e.g., zero coordinates, country coordinate mismatch, invalid coordinate, etc.).  
 
 ```{r}
 #| echo: true
 #| eval: true
+
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
-  country = country_code, # CZ, ISO code of Czechia
-  limit = 9000, # Max number of records to download
+  country = country_code, # CZ, ISO code of the Czech Republic
+  limit = 16000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 
@@ -791,11 +831,14 @@ mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data obj
 
 ## 4 Data exploration
 
-Mammals occurrence records from the Czech Republic
+Mammals occurrence records from the Czech Republic  
+
+Examine the dataset's variables and their respective data types: Are they `numeric`, `character`, or `boolean` in nature? 
 
 ```{r}
 #| echo: true
 #| eval: true
+
 glimpse(mammalsCZ)
 ```
 
@@ -805,7 +848,7 @@ glimpse(mammalsCZ)
 
 ## 4 Data exploration
 
-Mammals occurrence records from the Czech Republic
+Mammals occurrence records from the Czech Republic  
 
 How many records do we have?
 
@@ -838,13 +881,13 @@ mammalsCZ %>%
 
 ## 5 Data quality
 
-Data are not 'good' or 'bad', the quality will depend on our goal.\
-Some things we can check:
+Data are not 'good' or 'bad'; the quality will depend on our goal.  
+Some things we can check:  
 
 ::: incremental
--   Base of the record (type of occurrence)
--   Species names (taxonomic harmonisation)
--   Spatial and temporal (accuracy / precision)
+-   Basis of the record - the specific nature of the record (type of occurrence)  
+-   Species names (taxonomic harmonisation)  
+-   Spatial and temporal (accuracy / precision)  
 :::
 
 ::: {.fragment}
@@ -860,9 +903,9 @@ Automated flagging of common spatial and temporal errors in data.
 As an example of data cleaning procedures, we will check the following fields in our dataset:
 
 ::: incremental
--   `basisOfRecord`: we want preserved specimens or observations
--   `taxonRank`: we want records at species level.
--   `coordinateUncertaintyInMeters`: we want it to be smaller than 10km.
+-   `basisOfRecord`: we want preserved specimens or observations.  
+-   `taxonRank`: we want records at the species level.  
+-   `coordinateUncertaintyInMeters`: we want it to be smaller than 10km.  
 :::
 
 ------------------------------------------------------------------------
@@ -875,6 +918,7 @@ As an example of data cleaning procedures, we will check the following fields in
 ```{r}
 #| echo: true
 #| eval: true
+
 mammalsCZ %>% distinct(basisOfRecord)
 ```
 
@@ -906,16 +950,19 @@ mammalsCZ %>%
 
 -   `basisOfRecord`: we want preserved specimens or observations
 
+Update the object by filtering over the *basisOfRecord* to keep only records that correspond to "preserved specimens" or "human observations".
+
 ```{r}
 #| echo: true
 #| eval: true
+
 mammalsCZ <- mammalsCZ %>%
   filter(basisOfRecord == "PRESERVED_SPECIMEN" |
     basisOfRecord == "HUMAN_OBSERVATION")
 ```
 
 ::: {.fragment}
-[Note the use of `|` (OR) to filter the data. Another alternative is `filter(basisOfRecord %in% c("PRESERVED_SPECIMEN","HUMAN_OBSERVATION"))`.]{.font-aside}
+[Note the use of `|` (OR) to filter the data. An alternative is `filter(basisOfRecord %in% c("PRESERVED_SPECIMEN","HUMAN_OBSERVATION"))`.]{.font-aside}
 :::
 
 <br>
@@ -934,7 +981,7 @@ nrow(mammalsCZ)
 
 ## 5.1 Basic data filtering
 
--   `taxonRank`: we want records at species level
+-   `taxonRank`: we want records at the species level
 
 ::: {.fragment}
 ```{r}
@@ -948,7 +995,9 @@ mammalsCZ %>% distinct(taxonRank)
 
 ## 5.1 Basic data filtering
 
--   `taxonRank`: we want records at species level
+-   `taxonRank`: we want records at the species level
+
+Update the object by filtering over **taxonRank** to keep only records that correspond to the "species" level. 
 
 ```{r}
 #| echo: true
@@ -985,7 +1034,6 @@ mammalsCZ %>%
   select(scientificName, 
          coordinateUncertaintyInMeters, 
          stateProvince)
-  
 ```
 :::
 
@@ -994,6 +1042,8 @@ mammalsCZ %>%
 ## 5.1 Basic data filtering
 
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km
+
+Update the object by filtering over **coordinateUncertaintyInMeters** to keep only records that have less than 10000 meters of uncertainty. 
 
 ```{r}
 #| echo: true
