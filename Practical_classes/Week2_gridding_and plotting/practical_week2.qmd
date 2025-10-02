@@ -1,15 +1,14 @@
 ---
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 2'
-date: 2024-10-07
+date: 2025-10-06
 author:
+  - name: 'Adam Uličný'
+    # orcid:
+    email: ulicny@fld.czu.cz
   - name: 'Florencia Grattarola'
-    id: fg
     orcid: 0000-0001-8282-5732
     email: grattarola@fzp.czu.cz
-    affiliation: 
-      - name: MOBI Lab
-        url: https://petrkeil.github.io/
 format: 
   revealjs:
     self-contained: true
@@ -27,6 +26,8 @@ format:
     echo: true
     footer: '[https://github.com/petrkeil/Spatial-Ecology-and-Macroecology](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology)'
 editor: source
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## What are we going to see today?
@@ -154,13 +155,13 @@ We will get the data from:
 :::
 
 ::: {.column width="40%"}
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Pinus_sylvestris_range_in_EU.svg/1280px-Pinus_sylvestris_range_in_EU.svg.png){fig-align="center" width="300"}
+![](https://ars.els-cdn.com/content/image/1-s2.0-S2352340917301981-gr1.jpg){fig-align="center" width="300"}
 :::
 :::
 
 
 :::{.fragment}
-[We will **only** use the polygon data. See [`read_tree_data_to_gpkg.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/22c68d275b0fc0bc1a65de450e609c2386e0fe5c/Practical_classes/Week2_gridding_and%20plotting/read_tree_data_to_gpkg.R) to know how these data were processed.]{.font-aside}
+[We will **only** use the polygon data. See [`read_tree_data_to_gpkg.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/main/Practical_classes/Week2_gridding_and%20plotting/read_tree_data_to_gpkg.R) to know how these data were processed.]{.font-aside}
 :::
 
 
@@ -347,8 +348,8 @@ For the `cellsize` argument we will chose 1 degree, which is \~100km (=100,000m)
 europe_grid <- st_make_grid(europe_ea, 
                            cellsize=100000,
                            square=FALSE) %>%  # this will make hexagons
-  st_intersection(europe_ea) %>% 
-  st_sf(gridID=1:length(.))     
+  st_intersection(europe_ea) %>% # crop the grid by the borders of Europe
+  st_sf(gridID=1:length(.)) # create an ID number for each grid     
 ```
 
 . . .
@@ -440,9 +441,18 @@ trees_grid
 #| eval: true
 
 ggplot() + 
-  geom_sf(data=trees_grid %>% mutate(SR=ifelse(SR==0, NA, SR)), aes(fill=SR), lwd = 0) +
-  scale_fill_fermenter(palette ='YlOrBr', na.value ='grey90', n.breaks=6, direction = 1) +
-  geom_sf(data=europe_ea, fill=NA, col='grey70', size=0.2) +
+  geom_sf(data=trees_grid %>% 
+            mutate(SR=ifelse(SR==0, NA, SR)), 
+          aes(fill=SR), 
+          lwd = 0) +
+  scale_fill_fermenter(palette ='YlOrBr', 
+                       na.value ='grey90', 
+                       n.breaks=6, 
+                       direction = 1) +
+  geom_sf(data=europe_ea, 
+          fill=NA, 
+          col='grey70', 
+          size=0.2) +
   theme_bw()
 ```
 
@@ -493,7 +503,7 @@ Steps:
 
 1.  Get occurrence records of mammals in the Czech Republic
 
-We'll use the data from last practical (downloaded from GBIF), but his time, we will do a data download using `occ_download()`. In this way, we can download unlimited records and get a DOI for our dataset (very important for citation).  
+We'll use the data from last practical, downloaded from GBIF using `occ_download()`. In this way, we can download unlimited records and get a DOI for our dataset (very important for citation).  
 
 </br>
 
@@ -502,7 +512,7 @@ Check out how it looks like in GBIF, doi: [10.15468/dl.a9fytb](https://doi.org/1
 </br>
 
 :::{.fragment}
-[See [`download_mammalsCZ_data_from_GBIF.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/3713ec0823ba08d540f3aeea5f8d1a0acb56c71b/Practical_classes/Week2_gridding_and plotting/download_mammalsCZ_data_from_GBIF.R) to see how the data were downloaded.]{.font-aside}   
+[See [`download_mammalsCZ_data_from_GBIF.R`](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/main/Practical_classes/Week2_gridding_and%20plotting/download_mammalsCZ_data_from_GBIF.R) to see how the data were downloaded.]{.font-aside}   
 :::
 
 ---
@@ -955,6 +965,21 @@ ggplot() +
   theme_bw()
 ```
 
+--------------
+
+## Mapping occurrence records 🦌
+
+```{r}
+#| echo: true
+#| eval: true
+ggplot() + 
+  geom_sf(data=mammalsCZ_grids, aes(fill=log(N))) +
+  scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1) +
+  geom_sf(data=CZ_borders, fill=NA) +
+  coord_sf(crs=4326) +
+  theme_bw()
+```
+
 ------------------------------------------------------------------------
 
 ## Mapping occurrence records 🦌
@@ -979,7 +1004,7 @@ SR <- ggplot() +
   theme_bw()
 
 N <- ggplot() + 
-  geom_sf(data=mammalsCZ_grids, aes(fill=N)) +
+  geom_sf(data=mammalsCZ_grids, aes(fill=log(N))) +
   scale_fill_fermenter(palette ='YlGnBu', n.breaks=9, direction = 1)+
   geom_sf(data=CZ_borders, fill=NA) +
   coord_sf(crs=4326) +
