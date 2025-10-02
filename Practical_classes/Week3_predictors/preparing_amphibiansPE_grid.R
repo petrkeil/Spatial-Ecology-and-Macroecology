@@ -58,7 +58,7 @@ SR <- ggplot() +
   theme_bw()
 
 N <- ggplot() + 
-  geom_sf(data=amphibians_grid %>% mutate(N=ifelse(N==0, NA, N)), aes(fill=N), lwd = 0) +
+  geom_sf(data=amphibians_grid %>% mutate(N=ifelse(N==0, NA, N)), aes(fill=log(N)), lwd = 0) +
   scale_fill_fermenter(palette ='YlGnBu', na.value ='grey90', n.breaks=6, direction = 1) +
   geom_sf(data=peru_ea, fill=NA, col='grey70', size=0.2) +
   theme_bw()
