@@ -35,17 +35,14 @@ library(usdm) # assess collinearity in the predictors
 # 2. Get climatic predictors ####
 
 # 2.1 Download bioclim data for the study area
-# ?geodata::geodata
-# bio <- worldclim_country('United Kingdom', var = 'bio', tempdir())
-# names(bio) <- str_remove(names(bio), 'wc2.1_30s_') # rename bioclim data (if needed)
-# write_rds(bio, 'worldclim_UK.rds', compress = 'gz') # save
-# OR load...
 
-# 2.2 Plot examples
+# 2.2 Rename bioclim data (if needed)
 
-# 2.3 Convert everything to raster::stack
+# 2.3 Plot examples
 
-# 2.4 Detect and remove collinear variables
+# 2.4 Convert everything to raster::stack
+
+# 2.5 Detect and remove collinear variables
 
 
 # 3. Get Presence-Absence data ####
@@ -94,3 +91,4 @@ library(usdm) # assess collinearity in the predictors
 # 6.1 Fit and explore the performance of multiple algorithms (be aware of the computational time!)
 
 # 6.2 Compare unweighted and weighted ensemble
+
