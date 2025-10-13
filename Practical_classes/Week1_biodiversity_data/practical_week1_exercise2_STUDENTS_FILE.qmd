@@ -1,12 +1,9 @@
 ---
 title: 'Downloading, cleaning and mapping data from GBIF'
+date: 2025-09-29
 author:
   - name: 'Florencia Grattarola'
     orcid: 0000-0001-8282-5732
-  - name: 'Friederike Wölke'
-    orcid: 0000-0001-9034-4883
-  - name: 'Gabriel Ortega'
-    orcid: 0000-0002-0516-5694
 format: 
   html:
     toc: true
@@ -16,21 +13,24 @@ format:
     code-fold: true
 self-contained: true
 editor: source
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Mammal's of the Czech Republic
 
-We will use the mammals of Czech Republic as an example dataset. We will access data through [**GBIF**](https://gbif.org) using tools available in R.
+We will use the mammals of the Czech Republic as an example dataset.
+We will access the data through [**GBIF**](https://gbif.org) using R. 
 
 ## Some preparation before starting to code
 
--   Create a new project for all your practical sessions (with `code` and `data` folders inside).
--   Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).
--   Keep your code short and easily readable in plain English.
+  - Create a new project – you will use it for all your practical sessions (with `code` and `data` folders inside).  
+  - Comment your code as much as possible, as if you were to explain it to others (that other could be you in 3 months!).  
+  - Keep your code short and easily readable in plain English.
 
 ## 1 Install and load libraries
 
-We will always load packages into R using the package **`pacman`**. It's is a handy package to install, load, and unload libraries. If you attempt to load a library that is not installed, `pacman` will try to install it automatically.
+We will always load packages into R using the package **`pacman`**. It is a handy package for installing, loading, and unloading libraries. If you attempt to load a library that is not installed, `pacman` will try to install it automatically.
 
 ```{r}
 #| eval: false
@@ -47,17 +47,23 @@ pacman::p_load(tidyverse) # Data wrangling
 
 ## 1.1 Install and/or load `rgbif`
 
-We will use **`rgbif`** to download data from GBIF directly into our R session. `rgbif` has plenty of functions that allow us to interact with GBIF.
+We will use **`rgbif`** to download data from GBIF directly into our R session.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(rgbif) # the GBIF R package
 ```
 
 ## 1.2 Install and/or load `taxize`
 
-We will need to get a taxon ID (`taxonKey`) for the *Mammalia* class from the GBIF backbone. For that we will use another package called **`taxize`**.
+We will need to get a taxon ID (`taxonKey`) for the *Mammalia* class from the GBIF backbone. For that, we will use another package called **`taxize`**.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(taxize)
 ```
 
@@ -66,147 +72,132 @@ pacman::p_load(taxize)
 We will use **`sf`** to work with spatial data.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(sf)
 ```
 
 ## 1.4 Install and/or load `rnaturalearth`
 
-We will use **`rnaturalearth`** to interact with [Natural Earth](https://www.naturalearthdata.com/) to get mapping data into R (e.g., countries' polygons).
+We will use **`rnaturalearth`** to interact with [Natural Earth](https://www.naturalearthdata.com/) and get mapping data (e.g., countries' polygons) into R.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 pacman::p_load(rnaturalearth)
 ```
 
 # 2 Project variables
 
-It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
+It is advisable to have a section of project/work variables in your scripts. That way, it will be easy to reuse your scripts in other tasks.
 
 ## 2.1 Create a taxon ID for the *Mammalia* class
 
-Define here the things you already know you will use later on the script. For instance, we know that we will work with **mammals** from **Czechia** and the data we will get from GBIF are in **WGS84** latitude and longitude.
+Define here the things you already know you will use later in the script. For instance, we know that we will work with **mammals** from the **Czech Republic** and that the data we will get from GBIF are in **WGS84** latitude and longitude.
 
 ```{r}
-taxa <- "Mammalia"
-country_code <- "CZ" # Two letters ISO code for Czechia
+#| echo: true
+#| eval: true
+ 
+taxon <- 'Mammalia'
+country_code <- 'CZ' # Two letters ISO code for the Czech Republic
 proj_crs <- 4326 # EPSG code for WGS84
 ```
 
 Let's get the taxon ID for the *Mammalia* class
 
 ```{r}
-taxon_key <- taxize::get_gbifid_(taxa) %>%
+#| echo: true
+#| eval: true
+ 
+taxon_key <- taxize::get_gbifid_(taxon) %>%
   bind_rows() %>% # Transform the result of get_gbifid into a dataframe
-  filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
-  pull(usagekey) # Pull the contents of the column "usagekey"
+  filter(matchtype == 'EXACT' & status == 'HIGHERRANK') %>% # Filter the dataframe by the columns 'matchtype' and 'status'
+  pull(usagekey) # Pull the contents of the column 'usagekey'
 ```
 
 ## 2.2 Download a basemap of Czech Republic
 
-It is often useful to have a base map of the study area (in this case the whole Czechia).
+It is often useful to have a base map of the study area (in this case the whole the Czech Republic).
 
-```{r warning=FALSE,message=FALSE}
+```{r}
+#| echo: true
+#| eval: true
+#| warning: false
+#| message: false
+ 
 base_map <- rnaturalearth::ne_countries(
   scale = 110,
-  type = "countries",
-  country = "czechia",
-  returnclass = "sf"
+  type = 'countries',
+  country = 'Czechia',
+  returnclass = 'sf'
 )
 ```
 
 # 3 GBIF data download
 
-And now we can use the function `occ_count()` to find out the **number of occurrence records** for Czechia.
+## 3.1 Check GBIF's data
 
-How many occurrence records are in GBIF for the entire **Czechia**?
+Now, we can use the function `occ_count()` to find the **number of occurrence records** for the Czech Republic.
+
+How many occurrence records are in GBIF for the entire **Czech Republic**?
 
 ```{r}
+#| echo: true
+#| eval: true
+
 occ_count(country = country_code)
 ```
 
-And how many records for the **mammals** of Czech Republic?
+And how many of those records are **mammals**?
 
 ```{r}
+#| echo: true
+#| eval: true
+
 occ_count(
   country = country_code,
   taxonKey = taxon_key
 )
 ```
 
-Now we are ready to do a download. To do this, we will use `occ_search()`. This function has many options that correspond with fields in GBIF database.
-
-``` r
-occ_search(
-  taxonKey = NULL, # We will put here our taxon_key
-  scientificName = NULL,
-  country = NULL, # We will put here our country_code
-  publishingCountry = NULL,
-  hasCoordinate = NULL, 
-  typeStatus = NULL, 
-  recordNumber = NULL, 
-  lastInterpreted = NULL, 
-  continent = NULL, 
-  geometry = NULL, 
-  geom_big = "asis", 
-  geom_size = 40, 
-  geom_n = 10, 
-  recordedBy = NULL, 
-  recordedByID = NULL, 
-  identifiedByID = NULL, 
-  basisOfRecord = NULL, # Useful for filtering the type of record you want
-  datasetKey = NULL, 
-  eventDate = NULL, 
-  catalogNumber = NULL, 
-  year = NULL, 
-  month = NULL, 
-  decimalLatitude = NULL, 
-  decimalLongitude = NULL, 
-  elevation = NULL, 
-  depth = NULL, 
-  institutionCode = NULL, 
-  collectionCode = NULL, 
-  hasGeospatialIssue = NULL, # We will use this to retrieve only records without known geospatial issues
-  issue = NULL, 
-  search = NULL, 
-  mediaType = NULL, 
-  subgenusKey = NULL, 
-  repatriated = NULL, 
-  phylumKey = NULL, 
-  kingdomKey = NULL, 
-  classKey = NULL, 
-  orderKey = NULL, 
-  familyKey = NULL, 
-  genusKey = NULL, 
-  establishmentMeans = NULL, 
-  protocol = NULL, 
-  license = NULL, 
-  organismId = NULL, 
-  publishingOrg = NULL, 
-  stateProvince = NULL, 
-  waterBody = NULL, 
-  locality = NULL, 
-  limit = 500, # we will modify this to get the amount of records we need
-  start = 0, 
-  fields = "all", 
-  return = NULL, 
-  facet = NULL, 
-  facetMincount = NULL, 
-  facetMultiselect = NULL, 
-  skip_validate = TRUE, 
-  curlopts = list(), ...
-)
-```
-
-------------------------------------------------------------------------
+After this initial exploration, we are ready to download data. To do this, we will use `occ_search()`. This function has many options that correspond with fields in the GBIF database.
 
 ## 3.1 CZ mammals' GBIF data download
 
 Get occurrences records of mammals from Czech Republic.
 
 ```{r}
+#| echo: true
+#| eval: true
+
+occ_search(taxonKey = taxon_key,
+           country = country_code) 
+```
+
+By default, it will only return the first 500 records. To get **all** the records, we need to specify a larger limit. Since we have over 15,000 records, we'll choose 16,000 as the limit. **However**, this will get super slow, so you could pick 5000.
+
+```{r}
+#| echo: true
+#| eval: false
+ 
+occ_search(taxonKey = taxon_key,
+           country = country_code,
+           limit = 5000) 
+```
+
+Finally, we store the result in the object `mammalsCZ`. We include the option to remove common geospatial issues (e.g., zero coordinates, country coordinate mismatch, invalid coordinate, etc.).  
+
+```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
-  country = country_code, # CZ, ISO code of Czechia
-  limit = 9000, # Max number of records to download
+  country = country_code, # CZ, ISO code of the Czech Republic
+  limit = 5000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 
@@ -215,23 +206,32 @@ mammalsCZ <- mammalsCZ$data # The output of occ_search is a list with a data obj
 
 # 4 Data exploration
 
-Examine the dataset's variables and their respective data types: Are they numeric, character, or boolean in nature? That will tell you what you can do with every column in the dataset.
+Examine the dataset's variables and their respective data types: Are they `numeric`, `character`, or `boolean` in nature? 
 
-```{r eval=FALSE}
+```{r}
+#| echo: true
+#| eval: false
+ 
 glimpse(mammalsCZ)
 ```
 
 How many records do we have?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 nrow(mammalsCZ)
 ```
 
 How many species do we have?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ %>%
-  filter(taxonRank == "SPECIES") %>%
+  filter(taxonRank == 'SPECIES') %>%
   distinct(scientificName) %>%
   nrow()
 ```
@@ -242,56 +242,61 @@ mammalsCZ %>%
 
 Data are not 'good' or 'bad', the quality will depend on our goal. Some things we can check:
 
--   Base of the record (type of occurrence)
--   Species names (taxonomic harmonisation)
--   Spatial and temporal (accuracy / precision)
-
-![](https://docs.ropensci.org/CoordinateCleaner/logo.png){width="45"} `CoordinateCleaner`: <https://github.com/ropensci/CoordinateCleaner>
-
-CoordinateCleaner offers advanced data filtering and cleaning capabilities by automatically identifying and flagging common spatial and temporal errors.
+-   Basis of the record - the specific nature of the record (type of occurrence)  
+-   Species names (taxonomic harmonisation)  
+-   Spatial and temporal (accuracy / precision)  
 
 ## 5.1 Basic data filtering
 
 As an example of data cleaning procedures, we will check the following fields in our dataset:
 
 -   `basisOfRecord`: we want preserved specimens or observations
-
 -   `taxonRank`: we want records at species level.
-
 -   `coordinateUncertaintyInMeters`: we want them to be smaller than 10km.
 
 ### `basisOfRecord`:
 
-We want preserved specimens or observations
+We want preserved specimens and observations
 
 ```{r}
-mammalsCZ %>% distinct(basisOfRecord) %>% knitr::kable()
+#| echo: true
+#| eval: true
+ 
+mammalsCZ %>% distinct(basisOfRecord)
 ```
 
 Count how many records are in each type of *basisOfRecord*
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ %>%
   group_by(basisOfRecord) %>%
-  count() %>% 
-  knitr::kable()
+  count()
 ```
 
 `group_by()` is used to group values within a variable
 
-Filter *basisOfRecord* to get only records that correspond to "preserved specimens" or "human observations".
+Update the object by filtering over the *basisOfRecord* to keep only records that correspond to 'preserved specimens' or 'human observations'.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ <- mammalsCZ %>%
-  filter(basisOfRecord == "PRESERVED_SPECIMEN" |
-    basisOfRecord == "HUMAN_OBSERVATION")
+  filter(basisOfRecord == 'PRESERVED_SPECIMEN' |
+    basisOfRecord == 'HUMAN_OBSERVATION')
 ```
 
-Note the use of `|` (OR) to filter the data. Another alternative is `filter(basisOfRecord %in% c("PRESERVED_SPECIMEN","HUMAN_OBSERVATION"))`
+Note the use of `|` (OR) to filter the data. Another alternative is `filter(basisOfRecord %in% c('PRESERVED_SPECIMEN','HUMAN_OBSERVATION'))`
 
 How many records do we have now?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 nrow(mammalsCZ)
 ```
 
@@ -300,19 +305,28 @@ nrow(mammalsCZ)
 We want records at species level
 
 ```{r}
-mammalsCZ %>% distinct(taxonRank) %>% knitr::kable()
+#| echo: true
+#| eval: true
+ 
+mammalsCZ %>% distinct(taxonRank)
 ```
 
-Let's get records at species level
+Update the object by filtering over **taxonRank** to keep only records that correspond to the 'species' level. 
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ <- mammalsCZ %>%
-  filter(taxonRank == "SPECIES")
+  filter(taxonRank == 'SPECIES')
 ```
 
 How many records do we have now?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 nrow(mammalsCZ)
 ```
 
@@ -323,17 +337,22 @@ We want uncertainty to be smaller than 10km.
 Are there records with precision larger than 10km?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ %>%
   filter(coordinateUncertaintyInMeters >= 10000) %>%
   select(scientificName, 
          coordinateUncertaintyInMeters, 
-         stateProvince) %>% 
-  knitr::kable()
+         stateProvince) 
 ```
 
-Let's keep records with precision smaller than 10km.
+Update the object by filtering over **coordinateUncertaintyInMeters** to keep only records that have less than 10000 meters of uncertainty. 
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 mammalsCZ <- mammalsCZ %>%
   filter(coordinateUncertaintyInMeters < 10000) # keeping this
 ```
@@ -341,6 +360,9 @@ mammalsCZ <- mammalsCZ %>%
 How many records do we have now?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 nrow(mammalsCZ)
 ```
 
@@ -349,19 +371,22 @@ nrow(mammalsCZ)
 How are the records distributed?
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 library(sf)
 
 mammalsCZ_sf <- mammalsCZ %>%
   filter(!is.na(decimalLongitude) &
     !is.na(decimalLatitude)) %>%
   st_as_sf(coords = c(
-    "decimalLongitude",
-    "decimalLatitude"
+    'decimalLongitude',
+    'decimalLatitude'
   )) %>%
   st_set_crs(proj_crs)
 
 ggplot() +
-  geom_sf(data = base_map, fill = "white") +
+  geom_sf(data = base_map, fill = 'white') +
   geom_sf(
     data = sf::st_intersection(mammalsCZ_sf, base_map),
     aes(col = order)
@@ -372,8 +397,11 @@ ggplot() +
 And finally, a simple trick to produce separate maps per order.
 
 ```{r}
+#| echo: true
+#| eval: true
+ 
 ggplot() +
-  geom_sf(data = base_map, fill = "white") +
+  geom_sf(data = base_map, fill = 'white') +
   geom_sf(
     data = sf::st_intersection(mammalsCZ_sf, base_map),
     aes(col = order)
@@ -382,7 +410,13 @@ ggplot() +
   # Added to the previous ggplot
   facet_wrap(~order) +
   theme(
-    legend.position = "none",
+    legend.position = 'none',
     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
   )
 ```
+
+# EXTRA
+
+Now, please create an account in GBIF for our next practical and follow the script [download_mammalsCZ_data_from_GBIF.R](https://github.com/petrkeil/Spatial-Ecology-and-Macroecology/blob/main/Practical_classes/Week2_gridding_and%20plotting/download_mammalsCZ_data_from_GBIF.R) in the **Week2_gridding_and plotting** of the **Practical_classes** folder to get these data. 
+
+

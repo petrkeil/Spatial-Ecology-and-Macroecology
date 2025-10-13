@@ -16,9 +16,9 @@ taxon_key <- get_gbifid_(taxa) %>% # get a taxon_id for mammals
 
 # set up your credentials (you will need a GBIF user)
 
-GBIF_USER <- 'florencia_grattarola' # your gbif.org username 
-GBIF_PWD <- 'naFvez-modjir-dovpu1' # your gbif.org password
-GBIF_EMAIL <- 'flograttarola@gmail.com' # your email 
+GBIF_USER <- '' # your gbif.org username 
+GBIF_PWD <- '' # your gbif.org password
+GBIF_EMAIL <- '' # your email 
 
 # generate a download
 occ_download(
@@ -32,43 +32,46 @@ occ_download(
 )
 
 # <<gbif download>>
-#   Your download is being processed by GBIF:
-#   https://www.gbif.org/occurrence/download/0011679-241007104925546
+# Your download is being processed by GBIF:
+#   https://www.gbif.org/occurrence/download/0040123-250920141307145
 #   Most downloads finish within 15 min.
 #   Check status with
-#   occ_download_wait('0011679-241007104925546')
+#   occ_download_wait('0040123-250920141307145')
 #   After it finishes, use
-#   d <- occ_download_get('0011679-241007104925546') %>%
+#   d <- occ_download_get('0040123-250920141307145') %>%
 #     occ_download_import()
 #   to retrieve your download.
 # Download Info:
-#   Username: #### your gbif.org username 
-#   E-mail: #### your email  
+#   Username: florencia_grattarola
+#   E-mail: flograttarola@gmail.com
 #   Format: SIMPLE_CSV
-#   Download key: 0011679-241007104925546
-#   Created: 2024-10-13T11:39:39.902+00:00
+#   Download key: 0040123-250920141307145
+#   Created: 2025-10-02T13:59:49.115+00:00
 # Citation Info:  
 #   Please always cite the download DOI when using this data.
-# https://www.gbif.org/citation-guidelines
-# DOI: 10.15468/dl.9e9fjn
-# Citation:
-#   GBIF Occurrence Download https://doi.org/10.15468/dl.9e9fjn Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2024-10-13
+#   https://www.gbif.org/citation-guidelines
+#   DOI: 
+#   Citation:
+#   GBIF Occurrence Download https://www.gbif.org/occurrence/download/0040123-250920141307145 Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2025-10-02
 
 # check the query status
-occ_download_wait('0011679-241007104925546')
+occ_download_wait('0040123-250920141307145')
 
+# status: running
+# status: succeeded
+# download is done, status: succeeded
 # <<gbif download metadata>>
 #   Status: SUCCEEDED
-#   DOI: 10.15468/dl.9e9fjn
+#   DOI: 10.15468/dl.ndyup5
 #   Format: SIMPLE_CSV
-#   Download key: 0011679-241007104925546
-#   Created: 2024-10-13T11:39:39.902+00:00
-#   Modified: 2024-10-13T11:40:52.882+00:00
-#   Download link: https://api.gbif.org/v1/occurrence/download/request/0011679-241007104925546.zip
-#   Total records: 36264
+#   Download key: 0040123-250920141307145
+#   Created: 2025-10-02T13:59:49.115+00:00
+#   Modified: 2025-10-02T14:01:45.974+00:00
+#   Download link: https://api.gbif.org/v1/occurrence/download/request/0040123-250920141307145.zip
+#   Total records: 40638
 
 # download the data
-data <- occ_download_get('0011679-241007104925546') %>%
+data <- occ_download_get('0040123-250920141307145') %>%
   occ_download_import()
 
 # clean the data
