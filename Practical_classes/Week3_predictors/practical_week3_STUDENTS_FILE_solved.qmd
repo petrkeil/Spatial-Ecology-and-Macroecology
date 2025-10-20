@@ -885,7 +885,7 @@ summary(predictors)
 
 GGally::ggpairs(predictors, cex = 0.1)
 
-trees_grid <- readRDS("Practical_classes/Week3_predictors/data/trees_grid.rds") %>% st_transform(., 4326) %>% st_intersection(france)
+trees_grid <- readRDS("data/trees_grid.rds") %>% st_transform(., 4326) %>% st_intersection(france)
 
 trees_grid <- trees_grid %>% st_intersection(france)
 

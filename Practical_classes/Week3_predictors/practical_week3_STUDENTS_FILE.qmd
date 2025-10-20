@@ -582,6 +582,12 @@ Let's read the data, plot it and see the patterns
 
 amphibians_grid <- readRDS("data/amphibians_grid.rds") %>%
   st_transform(., 4326)
+
+
+ggplot() + 
+  geom_sf(data=amphibians_grid) +
+  coord_sf()
+
 ```
 
 
