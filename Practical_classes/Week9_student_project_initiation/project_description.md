@@ -9,14 +9,14 @@ output:
 
 # Time frame
 
-- 25 November 2024 - every student leaves with an idea about the project topic (species, taxonomic group, response, predictors, grain, extent)
+- Week 1 - every student leaves with an idea about the project topic (species, taxonomic group, response, predictors, grain, extent)
  
-- 2 December 2024 - work on the project
+- Week 2 - work on the project
 
-- 9 December 2024 - work on the project. If all goals have been achieved, 
+- Week 3 - work on the project. If all goals have been achieved, 
 expand the project.
 
-- 16 December 2024 - every student gives a 10 min presentation about the results.
+- Week 4 - every student gives a 10 min presentation about the results.
 
 # Goal
 
@@ -72,6 +72,6 @@ Use the model to map your response into areas for which you have no data.
 
 # Present the results
 
-Prepare a 10 min presentation describing all the steps above. 
+Prepare a 5-10 min presentation describing all the steps above. 
 
 
