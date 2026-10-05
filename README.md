@@ -40,27 +40,7 @@ the oral exam** to give us some time to fix issues.
 **Lectures:** Mon 8:45-10:15, lecture hall D220
 **Practical classes:** Mon 12:15-13:45, computer room Z225. Most practical classes use R. Mild use of either QGIS or ArcGIS can be expected.
 
-
-LECTURES
-Nov 9 works for Mel and Evolution
-Oct 26 works for Elisa
-Elisa would like to do the spatial scaling lecture
-Adam is interested in the drivers of distributions
-Adam away 3-17 November
-
-Lecture 2-3 we will divide to groups, best solution
-
-PRACTICAL
-Flo confirmed the open data
-Petr and Adam will do one of the first classes where they figure out a 
-case of a good class workflow, and all the others are invited
-Mel still good for SDM
-Gabri still good for SDM
-Gabri not good for late November and December
-Adam not there for part of Oct-Nov 
-
 ### Septebmer 28th - state holiday 
-
 
 ### October 5th 
 
@@ -97,9 +77,9 @@ Adam not there for part of Oct-Nov
 
 ### November 9th
 
-- LECTURE. *Petr Keil*. **Biodiversity and spatial scale - where and how much should we count species.** Biodiversity scaling: Species-area relationship, endemics-area relationship, alpha vs. beta vs. gamma diversity. Species accumulation curves, rarefaction, MoB. Grain-dependent drivers of biodiversity.
+- LECTURE. *Melanie Tietje* **Evolution of biodiversity.** Global biodiversity in geological time, mass extinctions, speciation and evolution - from natural selection to emergence of new species. Types of speciation, diversification, radiation, phylogeny. The current global biodiversity, and its partition among plants, animals, bacteria, primary producents, and among realms. 
 
-- PRACTICAL CLASS. *Gabriele, Carmen*. Species Distribution Models II.
+- PRACTICAL CLASS. **TBA**
 
 ### November 16th - independent work
 
@@ -107,43 +87,27 @@ Adam not there for part of Oct-Nov
 
 ### November 23th
 
-- LECTURE. *Melanie Tietje* **Evolution of biodiversity.** Global biodiversity in geological time, mass extinctions, speciation and evolution - from natural selection to emergence of new species. Types of speciation, diversification, radiation, phylogeny. The current global biodiversity, and its partition among plants, animals, bacteria, primary productents, and among realms. 
+- LECTURE. *Petr Keil*. **Biodiversity and spatial scale - where and how much should we count species.** Biodiversity scaling: Species-area relationship, endemics-area relationship, alpha vs. beta vs. gamma diversity. Species accumulation curves, rarefaction, MoB. Grain-dependent drivers of biodiversity.
 
+- PRACTICAL CLASS. **Mini project I**: Choosing a taxon, region, question, and data source. 
 
 ### November 30th 
 
 - LECTURE. *Petr Keil*. **Spatial patterns of biodiversity - where are the places with many species?** Biodiversity patterns: Latitudinal and altitudinal gradients, their ubiquity and most common forms, and exceptions from the pattern. Explanations for the patterns: Rohde's hypothesis, metabolic theory, species-energy, endotherms vs ectotherms, habitat heterogeneity. Historical drivers of diversity. 
 
+- PRACTICAL CLASS. **Mini project II**. Data acquisition and preparation.
 
 ### December 7th 
 
-*Petr Keil*. **Species composition, species associations** Community matrices and similarity matrices as the basis of community analysis. Pairwise similarity metrics, an example (Jaccard index), distance decay of similarity (Tobler's law), partitioning similarity to fractions explained by space vs environment, ordinations and clusters, biological regionalization. Interspecific associations, co-occurrences, inferring assembly rules from co-occurrence patterns.
+- LECTURE. *Petr Keil*. **Species composition, species associations** Community matrices and similarity matrices as the basis of community analysis. Pairwise similarity metrics, an example (Jaccard index), distance decay of similarity (Tobler's law), partitioning similarity to fractions explained by space vs environment, ordinations and clusters, biological regionalization. Interspecific associations, co-occurrences, inferring assembly rules from co-occurrence patterns.
+
+- PRACTICAL CLASS. **Mini project III**. Data analysis.
 
 ### December 14th 
 
-*Petr Keil*. **Temporal change - how does nature change in time during the Anthropocene?** Biodiversity change, species loss, extinction rates, invasions, homogenization, temporal turnover, temporal change of spatial turnover. Spatial scale and biodiversity change, drivers of biodiversity change, anthropocene. Conservation biogeography and applied issues.
+- LECTURE. *Petr Keil*. **Temporal change - how does nature change in time during the Anthropocene?** Biodiversity change, species loss, extinction rates, invasions, homogenization, temporal turnover, temporal change of spatial turnover. Spatial scale and biodiversity change, drivers of biodiversity change, anthropocene. Conservation biogeography and applied issues.
 
-
-
-
-
-
-*Petr*. Simulation models of biodiversity.
-
-*Petr, Flo*. Biodiversity change.
-
-*all*. Mini project I: Choosing a taxon, region, question, and data source. 
-
-*all*. Mini project II. Work on the project with us, data preparation.
-
-*all*. Mini project III. Work on the project with us, analysis.
-
-*all*. Mini project IV: Presentations of results.
-
-
-# Meeting with Adam 24/9/2026
-
-
+- PRACTICAL CLASS. **Mini project IV**. Presentation of results.
 
 ## Literature
 
