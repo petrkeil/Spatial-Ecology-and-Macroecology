@@ -185,7 +185,7 @@ By default, it will only return the first 500 records. To get **all** the record
  
 occ_search(taxonKey = taxon_key,
            country = country_code,
-           limit = 5000) 
+           limit = 9000) 
 ```
 
 Finally, we store the result in the object `mammalsCZ`. We include the option to remove common geospatial issues (e.g., zero coordinates, country coordinate mismatch, invalid coordinate, etc.).  
@@ -197,7 +197,7 @@ Finally, we store the result in the object `mammalsCZ`. We include the option to
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
   country = country_code, # CZ, ISO code of the Czech Republic
-  limit = 5000, # Max number of records to download
+  limit = 9000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 
