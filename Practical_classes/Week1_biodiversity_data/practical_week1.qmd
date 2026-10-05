@@ -1,7 +1,7 @@
 ---
 title: 'Spatial Ecology and Macroecology'
 subtitle: 'Practical - Week 1'
-date: 2025-09-29
+date: 2026-10-05
 author:
   - name: 'Florencia Grattarola'
     id: fg
@@ -20,8 +20,8 @@ format:
     enter-title-slide: false
     theme: [assets/monash.scss]
     controls: true
-    width: 1280
-    height: 720
+    # width: 1280
+    # height: 720
     css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
     highlight-style: github
     echo: true
@@ -608,7 +608,7 @@ Get a taxon ID for the *Mammalia* class.
 
 taxon_key <- get_gbifid_(taxon) %>%
   bind_rows() %>% # Transform the result of get_gbifid into a dataframe
-  filter(matchtype == "HIGHERRANK" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
+  filter(matchtype == "EXACT" & status == "ACCEPTED") %>% # Filter the dataframe by the columns "matchtype" and "status"
   pull(usagekey) # Pull the contents of the column "usagekey"
 
 taxon_key
@@ -624,7 +624,7 @@ Basemap of CZ to use later for plotting or checking the dataset.
 #| echo: TRUE
 
 base_map <- rnaturalearth::ne_countries(
-  scale = 110,
+  scale = 10,
   type = 'countries',
   country = 'Czechia',
   returnclass = 'sf'
@@ -804,7 +804,7 @@ To get **all** the records, we need to specify a larger limit. Since we have ove
  
 occ_search(taxonKey = taxon_key,
            country = country_code,
-            limit = 16000) 
+            limit = 9000) 
 ```
 
 ------------------------------------------------------------------------
@@ -820,7 +820,7 @@ Finally, we store the result in the object `mammalsCZ`. We include the option to
 mammalsCZ <- occ_search(
   taxonKey = taxon_key, # Key 359 created previously
   country = country_code, # CZ, ISO code of the Czech Republic
-  limit = 16000, # Max number of records to download
+  limit = 9000, # Max number of records to download
   hasGeospatialIssue = F # Only records without spatial issues
 )
 

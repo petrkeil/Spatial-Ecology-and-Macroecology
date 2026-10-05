@@ -114,7 +114,7 @@ Let's get the taxon ID for the *Mammalia* class
  
 taxon_key <- taxize::get_gbifid_(taxon) %>%
   bind_rows() %>% # Transform the result of get_gbifid into a dataframe
-  filter(matchtype == 'EXACT' & status == 'HIGHERRANK') %>% # Filter the dataframe by the columns 'matchtype' and 'status'
+  filter(matchtype == 'EXACT' & status == 'ACCEPTED') %>% # Filter the dataframe by the columns 'matchtype' and 'status'
   pull(usagekey) # Pull the contents of the column 'usagekey'
 ```
 
@@ -129,7 +129,7 @@ It is often useful to have a base map of the study area (in this case the whole 
 #| message: false
  
 base_map <- rnaturalearth::ne_countries(
-  scale = 110,
+  scale = 10,
   type = 'countries',
   country = 'Czechia',
   returnclass = 'sf'
