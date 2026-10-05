@@ -20,8 +20,8 @@ format:
     enter-title-slide: false
     theme: [assets/monash.scss]
     controls: true
-    # width: 1280
-    # height: 720
+    width: 1280
+    height: 720
     css: [assets/syntax-highlight.css, assets/custom.css, assets/pacman.css]
     highlight-style: github
     echo: true
@@ -445,6 +445,12 @@ Then answer the following 3 questions:
 -   How **accessible** is the data? Can anyone download it? Restrictions?
 -   What was your **experience**? What **issues** did you encounter while getting the data?
 :::
+
+```{r}
+#| echo: false
+library(countdown)
+countdown(minutes = 5, seconds = 0)
+```
 
 ::: aside
 Should take around **5 minutes** :)\
