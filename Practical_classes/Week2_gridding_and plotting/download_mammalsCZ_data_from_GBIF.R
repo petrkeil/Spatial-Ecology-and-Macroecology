@@ -11,14 +11,14 @@ taxa <- 'Mammalia'
 country_code <- 'CZ' 
 taxon_key <- get_gbifid_(taxa) %>% # get a taxon_id for mammals
   bind_rows() %>% 
-  filter(matchtype == 'HIGHERRANK' & status == 'ACCEPTED') %>% 
+  filter(matchtype == 'EXACT' & status == 'ACCEPTED') %>% 
   pull(usagekey)
 
 # set up your credentials (you will need a GBIF user)
 
-GBIF_USER <- '' # your gbif.org username 
-GBIF_PWD <- '' # your gbif.org password
-GBIF_EMAIL <- '' # your email 
+GBIF_USER <- 'florencia_grattarola' # your gbif.org username 
+GBIF_PWD <- 'naFvez-modjir-dovpu1' # your gbif.org password
+GBIF_EMAIL <- 'flograttarola@gmail.com' # your email 
 
 # generate a download
 occ_download(
@@ -33,29 +33,29 @@ occ_download(
 
 # <<gbif download>>
 #   Your download is being processed by GBIF:
-#   https://www.gbif.org/occurrence/download/0040070-250920141307145
+#   https://www.gbif.org/occurrence/download/0010836-260928105237408
 #   Most downloads finish within 15 min.
 #   Check status with
-#   occ_download_wait('0040070-250920141307145')
+#   occ_download_wait('0010836-260928105237408')
 #   After it finishes, use
-#   d <- occ_download_get('0040070-250920141307145') %>%
+#   d <- occ_download_get('0010836-260928105237408') %>%
 #     occ_download_import()
 #   to retrieve your download.
 # Download Info:
 #   Username: # your gbif.org username 
 #   E-mail: # your gbif.org email 
 #   Format: SIMPLE_CSV
-#   Download key: 0040070-250920141307145
-#   Created: 2025-10-02T13:42:01.349+00:00
+#   Download key: 0010836-260928105237408
+#   Created: 2026-10-05T08:18:43.682+00:00
 # Citation Info:  
 #   Please always cite the download DOI when using this data.
 #   https://www.gbif.org/citation-guidelines
-#   DOI: 
+# DOI: 
 #   Citation:
-#   GBIF Occurrence Download https://www.gbif.org/occurrence/download/0040070-250920141307145 Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2025-10-02
+#   GBIF Occurrence Download https://www.gbif.org/occurrence/download/0010836-260928105237408 Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2026-10-05
 
-# check the query status # USE THE NUMBER OF YOUR DOWNLOAD HERE
-occ_download_wait('0040070-250920141307145') 
+# check the query status 
+occ_download_wait('0010836-260928105237408') # USE THE NUMBER OF YOUR DOWNLOAD HERE (Download key)
 
 # status: preparing
 # status: running
@@ -63,20 +63,20 @@ occ_download_wait('0040070-250920141307145')
 # download is done, status: succeeded
 # <<gbif download metadata>>
 #   Status: SUCCEEDED
-#   DOI: 10.15468/dl.uwa52s
+#   DOI: 10.15468/dl.zvnbsq
 #   Format: SIMPLE_CSV
-#   Download key: 0040070-250920141307145
-#   Created: 2025-10-02T13:42:01.349+00:00
-#   Modified: 2025-10-02T13:46:06.180+00:00
-#   Download link: https://api.gbif.org/v1/occurrence/download/request/0040070-250920141307145.zip
-# Total records: 14907
+#   Download key: 0010836-260928105237408
+#   Created: 2026-10-05T08:18:43.682+00:00
+#   Modified: 2026-10-05T08:20:36.577+00:00
+#   Download link: https://api.gbif.org/v1/occurrence/download/request/0010836-260928105237408.zip
+#   Total records: 18532
 
-# download the data # USE THE NUMBER OF YOUR DOWNLOAD HERE
-data <- occ_download_get('0040070-250920141307145') %>% 
+# download the data 
+data <- occ_download_get('0010836-260928105237408') %>% # USE THE NUMBER OF YOUR DOWNLOAD HERE
   occ_download_import()
 
-# Download file size: 1.04 MB
-# On disk at ./0040070-250920141307145.zip
+# Download file size: 1.32 MB
+# On disk at ./0010836-260928105237408.zip
 
 # clean the data
 data_clean <- data %>% 

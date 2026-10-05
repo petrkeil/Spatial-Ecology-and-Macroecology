@@ -2,11 +2,7 @@
 title: "How to plot biodiversity data, explore patterns at different resolutions, and make pretty map"
 author:
   - name: 'Florencia Grattarola'
-    orcid: 0000-0001-8282-5732
-  - name: 'Friederike Wölke'
-    orcid: 0000-0001-9034-4883
-  - name: 'Gabriel Ortega'
-    orcid: 0000-0002-0516-5694
+  - name: 'Adam Uličný'
 format: 
   html:
     toc: true
@@ -63,16 +59,6 @@ We will also use `patchwork` to combine plots.
 pacman::p_load(patchwork)
 pacman::p_load(tidyverse) # load
 ```
-
-# Project variables
-
-It is advisable to have a section of project/work variables in your scripts. That way it will be easy to reuse your scripts in other tasks.
-
-```{r}
-# your variables
-
-```
-
 
 # Exercises
 
