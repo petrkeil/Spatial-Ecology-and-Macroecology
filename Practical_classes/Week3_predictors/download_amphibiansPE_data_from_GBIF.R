@@ -32,46 +32,47 @@ occ_download(
 )
 
 # <<gbif download>>
-# Your download is being processed by GBIF:
-#   https://www.gbif.org/occurrence/download/0040123-250920141307145
+#   Your download is being processed by GBIF:
+#   https://www.gbif.org/occurrence/download/0034184-260928105237408
 #   Most downloads finish within 15 min.
 #   Check status with
-#   occ_download_wait('0040123-250920141307145')
+#   occ_download_wait('0034184-260928105237408')
 #   After it finishes, use
-#   d <- occ_download_get('0040123-250920141307145') %>%
+#   d <- occ_download_get('0034184-260928105237408') %>%
 #     occ_download_import()
 #   to retrieve your download.
 # Download Info:
 #   Username: florencia_grattarola
 #   E-mail: flograttarola@gmail.com
 #   Format: SIMPLE_CSV
-#   Download key: 0040123-250920141307145
-#   Created: 2025-10-02T13:59:49.115+00:00
+#   Download key: 0034184-260928105237408
+#   Created: 2026-10-19T08:45:57.496+00:00
 # Citation Info:  
 #   Please always cite the download DOI when using this data.
 #   https://www.gbif.org/citation-guidelines
 #   DOI: 
 #   Citation:
-#   GBIF Occurrence Download https://www.gbif.org/occurrence/download/0040123-250920141307145 Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2025-10-02
+#   GBIF Occurrence Download https://www.gbif.org/occurrence/download/0034184-260928105237408 Accessed from R via rgbif (https://github.com/ropensci/rgbif) on 2026-10-19
 
 # check the query status
-occ_download_wait('0040123-250920141307145')
+occ_download_wait('0034184-260928105237408')
 
+# status: preparing
 # status: running
 # status: succeeded
 # download is done, status: succeeded
 # <<gbif download metadata>>
 #   Status: SUCCEEDED
-#   DOI: 10.15468/dl.ndyup5
+#   DOI: 10.15468/dl.wgvx9j
 #   Format: SIMPLE_CSV
-#   Download key: 0040123-250920141307145
-#   Created: 2025-10-02T13:59:49.115+00:00
-#   Modified: 2025-10-02T14:01:45.974+00:00
-#   Download link: https://api.gbif.org/v1/occurrence/download/request/0040123-250920141307145.zip
-#   Total records: 40638
+#   Download key: 0034184-260928105237408
+#   Created: 2026-10-19T08:45:57.496+00:00
+#   Modified: 2026-10-19T08:58:39.388+00:00
+#   Download link: https://api.gbif.org/v1/occurrence/download/request/0034184-260928105237408.zip
+#   Total records: 44252
 
 # download the data
-data <- occ_download_get('0040123-250920141307145') %>%
+data <- occ_download_get('0034184-260928105237408') %>%
   occ_download_import()
 
 # clean the data
