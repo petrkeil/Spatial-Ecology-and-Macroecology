@@ -3,7 +3,10 @@ title: "Drivers of species distribution"
 author:
   - name: 'Florencia Grattarola'
     orcid: 0000-0001-8282-5732
-  - name: 'Elisa Padulosi'
+  - name: 'Friederike Wölke'
+    orcid: 0000-0001-9034-4883
+  - name: 'Gabriel Ortega'
+    orcid: 0000-0002-0516-5694
 format: 
   html:
     toc: true
@@ -40,6 +43,9 @@ Please download the following file and store it on you `data` folder:
 #| code-block-border-left: true
 
 library(pacman)
+library(remotes)
+install_github("ropensci/MODIStsp")
+
 pacman::p_load(sf,  # Manage spatial data as simple features dataframes
                rnaturalearth, # useful base maps
                tidyverse) # install the package if you haven't already
@@ -51,6 +57,7 @@ pacman::p_load(terra, # Work with rasters and vectorial spatial data
                GGally, # Cool correlation maps
                geodata, # Get data from multiple sources
                MODIStsp) # Get data from MODIS
+
 ```
 
 ### 1.    Get a map of Peru
@@ -443,8 +450,7 @@ tm_shape(elev) +
   tm_raster(palette = "BrBG", 
             midpoint = NA, 
             style = "cont", n = 10) +
-  tm_view(bbox = extent) +
-  tm_layout(legend.position = 'left')
+  tm_view(bbox = extent) 
 ```
 
 #### Land-cover (MODIS Terra MCD12Q1)
@@ -505,8 +511,7 @@ You might not have the same classes/levels at different areas. Check here the cl
 tm_shape(land) +
   tm_raster(palette = "Set1", 
             style = "cat") +
-  tm_view(bbox = extent) +
-  tm_layout(legend.position = 'left')
+  tm_view(bbox = extent) 
 ```
 
 #### Human footprint index (SEDAC)
@@ -540,7 +545,7 @@ Let's see all the values together.
 
 predictors <- tibble(
   "tavg" = values(tavg$PER_wc2.1_30s_tavg_1) %>% as.vector(),
-  "prec" = values(prec$PER_wc2.1_30s_prec_1) %>% as.vector(),
+  "prec" = values(prec$wc2.1_30s_bio_12) %>% as.vector(),
   "elev" = values(elev) %>% as.vector(),
   "land" = values(land) %>% as.vector(),
   "footp" = values(footp) %>% as.vector()
