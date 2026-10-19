@@ -3,10 +3,7 @@ title: "Drivers of species distribution"
 author:
   - name: 'Florencia Grattarola'
     orcid: 0000-0001-8282-5732
-  - name: 'Friederike Wölke'
-    orcid: 0000-0001-9034-4883
-  - name: 'Gabriel Ortega'
-    orcid: 0000-0002-0516-5694
+  - name: 'Elisa Padulosi'
 format: 
   html:
     toc: true
